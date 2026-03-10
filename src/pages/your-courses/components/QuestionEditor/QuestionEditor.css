@@ -1,0 +1,212 @@
+.question-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+  padding: var(--space-ml);
+  background: var(--cards-background);
+  border: 2px solid var(--primary-600);
+  border-radius: var(--radius-sm);
+}
+
+.question-editor--new {
+  border-style: dashed;
+}
+
+/* Field */
+.question-editor-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.question-editor-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.question-editor-textarea {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: var(--space-sm);
+  resize: vertical;
+  min-height: 60px;
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.question-editor-textarea:hover {
+  border-color: var(--border-hover);
+}
+
+.question-editor-textarea:focus {
+  border-color: var(--secondary-500);
+}
+
+.question-editor-textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+.question-editor-select {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: var(--space-s) var(--space-sm);
+  background: var(--cards-background);
+  outline: none;
+  width: 200px;
+  cursor: pointer;
+  transition: border-color 150ms ease;
+}
+
+.question-editor-select:hover {
+  border-color: var(--border-hover);
+}
+
+.question-editor-select:focus {
+  border-color: var(--secondary-500);
+}
+
+/* Answer rows */
+.question-editor-answers {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  overflow: hidden;
+}
+
+.question-editor-answer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-m);
+  border-bottom: 1px solid var(--border);
+}
+
+.question-editor-answer:last-child {
+  border-bottom: none;
+}
+
+.question-editor-radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: border-color 150ms ease;
+  padding: 0;
+}
+
+.question-editor-radio--selected {
+  border-color: var(--success-500);
+  background: transparent;
+}
+
+.question-editor-answer-input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  border: none;
+  background: transparent;
+  outline: none;
+}
+
+.question-editor-answer-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.question-editor-answer-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity 150ms ease;
+}
+
+.question-editor-answer-remove:hover {
+  opacity: 1;
+}
+
+.question-editor-answer-remove:hover svg {
+  color: var(--danger-500) !important;
+}
+
+/* Add answer */
+.question-editor-add-answer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-s) 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary-600);
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+.question-editor-add-answer:hover {
+  opacity: 0.8;
+}
+
+/* Errors */
+.question-editor-errors {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.question-editor-error {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--danger-500);
+}
+
+/* Actions */
+.question-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+
+.question-editor-cancel {
+  padding: var(--space-s) var(--space-m);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: var(--radius-s);
+  transition: background 150ms ease;
+}
+
+.question-editor-cancel:hover {
+  background: var(--neutral-50);
+}
+
+.question-editor-save {
+  padding: var(--space-s) var(--space-ml);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--neutral-0);
+  background: var(--primary-600);
+  border-radius: var(--radius-s);
+  transition: background 150ms ease;
+}
+
+.question-editor-save:hover {
+  background: var(--primary-700);
+}

@@ -1,0 +1,211 @@
+.your-courses-layout {
+  display: flex;
+  flex: 1;
+}
+
+.your-courses-main {
+  flex: 1;
+  padding: var(--space-xl);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+}
+
+.your-courses-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.your-courses-headline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+}
+
+.your-courses-title {
+  flex: 1;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.your-courses-tabs {
+  display: flex;
+  gap: 24px;
+}
+
+.your-courses-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.your-courses-tab::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: transparent;
+  border-radius: var(--radius-xs);
+}
+
+.your-courses-tab:hover {
+  color: var(--text-primary);
+}
+
+.your-courses-tab--active {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.your-courses-tab--active::after {
+  background: var(--secondary-500);
+}
+
+/* Folders grid */
+.your-courses-folders {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xl);
+}
+
+/* New Folder card */
+.your-courses-new-folder {
+  width: 308px;
+  height: 272px;
+  border: none;
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  text-align: center;
+  transition: background 150ms ease;
+  position: relative;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect x='0.75' y='0.75' width='calc(100%25 - 1.5px)' height='calc(100%25 - 1.5px)' rx='12' ry='12' fill='none' stroke='%239EA4B3' stroke-width='1.5' stroke-dasharray='4 4'/%3E%3C/svg%3E");
+}
+
+.your-courses-new-folder:hover {
+  background-color: var(--cards-background-hover);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect x='0.75' y='0.75' width='calc(100%25 - 1.5px)' height='calc(100%25 - 1.5px)' rx='12' ry='12' fill='none' stroke='%23454C5E' stroke-width='1.5' stroke-dasharray='4 4'/%3E%3C/svg%3E");
+}
+
+.your-courses-new-folder-icon {
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.your-courses-new-folder-label {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Course folder card */
+.your-courses-folder-card {
+  width: 308px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+  align-items: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.your-courses-folder-thumb {
+  width: 308px;
+  height: 272px;
+  background: var(--cards-background);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-l);
+  position: relative;
+  transition: box-shadow 150ms ease;
+}
+
+.your-courses-folder-card:hover .your-courses-folder-thumb {
+  box-shadow: var(--shadow-s);
+}
+
+.your-courses-folder-thumbs {
+  width: 240px;
+  height: 164px;
+  position: relative;
+}
+
+.your-courses-folder-img-back {
+  position: absolute;
+  width: 208px;
+  height: 118px;
+  left: 50%;
+  top: calc(50% - 23px);
+  transform: translate(-50%, -50%);
+  background: var(--cards-background-hover);
+  border-radius: var(--radius-s);
+}
+
+.your-courses-folder-img-mid {
+  position: absolute;
+  width: 224px;
+  height: 132px;
+  left: 50%;
+  top: calc(50% - 4px);
+  transform: translate(-50%, -50%);
+  background: var(--neutral-100);
+  border-radius: var(--radius-s);
+}
+
+.your-courses-folder-img-front {
+  position: absolute;
+  width: 240px;
+  height: 148px;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  border-radius: var(--radius-s);
+  overflow: hidden;
+}
+
+.your-courses-folder-img-front img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.your-courses-folder-info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  line-height: 1.5;
+}
+
+.your-courses-folder-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.your-courses-folder-count {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}

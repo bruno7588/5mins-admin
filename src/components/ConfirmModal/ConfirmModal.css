@@ -1,0 +1,44 @@
+/* ConfirmModal — shared centered modal shell */
+
+.confirm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(15, 16, 20, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: confirm-overlay-in 200ms ease;
+}
+
+.confirm-modal {
+  width: 560px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  background: var(--neutral-0);
+  border-radius: var(--radius-sm);
+  padding: var(--space-l);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-ml);
+  box-shadow: -4px 0px 24px 0px rgba(32, 34, 42, 0.12);
+  animation: confirm-pop-in 250ms ease;
+}
+
+@keyframes confirm-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes confirm-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

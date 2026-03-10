@@ -1,0 +1,16 @@
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 8px;
+  border-radius: var(--radius-xxl, 40px);
+  cursor: pointer;
+  transition: background 150ms ease;
+  flex-shrink: 0;
+}
+
+.checkbox:hover {
+  background: var(--page-background-hover, rgba(45, 49, 61, 0.08));
+}

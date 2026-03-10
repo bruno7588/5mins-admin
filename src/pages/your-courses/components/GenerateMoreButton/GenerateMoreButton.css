@@ -1,0 +1,49 @@
+.generate-more-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: 10px var(--space-ml);
+  background: unset;
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;
+  white-space: nowrap;
+  transition: background 150ms ease;
+}
+
+/* Gradient border via pseudo-element */
+.generate-more-btn::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 8px;
+  padding: 1px;
+  background: linear-gradient(135deg, #00CEE6 0%, #9B55C9 25%, #00CEE6 68.5%, #8158EC 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Gradient text */
+.generate-more-text {
+  background: linear-gradient(135deg, #008393 0%, #8158EC 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: all 150ms ease;
+}
+
+/* Hover: subtle gradient fill at 16% opacity */
+.generate-more-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(0, 206, 230, 0.16) 0%, rgba(129, 88, 236, 0.16) 100%);
+  cursor: pointer;
+}
+
+.generate-more-btn--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

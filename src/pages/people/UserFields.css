@@ -1,0 +1,229 @@
+.user-fields-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+  padding: var(--space-ml) var(--space-l);
+}
+
+/* Page Header */
+.user-fields-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xl);
+}
+
+.user-fields-header-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.user-fields-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.user-fields-subtitle {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.user-fields-learn-more {
+  color: var(--text-secondary);
+  text-decoration: underline;
+}
+
+
+.user-fields-divider {
+  height: 1px;
+  background: var(--border);
+  border-radius: var(--radius-x);
+}
+
+/* Empty State */
+.user-fields-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-ml);
+  padding: 24px;
+  border-radius: 20px;
+}
+
+.user-fields-empty-icon {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-fields-empty-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-s);
+  text-align: center;
+}
+
+.user-fields-empty-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.user-fields-empty-desc {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 600px;
+}
+
+/* ═══ User Fields Table ═══ */
+.uf-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.uf-table-header {
+  display: flex;
+  align-items: center;
+}
+
+.uf-table-header .uf-table-cell {
+  padding-top: 0;
+  padding-bottom: 4px;
+}
+
+.uf-table-row {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: background 150ms ease;
+}
+
+.uf-table-row:hover {
+  background: var(--cards-background-hover);
+}
+
+/* Cells */
+.uf-table-cell {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.uf-table-cell--name {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.uf-table-cell--required {
+  width: 96px;
+}
+
+.uf-table-cell--action {
+  width: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Badges */
+.uf-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.uf-badge--yes {
+  background: rgba(24, 169, 87, 0.16);
+  color: var(--text-success);
+}
+
+.uf-badge--no {
+  background: var(--input-background);
+  color: var(--text-secondary);
+}
+
+/* Icon buttons */
+.uf-table-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.uf-table-icon-btn:hover {
+  background: var(--neutral-50);
+}
+
+.uf-table-icon-btn--danger {
+  color: var(--text-secondary);
+}
+
+.uf-table-icon-btn--danger:hover {
+  color: var(--danger-400);
+}
+
+/* Tooltip on icon buttons */
+.uf-table-icon-btn--tooltip {
+  position: relative;
+}
+
+.uf-table-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  background: var(--neutral-800);
+  color: var(--neutral-25);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  border-radius: var(--radius-s);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.uf-table-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--neutral-800);
+}
+
+.uf-table-icon-btn--tooltip:hover .uf-table-tooltip {
+  opacity: 1;
+}
+

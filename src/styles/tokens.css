@@ -1,0 +1,140 @@
+:root {
+  /* Primary (Cyan Brand) */
+  --primary-100: #CCF8FD;
+  --primary-500: #00CEE6;
+  --primary-600: #00AFC4;
+  --primary-700: #008393;
+  --primary-800: #005862;
+
+  /* Secondary (Yellow) */
+  --secondary-500: #FFBB38;
+  --secondary-600: #E6A830;
+  --secondary-700: #CC9528;
+
+  /* Success (Green) */
+  --success-100: #E8F6EE;
+  --success-500: #18A957;
+  --success-600: #148A46;
+
+  /* Warning (Orange) */
+  --warning-100: #FFEDD7;
+  --warning-500: #FFA538;
+  --text-warning: #E88206;
+
+  /* Danger (Red) */
+  --danger-100: #FCE8EC;
+  --danger-400: #e95c7b;
+  --danger-500: #DF1642;
+  --danger-600: #B8123A;
+
+  /* Neutral (Grays) */
+  --neutral-0: #FFFFFF;
+  --neutral-25: #F9F9FA;
+  --neutral-50: #EFF0F2;
+  --neutral-100: #DFE1E6;
+  --neutral-200: #BFC2CC;
+  --neutral-300: #9EA4B3;
+  --neutral-400: #656B7C;
+  --neutral-500: #454C5E;
+  --neutral-600: #353945;
+  --neutral-700: #2D313D;
+  --neutral-800: #20222A;
+  --neutral-900: #0F1014;
+
+  /* Gamification */
+  --blaze-quiz: #8158EC;
+  --flash-poll: #9B55C9;
+  --lesson-quiz: #FA715F;
+  --certificate-quiz: #6368DB;
+  --case-study-quiz: #2A90D8;
+
+  /* Semantic aliases */
+  --page-background: var(--neutral-25);
+  --cards-background: var(--neutral-0);
+  --cards-background-hover: var(--neutral-50);
+  --input-background: rgba(191, 194, 204, 0.16);
+  --input-background-hover: rgba(223, 225, 230, 1);
+  --border: var(--neutral-100);
+  --border-hover: var(--neutral-300);
+  --text-primary: var(--neutral-800);
+  --text-secondary: var(--neutral-500);
+  --text-tertiary: var(--neutral-400);
+  --text-disabled: var(--neutral-300);
+  --text-success: #18A957;
+  --button-background: var(--primary-600);
+  --button-background-hover: var(--primary-700);
+  --button-background-active: var(--primary-800);
+  --button-background-disabled: var(--neutral-100);
+  --text-button-disabled: var(--neutral-300);
+
+  /* Spacing (4px base) */
+  --space-xs: 0.25rem;   /* 4px */
+  --space-s: 0.5rem;     /* 8px */
+  --space-sm: 0.75rem;   /* 12px */
+  --space-m: 1rem;       /* 16px */
+  --space-ml: 1.25rem;   /* 20px */
+  --space-l: 1.5rem;     /* 24px */
+  --space-xl: 2rem;      /* 32px */
+  --space-xxl: 2.5rem;   /* 40px */
+
+  /* Border Radius */
+  --radius-xs: 0.25rem;  /* 4px */
+  --radius-s: 0.5rem;    /* 8px */
+  --radius-sm: 0.75rem;  /* 12px */
+  --radius-m: 1rem;      /* 16px */
+  --radius-ml: 1.25rem;  /* 20px */
+  --radius-full: 9999px;
+
+  /* Icon Sizes */
+  --icon-size-sm: 16px;
+  --icon-size-md: 20px;
+  --icon-size-lg: 24px;
+  --icon-size-xl: 32px;
+
+  /* Shadows */
+  --shadow-s: -1px -1px 4px rgba(32, 34, 42, 0.06), 1px 1px 4px rgba(32, 34, 42, 0.06);
+  --shadow-panel: -24px 0px 24px 0px rgba(32, 34, 42, 0.04);
+}
+
+/* Reusable button */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 10px var(--space-ml);
+  border-radius: var(--radius-s);
+  background: var(--primary-600);
+  color: var(--neutral-25);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+  transition: background 150ms ease;
+}
+
+.btn-primary:hover {
+  background: var(--primary-700);
+}
+
+.btn-outlined {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 10px var(--space-ml);
+  border-radius: var(--radius-s);
+  background: transparent;
+  border: 1px solid var(--primary-600);
+  color: var(--primary-600);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 150ms ease;
+}
+
+.btn-outlined:hover {
+  background: rgba(0, 206, 230, 0.08);
+}

@@ -1,0 +1,425 @@
+/* Overlay — same pattern as QuestionDrawer */
+.ai-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 16, 20, 0.5);
+  z-index: 200;
+  animation: drawer-overlay-in 200ms ease;
+}
+
+/* Panel */
+.ai-drawer-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 500px;
+  max-width: 100vw;
+  background: var(--page-background);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-panel);
+  animation: drawer-slide-in 250ms ease;
+}
+
+/* Header */
+.ai-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-l);
+  padding-bottom: var(--space-m);
+}
+
+.ai-drawer-title {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.ai-drawer-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  transition: background 150ms ease;
+}
+
+.ai-drawer-close:hover {
+  background: var(--neutral-50);
+}
+
+.ai-drawer-divider {
+  height: 1px;
+  background: var(--border);
+}
+
+/* Body (scrollable) */
+.ai-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+}
+
+/* ──────────────────────────────────────────
+   Stepper (generating phase)
+   ────────────────────────────────────────── */
+
+.ai-drawer-stepper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+  padding-top: var(--space-l);
+}
+
+.ai-drawer-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.ai-drawer-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+  transition: color 300ms ease;
+}
+
+.ai-drawer-step--done {
+  color: var(--text-primary);
+}
+
+.ai-drawer-step--active {
+  color: var(--text-primary);
+}
+
+.ai-drawer-step-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.ai-drawer-step-icon--pending {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  margin: 2px;
+}
+
+/* Sparkle pulse animation for active step */
+.ai-drawer-step--active .ai-drawer-step-icon {
+  animation: sparkle-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes sparkle-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Progress bar */
+.ai-drawer-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.ai-drawer-progress-track {
+  height: 6px;
+  background: var(--neutral-100);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ai-drawer-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00CEE6, #8158EC);
+  border-radius: 3px;
+  transition: width 300ms ease;
+}
+
+.ai-drawer-progress-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+/* ──────────────────────────────────────────
+   Review phase
+   ────────────────────────────────────────── */
+
+.ai-drawer-review-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.ai-drawer-review-counter {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+/* Reuse question-drawer field styling */
+.ai-drawer-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.ai-drawer-label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.ai-drawer-label--regular {
+  font-weight: 400;
+}
+
+.ai-drawer-textarea {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-m);
+  resize: vertical;
+  min-height: 60px;
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.ai-drawer-textarea:hover {
+  border-color: var(--border-hover);
+}
+
+.ai-drawer-textarea:focus {
+  border-color: var(--secondary-500);
+}
+
+.ai-drawer-textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Answer cards */
+.ai-drawer-answers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.ai-drawer-answer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.ai-drawer-answer--correct {
+  border-color: var(--border);
+  background: var(--neutral-0);
+}
+
+.ai-drawer-radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ai-drawer-answer-input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  border: none;
+  background: transparent;
+  outline: none;
+  min-width: 0;
+}
+
+.ai-drawer-answer-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.ai-drawer-correct-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-s) var(--space-m);
+  border-radius: 40px;
+  background: rgba(24, 169, 87, 0.16);
+  color: var(--success-500);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ai-drawer-answer-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 3.5px;
+  color: var(--text-tertiary);
+  transition: color 150ms ease;
+}
+
+.ai-drawer-answer-remove:hover {
+  color: var(--text-primary);
+}
+
+/* Add option */
+.ai-drawer-add-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  transition: background 150ms ease;
+}
+
+.ai-drawer-add-option:hover {
+  background: var(--neutral-50);
+}
+
+/* Explanation */
+.ai-drawer-explanation {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-s);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-s) var(--space-sm);
+  transition: border-color 150ms ease;
+}
+
+.ai-drawer-explanation:hover {
+  border-color: var(--border-hover);
+}
+
+.ai-drawer-explanation:focus-within {
+  border-color: var(--secondary-500);
+}
+
+.ai-drawer-explanation-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.ai-drawer-explanation-input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  border: none;
+  background: transparent;
+  outline: none;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.ai-drawer-explanation-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* ──────────────────────────────────────────
+   Footer
+   ────────────────────────────────────────── */
+
+.ai-drawer-footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+  padding: var(--space-m) var(--space-l);
+}
+
+.ai-drawer-footer::before {
+  content: '';
+  display: block;
+  height: 1px;
+  background: var(--border);
+  margin: 0 calc(-1 * var(--space-l));
+  margin-top: calc(-1 * var(--space-m));
+}
+
+.ai-drawer-footer-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.ai-drawer-btn-discard {
+  padding: 10px var(--space-ml);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  transition: background 150ms ease;
+}
+
+.ai-drawer-btn-discard:hover {
+  background: var(--neutral-50);
+}
+
+.ai-drawer-btn-save {
+  padding: 10px var(--space-ml);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--neutral-800);
+  background: var(--primary-500);
+  border-radius: var(--radius-s);
+  transition: background 150ms ease;
+}
+
+.ai-drawer-btn-save:hover {
+  background: var(--primary-600);
+}
+

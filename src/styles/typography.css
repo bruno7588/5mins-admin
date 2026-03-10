@@ -1,0 +1,23 @@
+/* Headings — Poppins Bold 700 */
+h1, .h1 { font-size: 32px; font-weight: 700; line-height: 1.5; color: var(--text-primary); }
+h2, .h2 { font-size: 24px; font-weight: 700; line-height: 1.5; color: var(--text-primary); }
+h3, .h3 { font-size: 20px; font-weight: 700; line-height: 1.5; color: var(--text-primary); }
+h4, .h4 { font-size: 16px; font-weight: 700; line-height: 1.5; color: var(--text-primary); }
+h5, .h5 { font-size: 14px; font-weight: 700; line-height: 1.5; color: var(--text-primary); }
+h6, .h6 { font-size: 12px; font-weight: 700; line-height: 1.5; color: var(--text-primary); }
+
+/* Paragraph sizes */
+.text-lg { font-size: 16px; font-weight: 400; line-height: 1.5; }
+.text-md { font-size: 14px; font-weight: 400; line-height: 1.5; }
+.text-sm { font-size: 12px; font-weight: 400; line-height: 1.5; }
+
+/* Text colors */
+.text-primary   { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary  { color: var(--text-tertiary); }
+.text-disabled  { color: var(--text-disabled); }
+
+/* Font weights */
+.font-regular { font-weight: 400; }
+.font-medium  { font-weight: 500; }
+.font-bold    { font-weight: 700; }

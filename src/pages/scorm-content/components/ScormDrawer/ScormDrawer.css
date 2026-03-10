@@ -1,0 +1,222 @@
+/* Overlay */
+.scorm-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(15, 16, 20, 0.4);
+  animation: scorm-overlay-fade 250ms ease;
+}
+
+@keyframes scorm-overlay-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.scorm-drawer-overlay--closing {
+  animation: scorm-overlay-fade-out 300ms ease forwards;
+}
+
+@keyframes scorm-overlay-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Drawer panel */
+.scorm-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 720px;
+  max-width: 100%;
+  background: var(--page-background);
+  border-left: 1px solid var(--border);
+  padding: var(--space-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+  overflow-y: auto;
+  animation: scorm-drawer-slide 300ms ease;
+}
+
+@keyframes scorm-drawer-slide {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.scorm-drawer--closing {
+  animation: scorm-drawer-slide-out 300ms ease forwards;
+}
+
+@keyframes scorm-drawer-slide-out {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+
+/* Close button */
+.scorm-drawer-close {
+  position: absolute;
+  top: var(--space-m);
+  right: var(--space-m);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: var(--radius-xs);
+}
+
+.scorm-drawer-close:hover {
+  background: var(--neutral-50);
+}
+
+/* Header */
+.scorm-drawer-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  padding-right: 40px;
+}
+
+.scorm-drawer-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.scorm-drawer-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.scorm-drawer-upload-link {
+  color: var(--primary-600);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.scorm-drawer-upload-link:hover {
+  text-decoration: underline;
+}
+
+/* Search */
+.scorm-drawer-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background-color: rgba(191, 194, 204, 0.16);
+}
+
+.scorm-drawer-search input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.scorm-drawer-search input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Table */
+.scorm-drawer-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.scorm-drawer-table th {
+  text-align: left;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  padding: var(--space-sm) var(--space-m);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.scorm-drawer-table td {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  padding: var(--space-sm) var(--space-m);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.scorm-drawer-table tbody tr {
+  transition: background 150ms ease;
+}
+
+.scorm-drawer-table tbody tr:hover {
+  background: var(--neutral-50);
+}
+
+/* File name cell */
+.scorm-drawer-file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.scorm-drawer-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-s);
+  flex-shrink: 0;
+}
+
+.scorm-drawer-filename {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+/* Type */
+.scorm-drawer-type {
+  color: var(--text-secondary);
+}
+
+/* Action buttons */
+.scorm-drawer-btn {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  white-space: nowrap;
+  min-width: 90px;
+  text-align: center;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+/* Filled "Add" */
+.scorm-drawer-btn--add {
+  color: var(--neutral-0);
+  background: var(--primary-600);
+  border: 1px solid var(--primary-600);
+}
+
+.scorm-drawer-btn--add:hover {
+  background: var(--primary-700);
+  border-color: var(--primary-700);
+}
+
+/* Outlined "Remove" */
+.scorm-drawer-btn--remove {
+  color: var(--primary-600);
+  background: none;
+  border: 1px solid var(--primary-600);
+}
+
+.scorm-drawer-btn--remove:hover {
+  background: rgba(0, 175, 196, 0.08);
+}

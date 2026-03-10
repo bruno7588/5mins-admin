@@ -1,0 +1,122 @@
+.quiz-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Question list */
+.quiz-tab-question-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.quiz-tab-shimmer-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+/* Action bar */
+.quiz-tab-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-s);
+}
+
+/* Add manual button */
+.quiz-tab-add-manual {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-s) 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(32, 34, 42, 1);
+  transition: opacity 150ms ease;
+}
+
+.quiz-tab-add-manual:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.quiz-tab-add-manual:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Empty state */
+.quiz-tab-empty-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 150ms ease;
+}
+
+.quiz-tab-empty-banner:hover {
+  border-color: var(--neutral-300);
+}
+
+
+.quiz-tab-empty-banner-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.quiz-tab-empty-banner-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  font-size: 16px;
+  font-weight: 700;
+  background: linear-gradient(to bottom right, var(--Primary-500, #00CEE6) 0%, var(--Blaze-quiz, #8158EC) 50%) bottom right / 50% 50% no-repeat, linear-gradient(to bottom left, var(--Primary-500, #00CEE6) 0%, var(--Blaze-quiz, #8158EC) 50%) bottom left / 50% 50% no-repeat, linear-gradient(to top left, var(--Primary-500, #00CEE6) 0%, var(--Blaze-quiz, #8158EC) 50%) top left / 50% 50% no-repeat, linear-gradient(to top right, var(--Primary-500, #00CEE6) 0%, var(--Blaze-quiz, #8158EC) 50%) top right / 50% 50% no-repeat;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.quiz-tab-empty-banner-desc {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+/* Empty pool state (existing lesson, no questions) */
+.quiz-tab-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px 24px;
+  border-radius: 20px;
+}
+
+.quiz-tab-empty-state-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.quiz-tab-empty-state-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.quiz-tab-empty-state-desc {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 600px;
+}

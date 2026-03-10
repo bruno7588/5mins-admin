@@ -1,0 +1,47 @@
+.draw-count-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.draw-count-stepper-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  color: var(--text-secondary);
+  transition: color 150ms ease;
+}
+
+.draw-count-stepper-btn:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+
+.draw-count-stepper-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.draw-count-stepper-input {
+  width: 26px;
+  height: 21px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  text-align: center;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.draw-count-stepper-input::-webkit-outer-spin-button,
+.draw-count-stepper-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

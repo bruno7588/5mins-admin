@@ -1,0 +1,124 @@
+.page-header {
+  padding: 0 var(--space-xl);
+  background: var(--page-background);
+}
+
+.page-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-ml) 0;
+}
+
+.page-header-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-m);
+}
+
+.page-header-btn-outline {
+  padding: var(--space-s) var(--space-ml);
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background-color: unset;
+  background: unset;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.page-header-btn-outline:hover {
+  background: var(--neutral-50);
+}
+
+.page-header-btn-filled {
+  padding: var(--space-s) var(--space-ml);
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-s);
+  background: var(--primary-600);
+  color: var(--neutral-0);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.page-header-btn-filled:hover {
+  background: var(--primary-700);
+}
+
+/* Disabled state for both buttons */
+.page-header-btn-disabled.page-header-btn-outline {
+  border-color: var(--text-disabled);
+  color: var(--text-disabled);
+  cursor: default;
+  pointer-events: none;
+}
+
+.page-header-btn-disabled.page-header-btn-filled {
+  background: var(--button-background-disabled);
+  color: var(--text-button-disabled);
+  cursor: default;
+  pointer-events: none;
+}
+
+.page-header-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: var(--radius-xs);
+  transition: background 150ms ease;
+}
+
+.page-header-close:hover {
+  background: var(--neutral-50);
+}
+
+/* Tabs */
+.page-header-tabs {
+  display: flex;
+  gap: var(--space-l);
+  border-bottom: 1px solid var(--border);
+}
+
+.page-header-tab {
+  position: relative;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: var(--space-s) 0 var(--space-sm) 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.page-header-tab:hover {
+  color: var(--text-primary);
+}
+
+.page-header-tab--active {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.page-header-tab--active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--secondary-500);
+  border-radius: 2px;
+}

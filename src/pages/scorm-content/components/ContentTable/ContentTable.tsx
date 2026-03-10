@@ -1,0 +1,346 @@
+import { useEffect, useRef, useState } from 'react'
+import {
+  SearchNormal1,
+  Add,
+  Setting4,
+  ArrowDown2,
+  ExportSquare,
+  Eye,
+  EyeSlash,
+  Edit2,
+  Trash,
+  More,
+  ArrowLeft2,
+  ArrowRight2,
+} from 'iconsax-react'
+import AddScormModal from '../AddScormModal/AddScormModal'
+import CloseButton from '../../../../components/CloseButton/CloseButton'
+import './ContentTable.css'
+
+interface ContentRow {
+  id: number
+  fileName: string
+  type: string
+  uploadedBy: string
+  updatedAt: string
+  thumbColor: string
+}
+
+const lessonRows: ContentRow[] = [
+  {
+    id: 1,
+    fileName: 'Software Development Life Cycle Policy',
+    type: 'Audio',
+    uploadedBy: 'Anthony Wallace',
+    updatedAt: 'Feb 14, 2025',
+    thumbColor: 'linear-gradient(135deg, #e74c6f, #c94080)',
+  },
+  {
+    id: 2,
+    fileName: 'Mastering the Software Development Life Cycle: A Comprehensive SCORM Guide',
+    type: 'SCORM',
+    uploadedBy: 'Oliver Bennett',
+    updatedAt: 'Feb 14, 2025',
+    thumbColor: 'linear-gradient(135deg, #2d8f6f, #1a6e5a)',
+  },
+  {
+    id: 3,
+    fileName: 'Understanding the Software Development Life Cycle',
+    type: 'External Link',
+    uploadedBy: 'Sophia Carter',
+    updatedAt: 'Feb 14, 2025',
+    thumbColor: 'linear-gradient(135deg, #5a7fbf, #4a6fa8)',
+  },
+  {
+    id: 4,
+    fileName: 'Exploring the Stages of Software Development',
+    type: 'Video',
+    uploadedBy: 'Liam Johnson',
+    updatedAt: 'Feb 14, 2025',
+    thumbColor: 'linear-gradient(135deg, #e6a04c, #d08a3a)',
+  },
+  {
+    id: 5,
+    fileName: 'Navigating the Software Development Life Cycle',
+    type: 'PDF',
+    uploadedBy: 'Emma Thompson',
+    updatedAt: 'Feb 14, 2025',
+    thumbColor: 'linear-gradient(135deg, #8b6fd4, #7558c0)',
+  },
+  {
+    id: 6,
+    fileName: 'Key Concepts in Software Development Life Cycle',
+    type: 'Flashcards',
+    uploadedBy: 'Noah Davis',
+    updatedAt: 'Feb 14, 2025',
+    thumbColor: 'linear-gradient(135deg, #00a5b5, #008c9a)',
+  },
+]
+
+const scormRows: ContentRow[] = [
+  {
+    id: 1,
+    fileName: 'Understanding the Software Development Life Cycle',
+    type: 'SCORM',
+    uploadedBy: 'Sophia Carter',
+    updatedAt: 'Feb 14, 2025',
+    thumbColor: 'linear-gradient(135deg, #5a7fbf, #4a6fa8)',
+  },
+  {
+    id: 2,
+    fileName: 'Exploring the Stages of Software Development',
+    type: 'SCORM',
+    uploadedBy: 'Liam Johnson',
+    updatedAt: 'Feb 14, 2025',
+    thumbColor: 'linear-gradient(135deg, #e6a04c, #d08a3a)',
+  },
+  {
+    id: 3,
+    fileName: 'Navigating the Software Development Life Cycle',
+    type: 'SCORM',
+    uploadedBy: 'Emma Thompson',
+    updatedAt: 'Feb 14, 2025',
+    thumbColor: 'linear-gradient(135deg, #8b6fd4, #7558c0)',
+  },
+  {
+    id: 4,
+    fileName: 'Key Concepts in Software Development Life Cycle',
+    type: 'SCORM',
+    uploadedBy: 'Noah Davis',
+    updatedAt: 'Feb 14, 2025',
+    thumbColor: 'linear-gradient(135deg, #00a5b5, #008c9a)',
+  },
+]
+
+interface ContentTableProps {
+  variant?: 'lessons' | 'scorm'
+}
+
+function ContentTable({ variant = 'lessons' }: ContentTableProps) {
+  const isScorm = variant === 'scorm'
+  const [lessons, setLessons] = useState(lessonRows)
+  const [scorm, setScorm] = useState(scormRows)
+  const rows = isScorm ? scorm : lessons
+  const setRows = isScorm ? setScorm : setLessons
+
+  const [showAddScorm, setShowAddScorm] = useState(false)
+  const [editScormRow, setEditScormRow] = useState<ContentRow | null>(null)
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [editValue, setEditValue] = useState('')
+  const [previewRow, setPreviewRow] = useState<ContentRow | null>(null)
+  const [menuOpenId, setMenuOpenId] = useState<number | null>(null)
+  const editInputRef = useRef<HTMLInputElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (menuOpenId === null) return
+    const handleClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpenId(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [menuOpenId])
+
+  const startEditing = (row: ContentRow) => {
+    setEditingId(row.id)
+    setEditValue(row.fileName)
+    setTimeout(() => editInputRef.current?.select(), 0)
+  }
+
+  const saveEdit = () => {
+    if (editingId === null) return
+    const trimmed = editValue.trim()
+    if (trimmed) {
+      setRows(prev => prev.map(r => r.id === editingId ? { ...r, fileName: trimmed } : r))
+    }
+    setEditingId(null)
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+  }
+
+  return (
+    <div className="content-table-wrapper">
+      {showAddScorm && (
+        <AddScormModal
+          onClose={() => setShowAddScorm(false)}
+          onPublish={(newName) => {
+            const newRow: ContentRow = {
+              id: Date.now(),
+              fileName: newName || 'Untitled SCORM',
+              type: 'SCORM',
+              uploadedBy: 'You',
+              updatedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+              thumbColor: `linear-gradient(135deg, hsl(${Math.floor(Math.random() * 360)}, 50%, 50%), hsl(${Math.floor(Math.random() * 360)}, 50%, 40%))`,
+            }
+            setScorm(prev => [newRow, ...prev])
+          }}
+        />
+      )}
+      {editScormRow && (
+        <AddScormModal
+          editRow={{ id: editScormRow.id, fileName: editScormRow.fileName }}
+          onClose={() => setEditScormRow(null)}
+          onPreview={() => { setPreviewRow(editScormRow); setEditScormRow(null) }}
+        />
+      )}
+
+      {/* Preview overlay */}
+      {previewRow && (
+        <div className="content-table-preview-overlay">
+          <CloseButton onClick={() => setPreviewRow(null)} size={32} className="content-table-preview-close" />
+          <div className="content-table-preview-content">
+            <h2 className="content-table-preview-title">{previewRow.fileName}</h2>
+            <div className="content-table-preview-divider" />
+            <div className="content-table-preview-frame">
+              <p className="content-table-preview-placeholder-text">SCORM content preview will load here</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Filter bar */}
+      <div className="content-table-filters">
+        <span className="content-table-filter-label">Show content from</span>
+        <button className="content-table-filter-dropdown">
+          <Setting4 size={16} color="var(--text-secondary)" variant="Linear" />
+          All
+          <ArrowDown2 size={12} color="var(--text-tertiary)" />
+        </button>
+
+        <div className="content-table-search">
+          <SearchNormal1 size={20} color="var(--text-tertiary)" variant="Linear" />
+          <input type="text" placeholder={isScorm ? 'Search SCORM files' : 'Search content'} />
+        </div>
+
+        <button className="content-table-add-btn" onClick={isScorm ? () => setShowAddScorm(true) : undefined}>
+          {isScorm ? 'Add SCORM' : 'Add Content'}
+          <Add size={20} color="white" />
+        </button>
+      </div>
+
+      {/* Table */}
+      <table className="content-table">
+        <thead>
+          <tr>
+            <th>File name</th>
+            <th>Type</th>
+            <th>Uploaded by</th>
+            <th className="col-sort">
+              Updated at
+              <span className="sort-indicator">
+                <ArrowDown2 size={14} color="var(--text-secondary)" />
+              </span>
+            </th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id}>
+              <td>
+                <div className="content-table-file">
+                  <div className="content-table-thumb">
+                    <div
+                      className="content-table-thumb-img"
+                      style={{ background: row.thumbColor, borderRadius: 'var(--radius-s)' }}
+                    />
+                  </div>
+                  {!isScorm && editingId === row.id ? (
+                    <input
+                      ref={editInputRef}
+                      className="content-table-filename-input"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={saveEdit}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') saveEdit()
+                        if (e.key === 'Escape') cancelEdit()
+                      }}
+                      autoFocus
+                    />
+                  ) : (
+                    <span
+                      className={`content-table-filename${isScorm ? ' content-table-filename--clickable' : ' content-table-filename--editable'}`}
+                      onClick={() => isScorm ? setEditScormRow(row) : startEditing(row)}
+                      title={isScorm ? 'Click to edit SCORM' : 'Click to edit'}
+                    >
+                      {row.fileName}
+                    </span>
+                  )}
+                </div>
+              </td>
+              <td className="content-table-type">{row.type}</td>
+              <td className="content-table-uploader">{row.uploadedBy}</td>
+              <td className="content-table-date">{row.updatedAt}</td>
+              <td>
+                <div className="content-table-actions">
+                  {isScorm && (
+                    <button className="content-table-action-btn" aria-label="Preview" onClick={() => setPreviewRow(row)}>
+                      <Eye size={20} color="var(--neutral-400)" variant="Linear" />
+                    </button>
+                  )}
+                  {!isScorm && (
+                    <button className="content-table-action-btn" aria-label="Share">
+                      <ExportSquare size={20} color="var(--neutral-400)" variant="Linear" />
+                    </button>
+                  )}
+                  <div className="content-table-more-wrapper" ref={menuOpenId === row.id ? menuRef : undefined}>
+                    <button
+                      className="content-table-action-btn"
+                      aria-label="More options"
+                      onClick={() => setMenuOpenId(menuOpenId === row.id ? null : row.id)}
+                    >
+                      <More size={20} color="var(--neutral-400)" variant="Linear" />
+                    </button>
+                    {menuOpenId === row.id && (
+                      <div className="content-table-menu">
+                        <button
+                          className="content-table-menu-item"
+                          onClick={() => { setMenuOpenId(null); setEditScormRow(row) }}
+                        >
+                          <Edit2 size={20} color="var(--text-secondary)" variant="Linear" />
+                          Edit SCORM
+                        </button>
+                        <button className="content-table-menu-item" onClick={() => setMenuOpenId(null)}>
+                          <EyeSlash size={20} color="var(--text-secondary)" variant="Linear" />
+                          Hide
+                        </button>
+                        <button
+                          className="content-table-menu-item content-table-menu-item--danger"
+                          onClick={() => {
+                            setMenuOpenId(null)
+                            setRows(prev => prev.filter(r => r.id !== row.id))
+                          }}
+                        >
+                          <Trash size={20} color="var(--danger-500)" variant="Linear" />
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Pagination */}
+      <div className="content-table-pagination">
+        <span className="content-table-pagination-text">1-10 of 28</span>
+        <button className="content-table-pagination-btn content-table-pagination-btn--disabled" aria-label="Previous page">
+          <ArrowLeft2 size={16} color="var(--neutral-400)" />
+        </button>
+        <button className="content-table-pagination-btn" aria-label="Next page">
+          <ArrowRight2 size={16} color="var(--neutral-400)" />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export default ContentTable

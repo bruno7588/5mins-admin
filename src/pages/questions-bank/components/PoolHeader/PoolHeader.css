@@ -1,0 +1,119 @@
+.pool-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+  padding: 0;
+  background-color: unset;
+  background: unset;
+  border-width: 0;
+  border-style: none;
+  border-color: rgba(0, 0, 0, 0);
+  border-image: none;
+  border-radius: var(--radius-sm);
+}
+
+/* Row 1: Title */
+.pool-header-row1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pool-header-title-area {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xs);
+}
+
+.pool-header-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pool-header-count {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+/* Actions (buttons in title row) */
+.pool-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.pool-header-add-manual {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-s) var(--space-m);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  border: none;
+  border-radius: var(--radius-s);
+  background: unset;
+  background-color: unset;
+  transition: opacity 150ms ease;
+}
+
+.pool-header-add-manual:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Row 2: Draw count */
+.pool-header-row2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+}
+
+.pool-header-draw-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.pool-header-draw-text strong {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Coverage badge */
+.pool-header-coverage {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 40px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 120%;
+}
+
+.pool-header-coverage svg {
+  flex-shrink: 0;
+}
+
+.pool-header-coverage--strong {
+  background: rgba(24, 169, 87, 0.16);
+  color: #11763D;
+}
+
+.pool-header-coverage--good {
+  background: rgba(24, 169, 87, 0.16);
+  color: #11763D;
+}
+
+.pool-header-coverage--weak {
+  background: rgba(245, 166, 35, 0.16);
+  color: #C67A00;
+}
+
+.pool-header-coverage--static {
+  background: rgba(101, 107, 124, 0.12);
+  color: var(--text-secondary);
+}

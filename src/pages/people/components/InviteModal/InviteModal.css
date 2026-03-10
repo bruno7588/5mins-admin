@@ -1,0 +1,445 @@
+/* Full-screen modal overlay (below TopNav) */
+.invite-modal {
+  position: fixed;
+  top: 72px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  background: var(--page-background);
+  display: flex;
+  flex-direction: column;
+  animation: invite-modal-fade 200ms ease;
+}
+
+@keyframes invite-modal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Header */
+.invite-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-ml) var(--space-l);
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.invite-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* Content area */
+.invite-modal-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-ml);
+  padding: 0 var(--space-l) var(--space-ml);
+  overflow-y: auto;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Alert banner */
+.invite-modal-alert {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+  padding: var(--space-m) 16px;
+  background: var(--input-background);
+  border-radius: var(--radius-sm);
+  width: 100%;
+}
+
+.invite-modal-alert-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.invite-modal-alert-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.invite-modal-alert-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+}
+
+.invite-modal-alert-bullet {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.invite-modal-alert-bullet::before {
+  content: '•';
+  margin-right: 8px;
+}
+
+.invite-modal-alert-badges {
+  display: flex;
+  gap: var(--space-s);
+}
+
+.invite-modal-alert-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  background: var(--input-background);
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.invite-modal-alert-more {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  line-height: 1.2;
+  padding-left: 16px;
+  cursor: pointer;
+}
+
+/* Form */
+.invite-modal-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Each invite user block */
+.invite-modal-user {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.invite-modal-row {
+  position: relative;
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-end;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  padding: var(--space-sm);
+  min-width: fit-content;
+}
+
+/* Hover background that only covers the input area, not labels */
+.invite-modal-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 56px;
+  border-radius: 12px;
+  background: transparent;
+  transition: background 150ms ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.invite-modal-row:hover::before {
+  background: var(--input-background);
+}
+
+/* First row has labels — no special height needed, same hover area */
+.invite-modal-row--first::before {
+  height: 56px;
+}
+
+/* Ensure fields sit above the pseudo bg */
+.invite-modal-field {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fields */
+.invite-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  flex-shrink: 0;
+}
+
+.invite-modal-field--grow {
+  flex: 1;
+  min-width: 180px;
+}
+
+.invite-modal-field--200 {
+  width: 200px;
+}
+
+.invite-modal-field--180 {
+  width: 180px;
+}
+
+.invite-modal-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.invite-modal-required {
+  color: var(--danger-500);
+}
+
+/* Input */
+.invite-modal-input {
+  width: 100%;
+  padding: var(--space-s) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 400;
+  font-family: inherit;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.invite-modal-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.invite-modal-input:hover {
+  border-color: var(--border-hover);
+}
+
+.invite-modal-input:focus {
+  border-color: var(--secondary-500);
+}
+
+.invite-modal-input--date {
+  color-scheme: light;
+}
+
+/* Dropdown */
+.invite-modal-dropdown-wrapper {
+  position: relative;
+}
+
+.invite-modal-dropdown {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: inherit;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: border-color 150ms ease;
+}
+
+.invite-modal-dropdown:hover {
+  border-color: var(--border-hover);
+}
+
+.invite-modal-dropdown-value {
+  flex: 1;
+  text-align: left;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.invite-modal-dropdown-placeholder {
+  flex: 1;
+  text-align: left;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+/* Listbox */
+.invite-modal-listbox {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: var(--neutral-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-s);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.invite-modal-listbox-item {
+  padding: var(--space-s) var(--space-sm);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  line-height: 1.5;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  text-align: left;
+  transition: background 150ms ease;
+}
+
+.invite-modal-listbox-item:hover {
+  background: var(--neutral-50);
+}
+
+.invite-modal-listbox-item--selected {
+  background: rgba(255, 187, 56, 0.16);
+  font-weight: 500;
+}
+
+/* Remove row X button */
+.invite-modal-remove-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  margin-bottom: 8px;
+  border-radius: var(--radius-xs);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.invite-modal-remove-row:hover {
+  color: var(--text-primary);
+  background: var(--neutral-50);
+}
+
+.invite-modal-remove-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  background: var(--neutral-800);
+  color: var(--neutral-25);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  border-radius: var(--radius-s);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.invite-modal-remove-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--neutral-800);
+}
+
+.invite-modal-remove-row:hover .invite-modal-remove-tooltip {
+  opacity: 1;
+}
+
+/* Add user button */
+.invite-modal-add-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+  cursor: pointer;
+  padding: 0;
+  align-self: flex-start;
+}
+
+.invite-modal-add-user:hover {
+  color: var(--primary-600);
+}
+
+/* Footer */
+.invite-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.invite-modal-btn {
+  padding: var(--space-sm) var(--space-ml);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  line-height: 1.5;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.invite-modal-btn--cancel {
+  background: transparent;
+  border: 1px solid var(--button-background);
+  color: var(--button-background);
+}
+
+.invite-modal-btn--cancel:hover {
+  background: rgba(0, 175, 196, 0.08);
+}
+
+.invite-modal-btn--invite {
+  background: var(--primary-600);
+  color: var(--neutral-25);
+}
+
+.invite-modal-btn--invite:hover {
+  background: var(--primary-700);
+}
+
+.invite-modal-btn--disabled {
+  background: var(--button-background-disabled);
+  color: var(--text-button-disabled);
+  cursor: not-allowed;
+}
+
+.invite-modal-btn--disabled:hover {
+  background: var(--button-background-disabled);
+}

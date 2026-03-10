@@ -1,0 +1,29 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--page-background);
+}
+
+.app-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding-top: 70px; /* TopNav height */
+}
+
+.app-body--no-nav {
+  padding-top: 0;
+}
+
+.app-content-area {
+  display: flex;
+  flex: 1;
+  position: relative;
+}
+
+.main-content {
+  flex: 1;
+  padding: 0 var(--space-xl);
+  overflow-y: auto;
+}

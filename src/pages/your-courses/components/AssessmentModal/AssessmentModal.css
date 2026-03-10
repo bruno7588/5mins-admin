@@ -1,0 +1,782 @@
+/* Overlay — scoped to .app-content-area */
+.assessment-modal-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  background: rgba(15, 16, 20, 0.4);
+  animation: assessment-overlay-fade 250ms ease;
+}
+
+@keyframes assessment-overlay-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.assessment-modal-overlay--closing {
+  animation: assessment-overlay-fade-out 300ms ease forwards;
+}
+
+@keyframes assessment-overlay-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Panel */
+.assessment-modal {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 201;
+  width: fit-content;
+  max-width: 100%;
+  background: var(--page-background);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  animation: assessment-modal-slide 300ms ease;
+}
+
+/* Form content area (scrollable) */
+.assessment-modal-content {
+  width: 540px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Collapsed sidebar strip on the right */
+.assessment-modal-sidebar {
+  width: 60px;
+  flex: 0 0 60px;
+  border-left: 1px solid var(--border);
+}
+
+.assessment-modal-sidebar .add-content-sidebar {
+  position: static;
+  z-index: auto;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  transition: none;
+  border-left: none;
+}
+
+@keyframes assessment-modal-slide {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.assessment-modal--closing {
+  animation: assessment-modal-slide-out 300ms ease forwards;
+}
+
+@keyframes assessment-modal-slide-out {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+
+/* Header */
+.assessment-modal-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-l);
+  padding-right: 56px;
+}
+
+.assessment-modal-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.assessment-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.assessment-modal-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Close button */
+.assessment-modal-close {
+  position: absolute;
+  top: var(--space-l);
+  right: var(--space-l);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: var(--radius-xs);
+}
+
+.assessment-modal-close:hover {
+  background: var(--neutral-50);
+}
+
+/* Form body */
+.assessment-modal-body {
+  flex: 1;
+  min-width: 0;
+  padding: 0 var(--space-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+}
+
+/* Form group */
+.assessment-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.assessment-modal-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.assessment-modal-input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-m);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--page-background);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.assessment-modal-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.assessment-modal-input:hover {
+  border-color: var(--border-hover);
+}
+
+.assessment-modal-input:focus {
+  border-color: var(--secondary-500);
+}
+
+/* Options list */
+.assessment-modal-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.assessment-modal-option {
+  display: flex;
+  align-items: center;
+}
+
+/* Wrapper that looks like a single input field */
+.assessment-modal-option-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+  padding: var(--space-s) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--page-background);
+  transition: border-color 150ms ease;
+}
+
+.assessment-modal-option-field:focus-within {
+  border-color: var(--secondary-600);
+}
+
+
+.assessment-modal-radio {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--neutral-300);
+  border-radius: 50%;
+  flex-shrink: 0;
+  cursor: pointer;
+  position: relative;
+  transition: border-color 150ms ease;
+}
+
+.assessment-modal-radio:checked {
+  border-color: var(--success-500);
+}
+
+.assessment-modal-radio:checked::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--success-500);
+}
+
+.assessment-modal-option-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.assessment-modal-option-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Correct badge */
+.assessment-modal-correct-badge {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 40px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--success-500);
+  background: rgba(24, 169, 87, 0.16);
+}
+
+/* Add option button — styled like an option row */
+.assessment-modal-add-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-s) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--page-background);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.assessment-modal-add-option:hover {
+  background: var(--input-background);
+  border-color: var(--neutral-400);
+}
+
+/* Footer */
+.assessment-modal-footer {
+  padding: var(--space-m) var(--space-l);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-start;
+  margin-top: auto;
+}
+
+.assessment-modal-cta {
+  padding: var(--space-sm) var(--space-l);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--neutral-0);
+  background: var(--primary-600);
+  border: none;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.assessment-modal-cta:hover {
+  background: var(--primary-700);
+}
+
+.assessment-modal-cta:disabled {
+  background: var(--button-background-disabled);
+  color: var(--text-button-disabled);
+  cursor: not-allowed;
+}
+
+/* ===== Add Media Button (collapsed trigger) ===== */
+.assessment-modal-add-media {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+.assessment-modal-add-media:hover {
+  color: var(--primary-700);
+}
+
+.assessment-modal-add-media:hover .assessment-modal-add-media-label {
+  color: var(--primary-700);
+}
+
+.assessment-modal-add-media:hover .assessment-modal-add-media-hint {
+  color: var(--primary-700);
+}
+
+.assessment-modal-add-media-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.assessment-modal-add-media-hint {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+}
+
+/* ===== Image Preview State ===== */
+.assessment-modal-media-preview {
+  position: relative;
+  width: 218px;
+  height: 122px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.assessment-modal-media-preview-bg {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Shared remove button */
+.assessment-modal-media-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border-radius: 40px;
+  background: rgba(15, 16, 20, 0.5);
+  cursor: pointer;
+  z-index: 2;
+  transition: background 150ms ease;
+}
+
+.assessment-modal-media-remove:hover {
+  background: rgba(15, 16, 20, 0.72);
+}
+
+.assessment-modal-media-remove[data-tooltip]::before,
+.assessment-modal-media-remove[data-tooltip]::after {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.assessment-modal-media-remove[data-tooltip]::before {
+  content: attr(data-tooltip);
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  background: var(--neutral-900);
+  color: var(--neutral-0);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  border-radius: var(--radius-s);
+}
+
+.assessment-modal-media-remove[data-tooltip]::after {
+  content: '';
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--neutral-900);
+}
+
+.assessment-modal-media-remove[data-tooltip]:hover::before,
+.assessment-modal-media-remove[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+/* ===== Compact Inline Audio Player (pill) ===== */
+.assessment-modal-audio-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-m);
+  padding: var(--space-m);
+  border-radius: 40px;
+  background: var(--input-background);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Play controls group */
+.assessment-modal-audio-pill-controls {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.assessment-modal-audio-pill-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 2px;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 150ms ease;
+}
+
+.assessment-modal-audio-pill-btn:hover {
+  opacity: 1;
+}
+
+.assessment-modal-audio-pill-btn--play {
+  width: 36px;
+  height: 36px;
+  opacity: 1;
+}
+
+/* Progress track */
+.assessment-modal-audio-pill-track {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  height: 4px;
+  background: var(--border);
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+.assessment-modal-audio-pill-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--text-primary);
+  border-radius: 16px 0 0 16px;
+  transition: width 100ms linear;
+}
+
+.assessment-modal-audio-pill-thumb {
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  transform: translate(-50%, -50%);
+  transition: left 100ms linear;
+}
+
+/* Duration */
+.assessment-modal-audio-pill-duration {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Close/remove button */
+.assessment-modal-audio-pill-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border-radius: 50%;
+  background: var(--input-background);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 150ms ease;
+}
+
+.assessment-modal-audio-pill-close:hover {
+  background: var(--input-background-hover);
+}
+
+/* ===== Attach Media Modal (centered overlay) ===== */
+.media-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(15, 16, 20, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: assessment-overlay-fade 200ms ease;
+}
+
+.media-modal {
+  position: relative;
+  width: 520px;
+  max-width: calc(100vw - 48px);
+  background: var(--page-background);
+  border-radius: 16px;
+  padding: var(--space-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16);
+  animation: media-modal-pop 250ms ease;
+}
+
+@keyframes media-modal-pop {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.media-modal-close {
+  position: absolute;
+  top: var(--space-m);
+  right: var(--space-m);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: var(--radius-xs);
+}
+
+.media-modal-close:hover {
+  background: var(--neutral-50);
+}
+
+/* Drop zone */
+.media-modal-dropzone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-height: 220px;
+  padding: var(--space-l);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.media-modal-dropzone:hover,
+.media-modal-dropzone--dragover {
+  background: var(--input-background);
+}
+
+/* SVG dashed border — rounded corners with exact 4px dash */
+.media-modal-dropzone-border {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.media-modal-dropzone-border rect {
+  x: 0.75px;
+  y: 0.75px;
+  width: calc(100% - 1.5px);
+  height: calc(100% - 1.5px);
+  fill: none;
+  stroke: var(--neutral-300);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  transition: stroke 150ms ease;
+}
+
+.media-modal-dropzone:hover .media-modal-dropzone-border rect,
+.media-modal-dropzone--dragover .media-modal-dropzone-border rect {
+  stroke: var(--neutral-400);
+}
+
+.media-modal-dropzone-icon {
+  color: var(--text-tertiary);
+}
+
+.media-modal-dropzone-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.media-modal-dropzone-formats {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.media-modal-select-btn {
+  margin-top: var(--space-xs);
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: transparent;
+  border: 1.5px solid var(--text-primary);
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.media-modal-select-btn:hover {
+  color: var(--primary-700);
+  border-color: var(--primary-700);
+}
+
+/* Staged preview inside drop zone */
+.media-modal-staged-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+/* ===== Crop UI ===== */
+.media-modal-crop {
+  position: relative;
+  width: 400px;
+  height: 224px;
+  overflow: hidden;
+  border-radius: 12px;
+  cursor: grab;
+  user-select: none;
+  background-color: var(--neutral-900, #1a1a2e);
+}
+
+.media-modal-crop--dragging {
+  cursor: grabbing;
+}
+
+/* Zoom slider bar — overlays bottom of crop area */
+.media-modal-crop-slider {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 8px 16px;
+  background: rgba(15, 16, 20, 0.56);
+  backdrop-filter: blur(4px);
+  z-index: 1;
+}
+
+/* Range input styling */
+.media-modal-crop-range {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.24);
+  outline: none;
+  cursor: pointer;
+}
+
+.media-modal-crop-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--neutral-0, #fff);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.media-modal-crop-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--neutral-0, #fff);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.media-modal-staged-audio {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-m);
+  background: var(--neutral-50);
+  border-radius: var(--radius-s);
+  width: 100%;
+}
+
+.media-modal-staged-filename {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.media-modal-staged-change {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary-600);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.media-modal-staged-change:hover {
+  color: var(--primary-700);
+}
+
+/* Save button */
+.media-modal-save {
+  align-self: center;
+  padding: var(--space-sm) var(--space-xl);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--neutral-0);
+  background: var(--primary-600);
+  border: none;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.media-modal-save:hover {
+  background: var(--primary-700);
+}
+
+.media-modal-save:disabled {
+  background: var(--button-background-disabled);
+  color: var(--text-button-disabled);
+  cursor: not-allowed;
+}

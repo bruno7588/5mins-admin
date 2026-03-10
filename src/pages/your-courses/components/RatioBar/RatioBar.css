@@ -1,0 +1,29 @@
+.ratio-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: var(--radius-ml);
+  background: var(--border);
+  overflow: hidden;
+}
+
+.ratio-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-ml);
+  transition: width 400ms ease, background-color 300ms ease;
+}
+
+.ratio-bar-fill--strong {
+  background: var(--blaze-quiz);
+}
+
+.ratio-bar-fill--good {
+  background: var(--success-500);
+}
+
+.ratio-bar-fill--weak {
+  background: var(--warning-500);
+}
+
+.ratio-bar-fill--static {
+  background: var(--neutral-300);
+}

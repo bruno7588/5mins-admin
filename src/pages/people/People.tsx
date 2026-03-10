@@ -1,0 +1,956 @@
+import { useState, useEffect, useRef } from 'react'
+import {
+  SearchNormal1,
+  More,
+  Add,
+  ProfileAdd,
+  DocumentText,
+  People as PeopleIcon,
+  ProfileRemove,
+  InfoCircle,
+  Danger,
+  Edit2,
+  ShieldSecurity,
+  Devices,
+  ArrowDown2,
+  ArrowUp2,
+} from 'iconsax-react'
+import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
+import Checkbox from '../../components/Checkbox/Checkbox'
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
+import ToastContainer, { useToast } from '../../components/Toast/Toast'
+import InviteModal from './components/InviteModal/InviteModal'
+import './People.css'
+
+/* ─── Types ─── */
+
+interface PersonRow {
+  id: number
+  name: string
+  email: string
+  avatar: string
+  role: string
+  team: string
+  startDate: string
+  region: string
+  status: 'Registered' | 'Invited'
+}
+
+type DeactivateStatus = 'terminated' | 'long-leave'
+
+interface DeactivatedPerson {
+  id: number
+  name: string
+  email: string
+  avatar: string
+  role: string
+  team: string
+  region: string
+  deactivatedOn: string
+  status: DeactivateStatus
+}
+
+type ModalState =
+  | { type: 'none' }
+  | { type: 'deactivate'; person: PersonRow }
+  | { type: 'deactivate-bulk'; persons: PersonRow[] }
+  | { type: 'reactivate-bulk'; persons: DeactivatedPerson[] }
+  | { type: 'delete-single'; person: DeactivatedPerson }
+  | { type: 'delete-bulk'; persons: DeactivatedPerson[] }
+
+/* ─── Mock data ─── */
+
+const initialPeople: PersonRow[] = [
+  { id: 1, name: 'Anthonny Wallace', email: 'anthonny@example.com', avatar: 'AW', role: 'Customer Support Specialist', team: 'Customer Support Team', startDate: 'Jan 13, 2025', region: 'Southeast Asia', status: 'Registered' },
+  { id: 2, name: 'Brenda Kwasaki', email: 'brenda@email.com', avatar: 'BK', role: 'Operations Manager', team: 'Financial Services', startDate: 'Jan 13, 2025', region: '–', status: 'Invited' },
+  { id: 3, name: 'Carlos Mendes', email: 'carlos@example.com', avatar: 'CM', role: 'Software Engineer', team: 'Product Engineering', startDate: 'Feb 1, 2025', region: 'Europe', status: 'Registered' },
+  { id: 4, name: 'Diana Ross', email: 'diana.ross@company.com', avatar: 'DR', role: 'Marketing Lead', team: 'Growth Team', startDate: 'Mar 5, 2025', region: 'North America', status: 'Registered' },
+  { id: 5, name: 'Erik Johansson', email: 'erik.j@email.com', avatar: 'EJ', role: 'Data Analyst', team: 'Business Intelligence', startDate: 'Dec 10, 2024', region: 'Europe', status: 'Invited' },
+]
+
+const initialDeactivated: DeactivatedPerson[] = [
+  { id: 101, name: 'Fiona Chen', email: 'fiona.chen@example.com', avatar: 'FC', role: 'UX Designer', team: 'Design Team', region: 'East Asia', deactivatedOn: 'Nov 12, 2025', status: 'terminated' },
+  { id: 102, name: 'Gabriel Santos', email: 'gabriel.s@email.com', avatar: 'GS', role: 'Sales Representative', team: 'Revenue Team', region: 'Latin America', deactivatedOn: 'Oct 28, 2025', status: 'long-leave' },
+  { id: 103, name: 'Hannah Mueller', email: 'hannah.m@company.com', avatar: 'HM', role: 'HR Coordinator', team: 'People Operations', region: 'Europe', deactivatedOn: 'Sep 15, 2025', status: 'terminated' },
+  { id: 104, name: 'Ivan Petrov', email: 'ivan.p@example.com', avatar: 'IP', role: 'DevOps Engineer', team: 'Infrastructure', region: 'Europe', deactivatedOn: 'Aug 3, 2025', status: 'long-leave' },
+  { id: 105, name: 'Julia Kim', email: 'julia.kim@email.com', avatar: 'JK', role: 'Content Writer', team: 'Marketing', region: 'East Asia', deactivatedOn: 'Jul 20, 2025', status: 'terminated' },
+  { id: 106, name: 'Kevin O\'Brien', email: 'kevin.ob@company.com', avatar: 'KO', role: 'Account Manager', team: 'Customer Success', region: 'North America', deactivatedOn: 'Jun 8, 2025', status: 'terminated' },
+  { id: 107, name: 'Lara Johansson', email: 'lara.j@example.com', avatar: 'LJ', role: 'Product Manager', team: '', region: 'Europe', deactivatedOn: 'May 14, 2025', status: 'long-leave' },
+  { id: 108, name: 'Marco Rossi', email: 'marco.r@email.com', avatar: 'MR', role: 'QA Engineer', team: 'Quality Assurance', region: 'Europe', deactivatedOn: 'Apr 22, 2025', status: 'terminated' },
+  { id: 109, name: 'Nina Patel', email: 'nina.patel@company.com', avatar: 'NP', role: 'Finance Analyst', team: 'Finance', region: 'Southeast Asia', deactivatedOn: 'Mar 10, 2025', status: 'long-leave' },
+  { id: 110, name: 'Oscar Diaz', email: 'oscar.d@example.com', avatar: 'OD', role: 'Backend Developer', team: 'Product Engineering', region: 'Latin America', deactivatedOn: 'Feb 5, 2025', status: 'terminated' },
+  { id: 111, name: 'Priya Sharma', email: 'priya.s@email.com', avatar: 'PS', role: 'Training Specialist', team: '', region: 'Southeast Asia', deactivatedOn: 'Jan 18, 2025', status: 'long-leave' },
+  { id: 112, name: 'Quinn Taylor', email: 'quinn.t@company.com', avatar: 'QT', role: 'Legal Counsel', team: 'Legal', region: 'North America', deactivatedOn: 'Dec 1, 2024', status: 'terminated' },
+]
+
+const quicklinks = [
+  { icon: <ProfileAdd size={40} color="var(--primary-500)" variant="Linear" />, color: '0, 206, 230', title: 'Invite people', description: 'Welcome someone new to the 5Mins account' },
+  { icon: <DocumentText size={40} color="var(--secondary-500)" variant="Linear" />, color: '255, 187, 56', title: 'Bulk upload people by CSV', description: "It's easy and will save you time" },
+  { icon: <PeopleIcon size={40} color="#8158EC" variant="Linear" />, color: '129, 88, 236', title: 'Move people to another team', description: 'Search for people to move to a different team' },
+]
+
+const avatarColors = ['#4a90d9', '#7b68ee', '#e67e22', '#2ecc71', '#e74c3c']
+
+function People() {
+  const [activeTab, setActiveTab] = useState('All People')
+  const [search, setSearch] = useState('')
+  const [people, setPeople] = useState(initialPeople)
+  const [deactivatedPeople, setDeactivatedPeople] = useState(initialDeactivated)
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null)
+  const [modal, setModal] = useState<ModalState>({ type: 'none' })
+  const [confirmInput, setConfirmInput] = useState('')
+  const [deactivateReason, setDeactivateReason] = useState<'terminated' | 'long-leave'>('long-leave')
+  const [sortCol, setSortCol] = useState<'name' | 'status' | 'role' | 'region' | 'deactivatedOn'>('deactivatedOn')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'terminated' | 'long-leave'>('all')
+  const { toasts, show: showToast } = useToast()
+  const menuRef = useRef<HTMLDivElement>(null)
+  const [filterOpen, setFilterOpen] = useState(false)
+  const filterRef = useRef<HTMLDivElement>(null)
+  const [showInvite, setShowInvite] = useState(false)
+
+  const tabs = [
+    'All People',
+    'Managers',
+    'Subject Experts',
+    `Deactivated (${deactivatedPeople.length})`,
+  ]
+
+  const isDeactivatedTab = activeTab.startsWith('Deactivated')
+
+  /* ─── Filtered lists ─── */
+
+  const filteredPeople = people.filter(
+    (p) =>
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.email.toLowerCase().includes(search.toLowerCase())
+  )
+
+  function toggleSort(col: typeof sortCol) {
+    if (sortCol === col) {
+      setSortDir(prev => prev === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortCol(col)
+      setSortDir(col === 'deactivatedOn' ? 'desc' : 'asc')
+    }
+  }
+
+  const filteredDeactivated = deactivatedPeople
+    .filter(
+      (p) =>
+        (p.name.toLowerCase().includes(search.toLowerCase()) ||
+        p.email.toLowerCase().includes(search.toLowerCase())) &&
+        (statusFilter === 'all' || p.status === statusFilter)
+    )
+    .sort((a, b) => {
+      const dir = sortDir === 'asc' ? 1 : -1
+      if (sortCol === 'deactivatedOn') {
+        return dir * (new Date(a.deactivatedOn).getTime() - new Date(b.deactivatedOn).getTime())
+      }
+      const valA = a[sortCol].toLowerCase()
+      const valB = b[sortCol].toLowerCase()
+      if (valA < valB) return -1 * dir
+      if (valA > valB) return 1 * dir
+      return 0
+    })
+
+  /* ─── Tab switch: clear selection + menu ─── */
+
+  function handleTabSwitch(tab: string) {
+    setActiveTab(tab)
+    setSelectedIds(new Set())
+    setOpenMenuId(null)
+    setSearch('')
+    setStatusFilter('all')
+  }
+
+  /* ─── Click outside to close menu ─── */
+
+  useEffect(() => {
+    if (openMenuId === null) return
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [openMenuId])
+
+  /* ─── Click outside to close filter ─── */
+
+  useEffect(() => {
+    if (!filterOpen) return
+    function handleClickOutside(e: MouseEvent) {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setFilterOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [filterOpen])
+
+  /* ─── Selection helpers ─── */
+
+  function toggleSelect(id: number) {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  function toggleSelectAll() {
+    const list = isDeactivatedTab ? filteredDeactivated : filteredPeople
+    const allIds = list.map(p => p.id)
+    const every = allIds.every(id => selectedIds.has(id))
+    if (every) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(allIds))
+    }
+  }
+
+  const currentList = isDeactivatedTab ? filteredDeactivated : filteredPeople
+  const allSelected = currentList.length > 0
+    && currentList.every(p => selectedIds.has(p.id))
+
+  /* ─── Actions ─── */
+
+  function closeModal() {
+    setModal({ type: 'none' })
+    setConfirmInput('')
+    setDeactivateReason('long-leave')
+  }
+
+  function handleDeactivate(person: PersonRow) {
+    const deactivated: DeactivatedPerson = {
+      id: person.id,
+      name: person.name,
+      email: person.email,
+      avatar: person.avatar,
+      role: person.role,
+      team: person.team,
+      region: person.region,
+      deactivatedOn: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: deactivateReason,
+    }
+    setPeople(prev => prev.filter(p => p.id !== person.id))
+    setDeactivatedPeople(prev => [...prev, deactivated])
+    closeModal()
+    showToast('success', `${person.name} has been deactivated. Find them in the Deactivated tab.`)
+  }
+
+  function handleReactivateSingle(person: DeactivatedPerson) {
+    const reactivated: PersonRow = {
+      id: person.id,
+      name: person.name,
+      email: person.email,
+      avatar: person.avatar,
+      role: person.role,
+      team: person.team,
+      region: person.region,
+      startDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: 'Registered',
+    }
+    setDeactivatedPeople(prev => prev.filter(p => p.id !== person.id))
+    setPeople(prev => [...prev, reactivated])
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      next.delete(person.id)
+      return next
+    })
+    if (!person.team) {
+      showToast('warning', `${person.name} has been reactivated but their previous team no longer exists. Please assign them to a team from the All People tab.`)
+    } else {
+      showToast('success', `${person.name} has been reactivated`)
+    }
+  }
+
+  function handleReactivateBulk(persons: DeactivatedPerson[]) {
+    const ids = new Set(persons.map(p => p.id))
+    const reactivated: PersonRow[] = persons.map(p => ({
+      id: p.id,
+      name: p.name,
+      email: p.email,
+      avatar: p.avatar,
+      role: p.role,
+      team: p.team,
+      region: p.region,
+      startDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: 'Registered' as const,
+    }))
+    setDeactivatedPeople(prev => prev.filter(p => !ids.has(p.id)))
+    setPeople(prev => [...prev, ...reactivated])
+    setSelectedIds(new Set())
+    const missingTeam = persons.filter(p => !p.team)
+    if (missingTeam.length > 0) {
+      showToast('warning', `${missingTeam.map(p => p.name).join(', ')} reactivated but their previous team no longer exists. Please assign them to a team.`)
+    }
+    showToast('success', `${persons.length} users reactivated`)
+  }
+
+  function handleDeleteSingle(person: DeactivatedPerson) {
+    setDeactivatedPeople(prev => prev.filter(p => p.id !== person.id))
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      next.delete(person.id)
+      return next
+    })
+    closeModal()
+    showToast('success', `${person.name} has been permanently deleted`)
+  }
+
+  function handleDeleteBulk(persons: DeactivatedPerson[]) {
+    const ids = new Set(persons.map(p => p.id))
+    setDeactivatedPeople(prev => prev.filter(p => !ids.has(p.id)))
+    setSelectedIds(new Set())
+    closeModal()
+    showToast('success', `${persons.length} users permanently deleted`)
+  }
+
+  function handleDeactivateBulk(persons: PersonRow[]) {
+    const ids = new Set(persons.map(p => p.id))
+    const deactivated: DeactivatedPerson[] = persons.map(p => ({
+      id: p.id,
+      name: p.name,
+      email: p.email,
+      avatar: p.avatar,
+      role: p.role,
+      team: p.team,
+      region: p.region,
+      deactivatedOn: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: deactivateReason,
+    }))
+    setPeople(prev => prev.filter(p => !ids.has(p.id)))
+    setDeactivatedPeople(prev => [...prev, ...deactivated])
+    setSelectedIds(new Set())
+    closeModal()
+    showToast('success', `${persons.length} users deactivated. Find them in the Deactivated tab.`)
+  }
+
+  /* ─── Selected persons for bulk actions ─── */
+
+  const selectedPersons = deactivatedPeople.filter(p => selectedIds.has(p.id))
+  const selectedPeoplePersons = people.filter(p => selectedIds.has(p.id))
+
+  /* ─── Render ─── */
+
+  return (
+    <div className="people-layout">
+      <LeftSidebar />
+      <main className="people-main">
+        <div className="people-page">
+      {/* Quicklinks */}
+      <div className="people-quicklinks">
+        {quicklinks.map((q) => (
+          <button
+            key={q.title}
+            className="people-quicklink"
+            style={{ '--ql-color': q.color } as React.CSSProperties}
+            onClick={q.title === 'Invite people' ? () => setShowInvite(true) : undefined}
+          >
+            <div className="people-quicklink-icon">{q.icon}</div>
+            <div className="people-quicklink-info">
+              <h3 className="people-quicklink-title">{q.title}</h3>
+              <p className="people-quicklink-desc">{q.description}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* Tabs */}
+      <div className="people-tabs">
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            className={`people-tab${activeTab === tab ? ' people-tab--active' : ''}`}
+            onClick={() => handleTabSwitch(tab)}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {/* Info banner — Deactivated tab only (hide when no deactivated users) */}
+      {isDeactivatedTab && deactivatedPeople.length > 0 && (
+        <div className="people-info-banner">
+          <InfoCircle size={20} color="var(--text-warning)" variant="Linear" />
+          <span>Terminated users are auto-deleted after 3 years. Long Leave users are retained indefinitely.</span>
+        </div>
+      )}
+
+      {/* Actions bar (hide on deactivated tab when no users exist) */}
+      {!(isDeactivatedTab && deactivatedPeople.length === 0) && (
+      <div className="people-actions">
+        <div className="people-actions-left">
+          {isDeactivatedTab && (
+            <div className="people-filter">
+              <span className="people-filter-label">Deactivation status is</span>
+              <div className="people-filter-dropdown" ref={filterRef}>
+                <button
+                  className={`people-filter-trigger${filterOpen ? ' people-filter-trigger--open' : ''}`}
+                  onClick={() => setFilterOpen(prev => !prev)}
+                >
+                  <span>{statusFilter === 'all' ? 'All' : statusFilter === 'terminated' ? 'Terminated' : 'Long Leave'}</span>
+                  <ArrowDown2 size={16} color="var(--text-secondary)" className={`people-filter-chevron${filterOpen ? ' people-filter-chevron--open' : ''}`} />
+                </button>
+                {filterOpen && (
+                  <div className="people-filter-listbox">
+                    {([['all', 'All'], ['terminated', 'Terminated'], ['long-leave', 'Long Leave']] as const).map(([value, label]) => (
+                      <button
+                        key={value}
+                        className={`people-filter-option${statusFilter === value ? ' people-filter-option--selected' : ''}`}
+                        onClick={() => {
+                          setStatusFilter(value)
+                          setFilterOpen(false)
+                        }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          <div className="people-search">
+            <SearchNormal1 size={18} color="var(--text-tertiary)" variant="Linear" />
+            <input
+              className="people-search-input"
+              type="text"
+              placeholder="Search for people"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
+        <button className="people-download-btn">
+          Download List
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2.5V12.5M10 12.5L6.25 8.75M10 12.5L13.75 8.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M3.33 14.167V15.833C3.33 16.292 3.513 16.733 3.838 17.058C4.163 17.383 4.604 17.567 5.063 17.567H14.938C15.396 17.567 15.838 17.383 16.163 17.058C16.488 16.733 16.671 16.292 16.671 15.833V14.167" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      )}
+
+      {/* ═══ All People Table ═══ */}
+      {!isDeactivatedTab && (
+        <div className="people-table">
+          <div className="people-table-header">
+            <div className="people-table-cell people-table-cell--checkbox">
+              <Checkbox checked={allSelected} onChange={toggleSelectAll} />
+            </div>
+            <div className="people-table-cell people-table-cell--name">Name</div>
+            <div className="people-table-cell people-table-cell--role">Role</div>
+            <div className="people-table-cell people-table-cell--team">Team</div>
+            <div className="people-table-cell people-table-cell--date">
+              Start Date
+              <Add size={14} color="var(--text-tertiary)" style={{ transform: 'rotate(45deg)', opacity: 0 }} />
+            </div>
+            <div className="people-table-cell people-table-cell--region">Region</div>
+            <div className="people-table-cell people-table-cell--status">Status</div>
+            <div className="people-table-cell people-table-cell--actions" />
+          </div>
+
+          {filteredPeople.map((person) => (
+            <div
+              className={`people-table-row${selectedIds.has(person.id) ? ' people-table-row--selected' : ''}`}
+              key={person.id}
+            >
+              <div className="people-table-cell people-table-cell--checkbox">
+                <Checkbox checked={selectedIds.has(person.id)} onChange={() => toggleSelect(person.id)} />
+              </div>
+              <div className="people-table-cell people-table-cell--name">
+                <div className="people-avatar" style={{ background: avatarColors[(person.id - 1) % avatarColors.length] }}>
+                  {person.avatar}
+                </div>
+                <div className="people-name-info">
+                  <span className="people-name">{person.name}</span>
+                  <span className="people-email">{person.email}</span>
+                </div>
+              </div>
+              <div className="people-table-cell people-table-cell--role">{person.role}</div>
+              <div className="people-table-cell people-table-cell--team">{person.team}</div>
+              <div className="people-table-cell people-table-cell--date">
+                <div className="people-date-stack">
+                  <span>{person.startDate.replace(/,?\s*\d{4}$/, ',')}</span>
+                  <span>{person.startDate.match(/\d{4}$/)?.[0]}</span>
+                </div>
+              </div>
+              <div className="people-table-cell people-table-cell--region">{person.region}</div>
+              <div className="people-table-cell people-table-cell--status">
+                <span className={`people-badge people-badge--${person.status.toLowerCase()}`}>
+                  {person.status}
+                </span>
+              </div>
+              <div className="people-table-cell people-table-cell--actions">
+                <div className="people-more-wrapper" ref={openMenuId === person.id ? menuRef : undefined}>
+                  <button
+                    className="people-more-btn"
+                    aria-label="More actions"
+                    onClick={() => setOpenMenuId(openMenuId === person.id ? null : person.id)}
+                  >
+                    <More size={24} color="var(--text-tertiary)" variant="Linear" />
+                  </button>
+                  {openMenuId === person.id && (
+                    <div className="people-action-menu">
+                      <div className="people-action-menu-caret" />
+                      <button className="people-action-menu-item" onClick={() => setOpenMenuId(null)}>
+                        <Edit2 size={20} color="var(--text-secondary)" variant="Linear" />
+                        Edit user profile
+                      </button>
+                      <button className="people-action-menu-item" onClick={() => setOpenMenuId(null)}>
+                        <ShieldSecurity size={20} color="var(--text-secondary)" variant="Linear" />
+                        Make user Admin
+                      </button>
+                      <button className="people-action-menu-item" onClick={() => setOpenMenuId(null)}>
+                        <Devices size={20} color="var(--text-secondary)" variant="Linear" />
+                        Make Subject Expert
+                      </button>
+                      <button
+                        className="people-action-menu-item people-action-menu-item--danger"
+                        onClick={() => {
+                          setOpenMenuId(null)
+                          setModal({ type: 'deactivate', person })
+                        }}
+                      >
+                        <ProfileRemove size={20} color="var(--danger-500)" variant="Linear" />
+                        Deactivate user account
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ═══ Deactivated Table ═══ */}
+      {isDeactivatedTab && (
+        <>
+          {deactivatedPeople.length === 0 ? (
+            <div className="people-empty-state">
+              <ProfileRemove size={48} color="var(--text-tertiary)" variant="Linear" />
+              <h3 className="people-empty-state-title">No deactivated users</h3>
+              <p className="people-empty-state-desc">
+                When you deactivate someone from the All People tab, they'll appear here.
+              </p>
+            </div>
+          ) : (
+            <div className="people-table">
+              <div className="people-table-header">
+                <div className="people-table-cell people-table-cell--checkbox">
+                  <Checkbox checked={allSelected} onChange={toggleSelectAll} />
+                </div>
+                <div className={`people-table-cell people-table-cell--name people-table-cell--sortable${sortCol === 'name' ? ' people-table-cell--sorted' : ''}`} onClick={() => toggleSort('name')}>
+                  Name
+                  {sortCol === 'name' && (sortDir === 'asc' ? <ArrowUp2 size={14} color="var(--text-tertiary)" /> : <ArrowDown2 size={14} color="var(--text-tertiary)" />)}
+                </div>
+                <div className={`people-table-cell people-table-cell--status-d people-table-cell--sortable${sortCol === 'status' ? ' people-table-cell--sorted' : ''}`} onClick={() => toggleSort('status')}>
+                  Status
+                  {sortCol === 'status' && (sortDir === 'asc' ? <ArrowUp2 size={14} color="var(--text-tertiary)" /> : <ArrowDown2 size={14} color="var(--text-tertiary)" />)}
+                </div>
+                <div className={`people-table-cell people-table-cell--role-d people-table-cell--sortable${sortCol === 'role' ? ' people-table-cell--sorted' : ''}`} onClick={() => toggleSort('role')}>
+                  Role
+                  {sortCol === 'role' && (sortDir === 'asc' ? <ArrowUp2 size={14} color="var(--text-tertiary)" /> : <ArrowDown2 size={14} color="var(--text-tertiary)" />)}
+                </div>
+                <div className="people-table-cell people-table-cell--team-d">Team</div>
+                <div className={`people-table-cell people-table-cell--region-d people-table-cell--sortable${sortCol === 'region' ? ' people-table-cell--sorted' : ''}`} onClick={() => toggleSort('region')}>
+                  Region
+                  {sortCol === 'region' && (sortDir === 'asc' ? <ArrowUp2 size={14} color="var(--text-tertiary)" /> : <ArrowDown2 size={14} color="var(--text-tertiary)" />)}
+                </div>
+                <div className={`people-table-cell people-table-cell--deactivated people-table-cell--sortable${sortCol === 'deactivatedOn' ? ' people-table-cell--sorted' : ''}`} onClick={() => toggleSort('deactivatedOn')}>
+                  Deactivated on
+                  {sortCol === 'deactivatedOn' && (sortDir === 'asc' ? <ArrowUp2 size={14} color="var(--text-tertiary)" /> : <ArrowDown2 size={14} color="var(--text-tertiary)" />)}
+                </div>
+                <div className="people-table-cell people-table-cell--actions" />
+              </div>
+
+              {filteredDeactivated.map((person) => (
+                <div
+                  className={`people-table-row${selectedIds.has(person.id) ? ' people-table-row--selected' : ''}`}
+                  key={person.id}
+                >
+                  <div className="people-table-cell people-table-cell--checkbox">
+                    <Checkbox checked={selectedIds.has(person.id)} onChange={() => toggleSelect(person.id)} />
+                  </div>
+                  <div className="people-table-cell people-table-cell--name">
+                    <div className="people-avatar" style={{ background: avatarColors[(person.id - 1) % avatarColors.length] }}>
+                      {person.avatar}
+                    </div>
+                    <div className="people-name-info">
+                      <span className="people-name">{person.name}</span>
+                      <span className="people-email">{person.email}</span>
+                    </div>
+                  </div>
+                  <div className="people-table-cell people-table-cell--status-d">
+                    <span className={`people-status-badge people-status-badge--${person.status === 'terminated' ? 'error' : 'warning'}`}>
+                      {person.status === 'terminated' ? 'Terminated' : 'Long Leave'}
+                    </span>
+                  </div>
+                  <div className="people-table-cell people-table-cell--role-d">{person.role}</div>
+                  <div className="people-table-cell people-table-cell--team-d">{person.team || '–'}</div>
+                  <div className="people-table-cell people-table-cell--region-d">{person.region}</div>
+                  <div className="people-table-cell people-table-cell--deactivated">
+                    <div className="people-date-stack">
+                      <span>{person.deactivatedOn.replace(/,?\s*\d{4}$/, ',')}</span>
+                      <span>{person.deactivatedOn.match(/\d{4}$/)?.[0]}</span>
+                    </div>
+                  </div>
+                  <div className="people-table-cell people-table-cell--actions">
+                    <div className="people-more-wrapper" ref={openMenuId === person.id ? menuRef : undefined}>
+                      <button
+                        className="people-more-btn"
+                        aria-label="More actions"
+                        onClick={() => setOpenMenuId(openMenuId === person.id ? null : person.id)}
+                      >
+                        <More size={24} color="var(--text-tertiary)" variant="Linear" />
+                      </button>
+                      {openMenuId === person.id && (
+                        <div className="people-action-menu">
+                          <div className="people-action-menu-caret" />
+                          <button
+                            className="people-action-menu-item"
+                            onClick={() => {
+                              setOpenMenuId(null)
+                              handleReactivateSingle(person)
+                            }}
+                          >
+                            Reactivate
+                          </button>
+                          <button
+                            className="people-action-menu-item"
+                            onClick={() => {
+                              setOpenMenuId(null)
+                              setDeactivatedPeople(prev =>
+                                prev.map(p =>
+                                  p.id === person.id
+                                    ? { ...p, status: person.status === 'terminated' ? 'long-leave' as const : 'terminated' as const }
+                                    : p
+                                )
+                              )
+                              showToast('success', `${person.name} status changed to ${person.status === 'terminated' ? 'Long Leave' : 'Terminated'}`)
+                            }}
+                          >
+                            {person.status === 'terminated' ? 'Change to Long Leave' : 'Change to Terminated'}
+                          </button>
+                          <button
+                            className="people-action-menu-item people-action-menu-item--danger"
+                            onClick={() => {
+                              setOpenMenuId(null)
+                              setModal({ type: 'delete-single', person })
+                            }}
+                          >
+                            Delete Permanently
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ═══ Bulk action bar — All People ═══ */}
+      {selectedIds.size > 0 && !isDeactivatedTab && (
+        <div className="people-bulk-bar">
+          <button
+            className="people-bulk-bar-close"
+            aria-label="Clear selection"
+            onClick={() => setSelectedIds(new Set())}
+          >
+            <Add size={18} color="currentColor" style={{ transform: 'rotate(45deg)' }} />
+          </button>
+          <span className="people-bulk-bar-count">{selectedIds.size} selected</span>
+          <div className="people-bulk-bar-divider" />
+          <div className="people-bulk-bar-actions">
+            <button
+              className="people-bulk-bar-btn people-bulk-bar-btn--danger"
+              onClick={() => setModal({ type: 'deactivate-bulk', persons: selectedPeoplePersons })}
+            >
+              Deactivate {selectedIds.size} {selectedIds.size === 1 ? 'User' : 'Users'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ Bulk action bar — Deactivated ═══ */}
+      {selectedIds.size > 0 && isDeactivatedTab && (
+        <div className="people-bulk-bar">
+          <button
+            className="people-bulk-bar-close"
+            aria-label="Clear selection"
+            onClick={() => setSelectedIds(new Set())}
+          >
+            <Add size={18} color="currentColor" style={{ transform: 'rotate(45deg)' }} />
+          </button>
+          <span className="people-bulk-bar-count">{selectedIds.size} selected</span>
+          <div className="people-bulk-bar-divider" />
+          <div className="people-bulk-bar-actions">
+            <button
+              className="people-bulk-bar-btn people-bulk-bar-btn--primary"
+              onClick={() => setModal({ type: 'reactivate-bulk', persons: selectedPersons })}
+            >
+              Reactivate {selectedIds.size} {selectedIds.size === 1 ? 'User' : 'Users'}
+            </button>
+            <button
+              className="people-bulk-bar-btn people-bulk-bar-btn--danger"
+              onClick={() => setModal({ type: 'delete-bulk', persons: selectedPersons })}
+            >
+              Delete {selectedIds.size} Permanently
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ Modals ═══ */}
+
+      {/* Deactivate single (radio reason cards — same flow as bulk) */}
+      <ConfirmModal open={modal.type === 'deactivate'} onClose={closeModal}>
+        {modal.type === 'deactivate' && (
+          <>
+            <div className="confirm-modal-header">
+              <h2 className="confirm-modal-title">Remove {modal.person.name} from the account</h2>
+              <p className="confirm-modal-body">
+                This will immediately remove their access to the platform.<br />
+                Choose a status:
+              </p>
+            </div>
+            <div className="confirm-modal-radio-cards">
+              <label className={`confirm-modal-radio-card${deactivateReason === 'long-leave' ? ' confirm-modal-radio-card--warning' : ''}`}>
+                <input
+                  type="radio"
+                  name="deactivate-reason-single"
+                  checked={deactivateReason === 'long-leave'}
+                  onChange={() => setDeactivateReason('long-leave')}
+                />
+                <span className="confirm-modal-radio-custom" />
+                <div className="confirm-modal-radio-card-text">
+                  <span className="confirm-modal-radio-card-title">Temporary Long Leave</span>
+                  <span className="confirm-modal-radio-card-desc">They're expected to return. Data retained indefinitely.</span>
+                </div>
+              </label>
+              <label className={`confirm-modal-radio-card${deactivateReason === 'terminated' ? ' confirm-modal-radio-card--danger' : ''}`}>
+                <input
+                  type="radio"
+                  name="deactivate-reason-single"
+                  checked={deactivateReason === 'terminated'}
+                  onChange={() => setDeactivateReason('terminated')}
+                />
+                <span className="confirm-modal-radio-custom" />
+                <div className="confirm-modal-radio-card-text">
+                  <span className="confirm-modal-radio-card-title">Terminated</span>
+                  <span className="confirm-modal-radio-card-desc">They've left the organisation. Data retained for 3 years, then auto-deleted.</span>
+                </div>
+              </label>
+            </div>
+            <div className="confirm-modal-actions">
+              <button className="confirm-modal-btn confirm-modal-btn--outlined-neutral" onClick={closeModal}>Cancel</button>
+              <button className="confirm-modal-btn confirm-modal-btn--primary" onClick={() => handleDeactivate(modal.person)}>Deactivate 1 User</button>
+            </div>
+          </>
+        )}
+      </ConfirmModal>
+
+      {/* Deactivate bulk (radio reason cards — no user list) */}
+      <ConfirmModal open={modal.type === 'deactivate-bulk'} onClose={closeModal}>
+        {modal.type === 'deactivate-bulk' && (
+          <>
+            <div className="confirm-modal-header">
+              <h2 className="confirm-modal-title">Remove {modal.persons.length} {modal.persons.length === 1 ? 'user' : 'users'} from the account</h2>
+              <p className="confirm-modal-body">
+                This will immediately remove their access to the platform.<br />
+                Choose a status:
+              </p>
+            </div>
+            <div className="confirm-modal-radio-cards">
+              <label className={`confirm-modal-radio-card${deactivateReason === 'long-leave' ? ' confirm-modal-radio-card--warning' : ''}`}>
+                <input
+                  type="radio"
+                  name="deactivate-reason"
+                  checked={deactivateReason === 'long-leave'}
+                  onChange={() => setDeactivateReason('long-leave')}
+                />
+                <span className="confirm-modal-radio-custom" />
+                <div className="confirm-modal-radio-card-text">
+                  <span className="confirm-modal-radio-card-title">Temporary Long Leave</span>
+                  <span className="confirm-modal-radio-card-desc">They're expected to return. Data retained indefinitely.</span>
+                </div>
+              </label>
+              <label className={`confirm-modal-radio-card${deactivateReason === 'terminated' ? ' confirm-modal-radio-card--danger' : ''}`}>
+                <input
+                  type="radio"
+                  name="deactivate-reason"
+                  checked={deactivateReason === 'terminated'}
+                  onChange={() => setDeactivateReason('terminated')}
+                />
+                <span className="confirm-modal-radio-custom" />
+                <div className="confirm-modal-radio-card-text">
+                  <span className="confirm-modal-radio-card-title">Terminated</span>
+                  <span className="confirm-modal-radio-card-desc">They've left the organisation. Data retained for 3 years, then auto-deleted.</span>
+                </div>
+              </label>
+            </div>
+            <div className="confirm-modal-actions">
+              <button className="confirm-modal-btn confirm-modal-btn--outlined-neutral" onClick={closeModal}>Cancel</button>
+              <button className="confirm-modal-btn confirm-modal-btn--primary" onClick={() => handleDeactivateBulk(modal.persons)}>Deactivate {modal.persons.length} {modal.persons.length === 1 ? 'user' : 'users'}</button>
+            </div>
+          </>
+        )}
+      </ConfirmModal>
+
+      {/* Reactivate bulk (status breakdown) */}
+      <ConfirmModal open={modal.type === 'reactivate-bulk'} onClose={closeModal}>
+        {modal.type === 'reactivate-bulk' && (() => {
+          const terminated = modal.persons.filter(p => p.status === 'terminated')
+          const longLeave = modal.persons.filter(p => p.status === 'long-leave')
+          const total = modal.persons.length
+          return (
+            <>
+              <div className="confirm-modal-header confirm-modal-header--center">
+                <h3 className="confirm-modal-title">Reactivate users</h3>
+                <p className="confirm-modal-reactivate-subtitle">
+                  {terminated.length > 0 && (
+                    <>
+                      <span>{terminated.length} </span>
+                      <span className="confirm-modal-reactivate-label--danger">Terminated</span>
+                      <span> {terminated.length === 1 ? 'user' : 'users'} will be restored to active.</span>
+                      <br />
+                    </>
+                  )}
+                  {longLeave.length > 0 && (
+                    <>
+                      <span>{longLeave.length} </span>
+                      <span className="confirm-modal-reactivate-label--warning">Long Leave</span>
+                      <span> {longLeave.length === 1 ? 'user' : 'users'} will return to active.</span>
+                    </>
+                  )}
+                </p>
+              </div>
+              <div className="confirm-modal-actions">
+                <button className="confirm-modal-btn confirm-modal-btn--cancel" onClick={closeModal}>
+                  Cancel
+                </button>
+                <button
+                  className="confirm-modal-btn confirm-modal-btn--primary"
+                  onClick={() => {
+                    handleReactivateBulk(modal.persons)
+                    closeModal()
+                  }}
+                >
+                  Reactivate {total} {total === 1 ? 'User' : 'Users'}
+                </button>
+              </div>
+            </>
+          )
+        })()}
+      </ConfirmModal>
+
+      {/* Delete single (Error dialog — centered icon/title/body + type-to-confirm) */}
+      <ConfirmModal open={modal.type === 'delete-single'} onClose={closeModal}>
+        {modal.type === 'delete-single' && (
+          <>
+            <div className="confirm-modal-header confirm-modal-header--center">
+              <div className="confirm-modal-icon">
+                <Danger size={72} color="var(--danger-500)" variant="Linear" />
+              </div>
+              <h2 className="confirm-modal-title">Delete permanently {modal.person.name}</h2>
+              <p className="confirm-modal-body">
+                This action cannot be undone. All data for this user will be permanently removed.
+              </p>
+            </div>
+            <div className="confirm-modal-input-group">
+              <label className="confirm-modal-label">
+                Type <span className="confirm-modal-label-danger">'Delete'</span> below, to confirm
+              </label>
+              <input
+                className="confirm-modal-input"
+                type="text"
+                value={confirmInput}
+                onChange={e => setConfirmInput(e.target.value)}
+                placeholder="Delete"
+              />
+            </div>
+            <div className="confirm-modal-actions">
+              <button className="confirm-modal-btn confirm-modal-btn--outlined" onClick={closeModal}>Cancel</button>
+              <button
+                className="confirm-modal-btn confirm-modal-btn--danger"
+                disabled={confirmInput !== 'Delete'}
+                onClick={() => handleDeleteSingle(modal.person)}
+              >
+                Delete Permanently
+              </button>
+            </div>
+          </>
+        )}
+      </ConfirmModal>
+
+      {/* Delete bulk (Error dialog — centered icon/title/body + type-to-confirm) */}
+      <ConfirmModal open={modal.type === 'delete-bulk'} onClose={closeModal}>
+        {modal.type === 'delete-bulk' && (
+          <>
+            <div className="confirm-modal-header confirm-modal-header--center">
+              <div className="confirm-modal-icon">
+                <Danger size={72} color="var(--danger-500)" variant="Linear" />
+              </div>
+              <h2 className="confirm-modal-title">Delete permanently {modal.persons.length} users</h2>
+              <p className="confirm-modal-body">
+                This action cannot be undone. All data for these users will be permanently removed.
+              </p>
+            </div>
+            <div className="confirm-modal-input-group">
+              <label className="confirm-modal-label">
+                Type <span className="confirm-modal-label-danger">'Delete'</span> below, to confirm
+              </label>
+              <input
+                className="confirm-modal-input"
+                type="text"
+                value={confirmInput}
+                onChange={e => setConfirmInput(e.target.value)}
+                placeholder="Delete"
+              />
+            </div>
+            <div className="confirm-modal-actions">
+              <button className="confirm-modal-btn confirm-modal-btn--outlined" onClick={closeModal}>Cancel</button>
+              <button
+                className="confirm-modal-btn confirm-modal-btn--danger"
+                disabled={confirmInput !== 'Delete'}
+                onClick={() => handleDeleteBulk(modal.persons)}
+              >
+                Delete {modal.persons.length} Permanently
+              </button>
+            </div>
+          </>
+        )}
+      </ConfirmModal>
+
+      {/* Invite modal */}
+      {showInvite && (
+        <InviteModal
+          onClose={() => setShowInvite(false)}
+          userFields={(() => {
+            try {
+              const raw = localStorage.getItem('5mins-user-fields')
+              return raw ? JSON.parse(raw) : []
+            } catch { return [] }
+          })()}
+        />
+      )}
+
+      {/* Toast stack */}
+      <ToastContainer toasts={toasts} />
+        </div>
+      </main>
+    </div>
+  )
+}
+
+export default People
