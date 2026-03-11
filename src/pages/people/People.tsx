@@ -14,12 +14,15 @@ import {
   Devices,
   ArrowDown2,
   ArrowUp2,
+  Setting4,
 } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import Checkbox from '../../components/Checkbox/Checkbox'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import ToastContainer, { useToast } from '../../components/Toast/Toast'
 import InviteModal from './components/InviteModal/InviteModal'
+import EditColumnsPopover from './components/EditColumnsPopover/EditColumnsPopover'
+import { useColumnPreferences } from './hooks/useColumnPreferences'
 import './People.css'
 
 /* ─── Types ─── */
@@ -109,7 +112,18 @@ function People() {
   const [filterOpen, setFilterOpen] = useState(false)
   const filterRef = useRef<HTMLDivElement>(null)
   const [showInvite, setShowInvite] = useState(false)
+  const [editColumnsOpen, setEditColumnsOpen] = useState(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [isScrolled, setIsScrolled] = useState(false)
 
+  const userFields = (() => {
+    try {
+      const raw = localStorage.getItem('5mins-user-fields')
+      return raw ? JSON.parse(raw) : []
+    } catch { return [] }
+  })()
+
+  const { visibleKeys, toggleColumn, resetToDefault, allColumns } = useColumnPreferences(userFields)
   const tabs = [
     'All People',
     'Managers',
@@ -190,6 +204,33 @@ function People() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [filterOpen])
+
+  /* ─── Track horizontal scroll for frozen column styling ─── */
+
+  const [hasScroll, setHasScroll] = useState(false)
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+
+    function onScroll() {
+      setIsScrolled(el!.scrollLeft > 0)
+    }
+
+    function checkOverflow() {
+      setHasScroll(el!.scrollWidth > el!.clientWidth)
+    }
+
+    el.addEventListener('scroll', onScroll)
+    const ro = new ResizeObserver(checkOverflow)
+    ro.observe(el)
+    checkOverflow()
+
+    return () => {
+      el.removeEventListener('scroll', onScroll)
+      ro.disconnect()
+    }
+  }, [isDeactivatedTab, visibleKeys])
 
   /* ─── Selection helpers ─── */
 
@@ -427,106 +468,149 @@ function People() {
             />
           </div>
         </div>
-        <button className="people-download-btn">
-          Download List
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M10 2.5V12.5M10 12.5L6.25 8.75M10 12.5L13.75 8.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M3.33 14.167V15.833C3.33 16.292 3.513 16.733 3.838 17.058C4.163 17.383 4.604 17.567 5.063 17.567H14.938C15.396 17.567 15.838 17.383 16.163 17.058C16.488 16.733 16.671 16.292 16.671 15.833V14.167" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
+        <div className="people-actions-right">
+          {!isDeactivatedTab && userFields.length > 0 && (
+            <div className="people-edit-cols-wrapper">
+              <button
+                className="people-edit-cols-btn"
+                onClick={() => setEditColumnsOpen(prev => !prev)}
+              >
+                <Setting4 size={18} color="currentColor" variant="Linear" />
+                Edit columns
+              </button>
+              {editColumnsOpen && (
+                <EditColumnsPopover
+                  columns={allColumns}
+                  visibleKeys={visibleKeys}
+                  onToggle={toggleColumn}
+                  onReset={() => {
+                    resetToDefault()
+                    showToast('success', 'Columns reset to default')
+                  }}
+                  onClose={() => setEditColumnsOpen(false)}
+                />
+              )}
+            </div>
+          )}
+          <button className="people-download-btn">
+            Download List
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2.5V12.5M10 12.5L6.25 8.75M10 12.5L13.75 8.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3.33 14.167V15.833C3.33 16.292 3.513 16.733 3.838 17.058C4.163 17.383 4.604 17.567 5.063 17.567H14.938C15.396 17.567 15.838 17.383 16.163 17.058C16.488 16.733 16.671 16.292 16.671 15.833V14.167" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        </div>
       </div>
       )}
 
       {/* ═══ All People Table ═══ */}
       {!isDeactivatedTab && (
-        <div className="people-table">
-          <div className="people-table-header">
-            <div className="people-table-cell people-table-cell--checkbox">
-              <Checkbox checked={allSelected} onChange={toggleSelectAll} />
-            </div>
-            <div className="people-table-cell people-table-cell--name">Name</div>
-            <div className="people-table-cell people-table-cell--role">Role</div>
-            <div className="people-table-cell people-table-cell--team">Team</div>
-            <div className="people-table-cell people-table-cell--date">
-              Start Date
-              <Add size={14} color="var(--text-tertiary)" style={{ transform: 'rotate(45deg)', opacity: 0 }} />
-            </div>
-            <div className="people-table-cell people-table-cell--region">Region</div>
-            <div className="people-table-cell people-table-cell--status">Status</div>
-            <div className="people-table-cell people-table-cell--actions" />
-          </div>
-
-          {filteredPeople.map((person) => (
-            <div
-              className={`people-table-row${selectedIds.has(person.id) ? ' people-table-row--selected' : ''}`}
-              key={person.id}
-            >
+        <div
+          className={`people-table-scroll${hasScroll ? ' people-table-scroll--has-scroll' : ''}${isScrolled ? ' people-table-scroll--scrolled' : ''}`}
+          ref={scrollRef}
+        >
+          <div className="people-table">
+            <div className="people-table-header">
               <div className="people-table-cell people-table-cell--checkbox">
-                <Checkbox checked={selectedIds.has(person.id)} onChange={() => toggleSelect(person.id)} />
+                <Checkbox checked={allSelected} onChange={toggleSelectAll} />
               </div>
-              <div className="people-table-cell people-table-cell--name">
-                <div className="people-avatar" style={{ background: avatarColors[(person.id - 1) % avatarColors.length] }}>
-                  {person.avatar}
+              <div className="people-table-cell people-table-cell--name">Name</div>
+              {visibleKeys.includes('role') && <div className="people-table-cell people-table-cell--role">Role</div>}
+              {visibleKeys.includes('team') && <div className="people-table-cell people-table-cell--team">Team</div>}
+              {visibleKeys.includes('startDate') && (
+                <div className="people-table-cell people-table-cell--date">
+                  Start Date
+                  <Add size={14} color="var(--text-tertiary)" style={{ transform: 'rotate(45deg)', opacity: 0 }} />
                 </div>
-                <div className="people-name-info">
-                  <span className="people-name">{person.name}</span>
-                  <span className="people-email">{person.email}</span>
-                </div>
-              </div>
-              <div className="people-table-cell people-table-cell--role">{person.role}</div>
-              <div className="people-table-cell people-table-cell--team">{person.team}</div>
-              <div className="people-table-cell people-table-cell--date">
-                <div className="people-date-stack">
-                  <span>{person.startDate.replace(/,?\s*\d{4}$/, ',')}</span>
-                  <span>{person.startDate.match(/\d{4}$/)?.[0]}</span>
-                </div>
-              </div>
-              <div className="people-table-cell people-table-cell--region">{person.region}</div>
-              <div className="people-table-cell people-table-cell--status">
-                <span className={`people-badge people-badge--${person.status.toLowerCase()}`}>
-                  {person.status}
-                </span>
-              </div>
-              <div className="people-table-cell people-table-cell--actions">
-                <div className="people-more-wrapper" ref={openMenuId === person.id ? menuRef : undefined}>
-                  <button
-                    className="people-more-btn"
-                    aria-label="More actions"
-                    onClick={() => setOpenMenuId(openMenuId === person.id ? null : person.id)}
-                  >
-                    <More size={24} color="var(--text-tertiary)" variant="Linear" />
-                  </button>
-                  {openMenuId === person.id && (
-                    <div className="people-action-menu">
-                      <div className="people-action-menu-caret" />
-                      <button className="people-action-menu-item" onClick={() => setOpenMenuId(null)}>
-                        <Edit2 size={20} color="var(--text-secondary)" variant="Linear" />
-                        Edit user profile
-                      </button>
-                      <button className="people-action-menu-item" onClick={() => setOpenMenuId(null)}>
-                        <ShieldSecurity size={20} color="var(--text-secondary)" variant="Linear" />
-                        Make user Admin
-                      </button>
-                      <button className="people-action-menu-item" onClick={() => setOpenMenuId(null)}>
-                        <Devices size={20} color="var(--text-secondary)" variant="Linear" />
-                        Make Subject Expert
-                      </button>
-                      <button
-                        className="people-action-menu-item people-action-menu-item--danger"
-                        onClick={() => {
-                          setOpenMenuId(null)
-                          setModal({ type: 'deactivate', person })
-                        }}
-                      >
-                        <ProfileRemove size={20} color="var(--danger-500)" variant="Linear" />
-                        Deactivate user account
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
+              )}
+              {visibleKeys.includes('region') && <div className="people-table-cell people-table-cell--region">Region</div>}
+              {visibleKeys.includes('status') && <div className="people-table-cell people-table-cell--status">Status</div>}
+              {visibleKeys.filter(k => k.startsWith('custom-')).map(key => {
+                const col = allColumns.find(c => c.key === key)
+                return col ? <div key={key} className="people-table-cell people-table-cell--custom">{col.label}</div> : null
+              })}
+              <div className="people-table-cell people-table-cell--actions" />
             </div>
-          ))}
+
+            {filteredPeople.map((person) => (
+              <div
+                className={`people-table-row${selectedIds.has(person.id) ? ' people-table-row--selected' : ''}`}
+                key={person.id}
+              >
+                <div className="people-table-cell people-table-cell--checkbox">
+                  <Checkbox checked={selectedIds.has(person.id)} onChange={() => toggleSelect(person.id)} />
+                </div>
+                <div className="people-table-cell people-table-cell--name">
+                  <div className="people-avatar" style={{ background: avatarColors[(person.id - 1) % avatarColors.length] }}>
+                    {person.avatar}
+                  </div>
+                  <div className="people-name-info">
+                    <span className="people-name">{person.name}</span>
+                    <span className="people-email">{person.email}</span>
+                  </div>
+                </div>
+                {visibleKeys.includes('role') && <div className="people-table-cell people-table-cell--role">{person.role}</div>}
+                {visibleKeys.includes('team') && <div className="people-table-cell people-table-cell--team">{person.team}</div>}
+                {visibleKeys.includes('startDate') && (
+                  <div className="people-table-cell people-table-cell--date">
+                    <div className="people-date-stack">
+                      <span>{person.startDate.replace(/,?\s*\d{4}$/, ',')}</span>
+                      <span>{person.startDate.match(/\d{4}$/)?.[0]}</span>
+                    </div>
+                  </div>
+                )}
+                {visibleKeys.includes('region') && <div className="people-table-cell people-table-cell--region">{person.region}</div>}
+                {visibleKeys.includes('status') && (
+                  <div className="people-table-cell people-table-cell--status">
+                    <span className={`people-badge people-badge--${person.status.toLowerCase()}`}>
+                      {person.status}
+                    </span>
+                  </div>
+                )}
+                {visibleKeys.filter(k => k.startsWith('custom-')).map(key => (
+                  <div key={key} className="people-table-cell people-table-cell--custom">–</div>
+                ))}
+                <div className="people-table-cell people-table-cell--actions">
+                  <div className="people-more-wrapper" ref={openMenuId === person.id ? menuRef : undefined}>
+                    <button
+                      className="people-more-btn"
+                      aria-label="More actions"
+                      onClick={() => setOpenMenuId(openMenuId === person.id ? null : person.id)}
+                    >
+                      <More size={24} color="var(--text-tertiary)" variant="Linear" />
+                    </button>
+                    {openMenuId === person.id && (
+                      <div className="people-action-menu">
+                        <div className="people-action-menu-caret" />
+                        <button className="people-action-menu-item" onClick={() => setOpenMenuId(null)}>
+                          <Edit2 size={20} color="var(--text-secondary)" variant="Linear" />
+                          Edit user profile
+                        </button>
+                        <button className="people-action-menu-item" onClick={() => setOpenMenuId(null)}>
+                          <ShieldSecurity size={20} color="var(--text-secondary)" variant="Linear" />
+                          Make user Admin
+                        </button>
+                        <button className="people-action-menu-item" onClick={() => setOpenMenuId(null)}>
+                          <Devices size={20} color="var(--text-secondary)" variant="Linear" />
+                          Make Subject Expert
+                        </button>
+                        <button
+                          className="people-action-menu-item people-action-menu-item--danger"
+                          onClick={() => {
+                            setOpenMenuId(null)
+                            setModal({ type: 'deactivate', person })
+                          }}
+                        >
+                          <ProfileRemove size={20} color="var(--danger-500)" variant="Linear" />
+                          Deactivate user account
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -941,12 +1025,7 @@ function People() {
             setActiveTab('All People')
             showToast('success', count === 1 ? 'Invite sent' : 'Invites sent')
           }}
-          userFields={(() => {
-            try {
-              const raw = localStorage.getItem('5mins-user-fields')
-              return raw ? JSON.parse(raw) : []
-            } catch { return [] }
-          })()}
+          userFields={userFields}
         />
       )}
 

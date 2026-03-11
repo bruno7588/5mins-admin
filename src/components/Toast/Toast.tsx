@@ -30,7 +30,7 @@ function ToastPill({ type, message, fading, icon }: { type: ToastType; message: 
   const Icon = ICON_MAP[type]
   return (
     <div className={`toast toast--${type}${fading ? ' toast--fading' : ''}`}>
-      {icon && <Icon size={24} color="currentColor" variant="Bold" />}
+      {icon && <Icon size={24} color="currentColor" variant="Linear" />}
       <span>{message}</span>
     </div>
   )

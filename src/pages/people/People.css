@@ -160,6 +160,36 @@
   color: var(--text-tertiary);
 }
 
+/* Actions right group */
+.people-actions-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+}
+
+.people-edit-cols-wrapper {
+  position: relative;
+}
+
+.people-edit-cols-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-s) var(--space-m);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.people-edit-cols-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
 .people-download-btn {
   display: flex;
   align-items: center;
@@ -290,6 +320,11 @@
 }
 
 /* ===== Table ===== */
+/* Scroll wrapper — only scrolls when content overflows */
+.people-table-scroll {
+  overflow-x: auto;
+}
+
 .people-table {
   display: flex;
   flex-direction: column;
@@ -299,6 +334,11 @@
 .people-table-header {
   display: flex;
   align-items: center;
+  min-width: fit-content;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--page-background);
 }
 
 .people-table-header .people-table-cell {
@@ -316,6 +356,7 @@
 .people-table-row {
   display: flex;
   align-items: center;
+  min-width: fit-content;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   transition: background 150ms ease;
@@ -347,7 +388,7 @@
 /* Column widths — All People */
 .people-table-cell--name {
   flex: 1;
-  min-width: 200px;
+  min-width: 240px;
   gap: var(--space-m);
 }
 
@@ -397,6 +438,54 @@
 
 .people-table-cell--checkbox + .people-table-cell--name {
   padding-left: var(--space-m);
+}
+
+/* Custom field column */
+.people-table-cell--custom {
+  width: 160px;
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+/* ─── Sticky name column (checkbox + name act as one frozen group) ─── */
+.people-table-scroll--has-scroll .people-table-cell--checkbox,
+.people-table-scroll--has-scroll .people-table-cell--name {
+  position: sticky;
+  z-index: 3;
+}
+
+.people-table-scroll--has-scroll .people-table-cell--checkbox {
+  left: 0;
+}
+
+.people-table-scroll--has-scroll .people-table-cell--name {
+  left: 40px; /* checkbox width (border-box includes padding) */
+  flex: none;
+  width: 240px;
+}
+
+/* Opaque page-background on sticky cells so content doesn't show through */
+.people-table-scroll--has-scroll .people-table-cell--checkbox,
+.people-table-scroll--has-scroll .people-table-cell--name {
+  background: var(--page-background);
+}
+
+/* Shadow on name cell edge — only when scrolled */
+.people-table-scroll--has-scroll .people-table-cell--name::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.04), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.people-table-scroll--scrolled .people-table-cell--name::after {
+  opacity: 1;
 }
 
 .people-table-cell--team-d {

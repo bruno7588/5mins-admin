@@ -154,7 +154,7 @@ function UserFields() {
           {deleteField && (
             <>
               <div className="confirm-modal-header confirm-modal-header--center">
-                <Danger size={72} color="var(--danger-500)" variant="Bold" />
+                <Danger size={72} color="var(--danger-500)" variant="Linear" />
                 <h3 className="confirm-modal-title">Delete user field</h3>
                 <p className="confirm-modal-body">
                   This field contains data for users. Delete anyway?
