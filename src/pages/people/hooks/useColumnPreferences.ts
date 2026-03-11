@@ -24,11 +24,11 @@ interface UserField {
 /* ─── Default columns for All People table ─── */
 
 const DEFAULT_COLUMNS: ColumnDef[] = [
-  { key: 'role', label: 'Role', locked: false, isCustomField: false },
-  { key: 'team', label: 'Team', locked: false, isCustomField: false },
-  { key: 'startDate', label: 'Start Date', locked: false, isCustomField: false },
-  { key: 'region', label: 'Region', locked: false, isCustomField: false },
-  { key: 'status', label: 'Status', locked: false, isCustomField: false },
+  { key: 'role', label: 'Role', locked: true, isCustomField: false },
+  { key: 'team', label: 'Team', locked: true, isCustomField: false },
+  { key: 'startDate', label: 'Start Date', locked: true, isCustomField: false },
+  { key: 'region', label: 'Region', locked: true, isCustomField: false },
+  { key: 'status', label: 'Status', locked: true, isCustomField: false },
 ]
 
 const DEFAULT_VISIBLE_KEYS = DEFAULT_COLUMNS.map(c => c.key)

@@ -367,12 +367,12 @@
 }
 
 .people-table-row--selected {
-  background: rgba(255, 187, 56, 0.12);
-  border-color: rgba(255, 187, 56, 0.12);
+  background: #FEF1D6;
+  border-color: #FEF1D6;
 }
 
 .people-table-row--selected:hover {
-  background: rgba(255, 187, 56, 0.18);
+  background: #FDECC5;
 }
 
 .people-table-cell {
@@ -470,15 +470,30 @@
   background: var(--page-background);
 }
 
-/* Shadow on name cell edge — only when scrolled */
+.people-table-scroll--has-scroll .people-table-row:hover .people-table-cell--checkbox,
+.people-table-scroll--has-scroll .people-table-row:hover .people-table-cell--name {
+  background: var(--cards-background-hover);
+}
+
+.people-table-scroll--has-scroll .people-table-row--selected .people-table-cell--checkbox,
+.people-table-scroll--has-scroll .people-table-row--selected .people-table-cell--name {
+  background: #FEF1D6;
+}
+
+.people-table-scroll--has-scroll .people-table-row--selected:hover .people-table-cell--checkbox,
+.people-table-scroll--has-scroll .people-table-row--selected:hover .people-table-cell--name {
+  background: #FDECC5;
+}
+
+/* Shadow on name cell edge — only when user has scrolled horizontally */
 .people-table-scroll--has-scroll .people-table-cell--name::after {
   content: '';
   position: absolute;
-  right: -8px;
+  right: -12px;
   top: 0;
   bottom: 0;
-  width: 8px;
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.04), transparent);
+  width: 12px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.08), transparent);
   pointer-events: none;
   opacity: 0;
   transition: opacity 150ms ease;
