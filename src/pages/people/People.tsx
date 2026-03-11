@@ -936,6 +936,11 @@ function People() {
       {showInvite && (
         <InviteModal
           onClose={() => setShowInvite(false)}
+          onInvite={(count) => {
+            setShowInvite(false)
+            setActiveTab('All People')
+            showToast('success', count === 1 ? 'Invite sent' : 'Invites sent')
+          }}
           userFields={(() => {
             try {
               const raw = localStorage.getItem('5mins-user-fields')

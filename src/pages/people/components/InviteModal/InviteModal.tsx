@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Add, Notification, ArrowDown2 } from 'iconsax-react'
+import { Add, Notification, ArrowDown2, Calendar } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import './InviteModal.css'
 
@@ -22,6 +22,7 @@ interface InviteRow {
 
 interface InviteModalProps {
   onClose: () => void
+  onInvite: (count: number) => void
   userFields: UserField[]
 }
 
@@ -45,7 +46,7 @@ const automations = [
   { name: 'Q1 Safety Training', badges: ['Region'] },
 ]
 
-function InviteModal({ onClose, userFields }: InviteModalProps) {
+function InviteModal({ onClose, onInvite, userFields }: InviteModalProps) {
   const [rows, setRows] = useState<InviteRow[]>([emptyRow(userFields)])
   const [showMoreAutomations, setShowMoreAutomations] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
@@ -127,11 +128,26 @@ function InviteModal({ onClose, userFields }: InviteModalProps) {
         {/* Form rows */}
         <div className="invite-modal-form">
           {rows.map((row, rowIndex) => (
-            <div className="invite-modal-user" key={rowIndex}>
-              <div className={`invite-modal-row${rowIndex === 0 ? ' invite-modal-row--first' : ''}`}>
+            <div className="invite-modal-card" key={rowIndex}>
+              {/* Remove button — top right of card */}
+              {rows.length > 1 && (
+                <button
+                  className="invite-modal-card-remove"
+                  onClick={() => removeRow(rowIndex)}
+                  aria-label="Remove row"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M17.25 17.25L6.75 6.75M17.25 6.75L6.75 17.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <span className="invite-modal-card-remove-tooltip">Remove</span>
+                </button>
+              )}
+
+              {/* Fields grid */}
+              <div className="invite-modal-grid">
                 {/* Email */}
-                <div className="invite-modal-field invite-modal-field--grow">
-                  {rowIndex === 0 && <label className="invite-modal-label">Email address</label>}
+                <div className="invite-modal-field">
+                  <label className="invite-modal-label">Email address</label>
                   <input
                     className="invite-modal-input"
                     type="email"
@@ -142,8 +158,8 @@ function InviteModal({ onClose, userFields }: InviteModalProps) {
                 </div>
 
                 {/* Team name */}
-                <div className="invite-modal-field invite-modal-field--200">
-                  {rowIndex === 0 && <label className="invite-modal-label">Team name</label>}
+                <div className="invite-modal-field">
+                  <label className="invite-modal-label">Team name</label>
                   <div className="invite-modal-dropdown-wrapper">
                     <button
                       className="invite-modal-dropdown"
@@ -171,8 +187,8 @@ function InviteModal({ onClose, userFields }: InviteModalProps) {
                 </div>
 
                 {/* Role */}
-                <div className="invite-modal-field invite-modal-field--200">
-                  {rowIndex === 0 && <label className="invite-modal-label">Role <span className="invite-modal-required">*</span></label>}
+                <div className="invite-modal-field">
+                  <label className="invite-modal-label">Role <span className="invite-modal-required">*</span></label>
                   <input
                     className="invite-modal-input"
                     type="text"
@@ -184,18 +200,21 @@ function InviteModal({ onClose, userFields }: InviteModalProps) {
 
                 {/* Start date */}
                 <div className="invite-modal-field">
-                  {rowIndex === 0 && <label className="invite-modal-label">Start date <span className="invite-modal-required">*</span></label>}
-                  <input
-                    className="invite-modal-input invite-modal-input--date"
-                    type="date"
-                    value={row.startDate}
-                    onChange={e => updateRow(rowIndex, { startDate: e.target.value })}
-                  />
+                  <label className="invite-modal-label">Start date <span className="invite-modal-required">*</span></label>
+                  <div className="invite-modal-date-wrapper">
+                    <input
+                      className="invite-modal-input invite-modal-input--date"
+                      type="date"
+                      value={row.startDate}
+                      onChange={e => updateRow(rowIndex, { startDate: e.target.value })}
+                    />
+                    <Calendar size={20} color="var(--text-secondary)" className="invite-modal-date-icon" />
+                  </div>
                 </div>
 
                 {/* Region */}
-                <div className="invite-modal-field invite-modal-field--180">
-                  {rowIndex === 0 && <label className="invite-modal-label">Region <span className="invite-modal-required">*</span></label>}
+                <div className="invite-modal-field">
+                  <label className="invite-modal-label">Region <span className="invite-modal-required">*</span></label>
                   <div className="invite-modal-dropdown-wrapper">
                     <button
                       className="invite-modal-dropdown"
@@ -224,7 +243,7 @@ function InviteModal({ onClose, userFields }: InviteModalProps) {
 
                 {/* Team rights */}
                 <div className="invite-modal-field">
-                  {rowIndex === 0 && <label className="invite-modal-label">Team rights</label>}
+                  <label className="invite-modal-label">Team rights</label>
                   <div className="invite-modal-dropdown-wrapper">
                     <button
                       className="invite-modal-dropdown"
@@ -253,13 +272,11 @@ function InviteModal({ onClose, userFields }: InviteModalProps) {
 
                 {/* Custom user fields */}
                 {userFields.map(field => (
-                  <div className="invite-modal-field invite-modal-field--180" key={field.id}>
-                    {rowIndex === 0 && (
-                      <label className="invite-modal-label">
-                        {field.name}
-                        {field.required && <span className="invite-modal-required"> *</span>}
-                      </label>
-                    )}
+                  <div className="invite-modal-field" key={field.id}>
+                    <label className="invite-modal-label">
+                      {field.name}
+                      {field.required && <span className="invite-modal-required"> *</span>}
+                    </label>
                     <div className="invite-modal-dropdown-wrapper">
                       <button
                         className="invite-modal-dropdown"
@@ -286,29 +303,20 @@ function InviteModal({ onClose, userFields }: InviteModalProps) {
                     </div>
                   </div>
                 ))}
-
-                {/* Remove row X */}
-                {rows.length > 1 && (
-                  <button
-                    className="invite-modal-remove-row"
-                    onClick={() => removeRow(rowIndex)}
-                    aria-label="Remove row"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M17.25 17.25L6.75 6.75M17.25 6.75L6.75 17.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    <span className="invite-modal-remove-tooltip">Remove</span>
-                  </button>
-                )}
               </div>
             </div>
           ))}
 
-          {/* Add another user */}
-          <button className="invite-modal-add-user" onClick={addRow}>
-            Invite Another User
-            <Add size={20} color="currentColor" />
-          </button>
+          {/* Add another user + required hint */}
+          <div className="invite-modal-form-footer">
+            <button className="invite-modal-add-user" onClick={addRow}>
+              Invite Another User
+              <Add size={20} color="currentColor" />
+            </button>
+            <span className="invite-modal-required-hint">
+              <span className="invite-modal-required">*</span> Required fields
+            </span>
+          </div>
         </div>
 
         {/* Footer CTAs */}
@@ -316,12 +324,21 @@ function InviteModal({ onClose, userFields }: InviteModalProps) {
           <button className="invite-modal-btn invite-modal-btn--cancel" onClick={onClose}>
             Cancel
           </button>
-          <button
-            className={`invite-modal-btn invite-modal-btn--invite${!canInvite ? ' invite-modal-btn--disabled' : ''}`}
-            disabled={!canInvite}
-          >
-            Invite
-          </button>
+          <div className="invite-modal-btn-wrapper">
+            <button
+              className={`invite-modal-btn invite-modal-btn--invite${!canInvite ? ' invite-modal-btn--disabled' : ''}`}
+              disabled={!canInvite}
+              onClick={() => {
+                const filledCount = rows.filter(r => r.email.trim().length > 0).length
+                onInvite(filledCount)
+              }}
+            >
+              Invite
+            </button>
+            {!canInvite && (
+              <span className="invite-modal-btn-tooltip">Fill all the required fields</span>
+            )}
+          </div>
         </div>
       </div>
     </div>
