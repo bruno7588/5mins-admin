@@ -91,7 +91,7 @@
 .uf-table {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 12px;
 }
 
 .uf-table-header {

@@ -183,54 +183,11 @@
 
 .uf-drawer-preview-card {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  max-width: 260px;
+  align-items: flex-start;
 }
 
-.uf-drawer-preview-field-name {
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--text-tertiary);
-  line-height: 1.5;
-}
-
-.uf-drawer-preview-select {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 7px 10px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-s);
-  background: transparent;
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--text-primary);
-  line-height: 1.5;
-}
-
-.uf-drawer-preview-chevron {
-  color: var(--text-secondary);
-  flex-shrink: 0;
-}
-
-.uf-drawer-preview-options {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s);
-  padding: var(--space-s) var(--space-sm);
-  background: rgba(191, 194, 204, 0.16);
-  border-radius: var(--radius-s);
-}
-
-.uf-drawer-preview-option {
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--text-secondary);
-  line-height: 1.5;
+.uf-drawer-preview-img {
+  display: block;
 }
 
 /* Option rows */

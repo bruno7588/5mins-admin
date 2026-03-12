@@ -29,6 +29,7 @@ function UserFields() {
   const [showDrawer, setShowDrawer] = useState(false)
   const [editingField, setEditingField] = useState<UserField | null>(null)
   const [deleteField, setDeleteField] = useState<UserField | null>(null)
+  const [confirmInput, setConfirmInput] = useState('')
   const { toasts, show: showToast } = useToast()
 
   useEffect(() => {
@@ -50,7 +51,7 @@ function UserFields() {
       setFields(prev => prev.map(f =>
         f.id === editingField.id ? { ...f, ...data } : f
       ))
-      showToast('success', 'User field updated!')
+      showToast('success', 'Custom field updated!')
     } else {
       setFields(prev => [...prev, { id: nextId++, ...data }])
       showToast('success', 'New field created!')
@@ -63,7 +64,8 @@ function UserFields() {
     if (!deleteField) return
     setFields(prev => prev.filter(f => f.id !== deleteField.id))
     setDeleteField(null)
-    showToast('success', 'User field deleted!')
+    setConfirmInput('')
+    showToast('success', 'Custom field deleted!')
   }
 
   return (
@@ -74,7 +76,7 @@ function UserFields() {
           {/* Page Header */}
           <div className="user-fields-header">
             <div className="user-fields-header-text">
-              <h2 className="user-fields-title">User Fields</h2>
+              <h2 className="user-fields-title">Custom Fields</h2>
               <p className="user-fields-subtitle">
                 Define custom fields to capture organization-specific data for your users. These fields can be included in CSV uploads and API operations.{' '}
                 <a href="#" className="user-fields-learn-more">Learn more</a>
@@ -95,11 +97,11 @@ function UserFields() {
                 <Setting3 size={40} color="var(--neutral-500)" variant="Linear" />
               </div>
               <div className="user-fields-empty-info">
-                <h3 className="user-fields-empty-title">Create a new user field to get started!</h3>
+                <h3 className="user-fields-empty-title">Create a new custom field to get started!</h3>
                 <p className="user-fields-empty-desc">Customize user profiles with unique fields.</p>
               </div>
               <button className="btn-outlined" onClick={handleOpenDrawer}>
-                New User Field
+                New Custom Field
               </button>
             </div>
           ) : (
@@ -150,25 +152,37 @@ function UserFields() {
         )}
 
         {/* Delete confirmation */}
-        <ConfirmModal open={!!deleteField} onClose={() => setDeleteField(null)}>
+        <ConfirmModal open={!!deleteField} onClose={() => { setDeleteField(null); setConfirmInput('') }}>
           {deleteField && (
             <>
               <div className="confirm-modal-header confirm-modal-header--center">
                 <Danger size={72} color="var(--danger-500)" variant="Linear" />
-                <h3 className="confirm-modal-title">Delete user field</h3>
+                <h3 className="confirm-modal-title">Delete custom field</h3>
                 <p className="confirm-modal-body">
                   This field contains data for users. Delete anyway?
                 </p>
               </div>
+              <div className="confirm-modal-input-group">
+                <label className="confirm-modal-label">
+                  Type <span className="confirm-modal-label-danger">'Delete'</span> below, to confirm
+                </label>
+                <input
+                  className="confirm-modal-input"
+                  type="text"
+                  value={confirmInput}
+                  onChange={(e) => setConfirmInput(e.target.value)}
+                />
+              </div>
               <div className="confirm-modal-actions confirm-modal-actions--center">
                 <button
                   className="confirm-modal-btn confirm-modal-btn--outlined-neutral"
-                  onClick={() => setDeleteField(null)}
+                  onClick={() => { setDeleteField(null); setConfirmInput('') }}
                 >
                   Cancel
                 </button>
                 <button
                   className="confirm-modal-btn confirm-modal-btn--danger"
+                  disabled={confirmInput !== 'Delete'}
                   onClick={handleDeleteConfirm}
                 >
                   Delete Field

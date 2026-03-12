@@ -14,7 +14,7 @@ import {
   Devices,
   ArrowDown2,
   ArrowUp2,
-  Setting4,
+  RowVertical,
 } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import Checkbox from '../../components/Checkbox/Checkbox'
@@ -475,8 +475,9 @@ function People() {
                 className="people-edit-cols-btn"
                 onClick={() => setEditColumnsOpen(prev => !prev)}
               >
-                <Setting4 size={18} color="currentColor" variant="Linear" />
-                Edit columns
+                <RowVertical size={18} color="currentColor" variant="Linear" />
+                Columns
+                <ArrowDown2 size={14} color="currentColor" variant="Linear" />
               </button>
               {editColumnsOpen && (
                 <EditColumnsPopover

@@ -68,7 +68,7 @@ function LeftSidebar() {
               className={`sidebar-sub-item${activePage === '/user-fields' ? ' sidebar-sub-item--active' : ''}`}
               onClick={() => navigate('/user-fields')}
             >
-              User Fields
+              Custom Fields
             </button>
           </div>
         )}
