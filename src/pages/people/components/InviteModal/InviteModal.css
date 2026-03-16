@@ -133,23 +133,42 @@
 /* ─── Card per user ─── */
 .invite-modal-card {
   position: relative;
-  background: var(--neutral-0);
-  border-radius: var(--radius-m);
-  padding: var(--space-ml);
-  padding-right: 48px;
+  background: var(--cards-background);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm);
   box-shadow: var(--shadow-s);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  transition: background 150ms ease;
 }
 
-/* Remove button — anchored top-right of card */
+.invite-modal-card:hover {
+  background: var(--cards-background-hover);
+}
+
+/* Headline — User label + remove */
+.invite-modal-card-headline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.invite-modal-card-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+/* Remove button */
 .invite-modal-card-remove {
-  position: absolute;
-  top: var(--space-sm);
-  right: var(--space-sm);
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 20px;
+  height: 20px;
   border-radius: var(--radius-full);
   background: var(--input-background);
   color: var(--text-tertiary);
@@ -158,10 +177,11 @@
 }
 
 .invite-modal-card-remove:hover {
-  color: var(--text-primary);
+  color: var(--text-error);
   background: var(--input-background-hover);
 }
 
+/* Tooltip on remove button */
 .invite-modal-card-remove-tooltip {
   position: absolute;
   bottom: calc(100% + 8px);

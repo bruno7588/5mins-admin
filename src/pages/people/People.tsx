@@ -21,6 +21,7 @@ import Checkbox from '../../components/Checkbox/Checkbox'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import ToastContainer, { useToast } from '../../components/Toast/Toast'
 import InviteModal from './components/InviteModal/InviteModal'
+import BulkUploadModal from './components/BulkUploadModal/BulkUploadModal'
 import EditColumnsPopover from './components/EditColumnsPopover/EditColumnsPopover'
 import { useColumnPreferences } from './hooks/useColumnPreferences'
 import './People.css'
@@ -95,7 +96,7 @@ const quicklinks = [
 const avatarColors = ['#4a90d9', '#7b68ee', '#e67e22', '#2ecc71', '#e74c3c']
 
 function People() {
-  const [activeTab, setActiveTab] = useState('All People')
+  const [activeTab, setActiveTab] = useState('Active People')
   const [search, setSearch] = useState('')
   const [people, setPeople] = useState(initialPeople)
   const [deactivatedPeople, setDeactivatedPeople] = useState(initialDeactivated)
@@ -112,6 +113,7 @@ function People() {
   const [filterOpen, setFilterOpen] = useState(false)
   const filterRef = useRef<HTMLDivElement>(null)
   const [showInvite, setShowInvite] = useState(false)
+  const [showBulkUpload, setShowBulkUpload] = useState(false)
   const [editColumnsOpen, setEditColumnsOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = useState(false)
@@ -125,7 +127,7 @@ function People() {
 
   const { visibleKeys, toggleColumn, resetToDefault, allColumns } = useColumnPreferences(userFields)
   const tabs = [
-    'All People',
+    'Active People',
     'Managers',
     'Subject Experts',
     `Deactivated (${deactivatedPeople.length})`,
@@ -304,7 +306,7 @@ function People() {
       return next
     })
     if (!person.team) {
-      showToast('warning', `${person.name} has been reactivated but their previous team no longer exists. Please assign them to a team from the All People tab.`)
+      showToast('warning', `${person.name} has been reactivated but their previous team no longer exists. Please assign them to a team from the Active People tab.`)
     } else {
       showToast('success', `${person.name} has been reactivated`)
     }
@@ -391,7 +393,11 @@ function People() {
             key={q.title}
             className="people-quicklink"
             style={{ '--ql-color': q.color } as React.CSSProperties}
-            onClick={q.title === 'Invite people' ? () => setShowInvite(true) : undefined}
+            onClick={
+              q.title === 'Invite people' ? () => setShowInvite(true)
+              : q.title === 'Bulk upload people by CSV' ? () => setShowBulkUpload(true)
+              : undefined
+            }
           >
             <div className="people-quicklink-icon">{q.icon}</div>
             <div className="people-quicklink-info">
@@ -504,7 +510,7 @@ function People() {
       </div>
       )}
 
-      {/* ═══ All People Table ═══ */}
+      {/* ═══ Active People Table ═══ */}
       {!isDeactivatedTab && (
         <div
           className={`people-table-scroll${hasScroll ? ' people-table-scroll--has-scroll' : ''}${isScrolled ? ' people-table-scroll--scrolled' : ''}`}
@@ -623,7 +629,7 @@ function People() {
               <ProfileRemove size={48} color="var(--text-tertiary)" variant="Linear" />
               <h3 className="people-empty-state-title">No deactivated users</h3>
               <p className="people-empty-state-desc">
-                When you deactivate someone from the All People tab, they'll appear here.
+                When you deactivate someone from the Active People tab, they'll appear here.
               </p>
             </div>
           ) : (
@@ -744,7 +750,7 @@ function People() {
         </>
       )}
 
-      {/* ═══ Bulk action bar — All People ═══ */}
+      {/* ═══ Bulk action bar — Active People ═══ */}
       {selectedIds.size > 0 && !isDeactivatedTab && (
         <div className="people-bulk-bar">
           <button
@@ -1023,11 +1029,16 @@ function People() {
           onClose={() => setShowInvite(false)}
           onInvite={(count) => {
             setShowInvite(false)
-            setActiveTab('All People')
+            setActiveTab('Active People')
             showToast('success', count === 1 ? 'Invite sent' : 'Invites sent')
           }}
           userFields={userFields}
         />
+      )}
+
+      {/* Bulk upload CSV modal */}
+      {showBulkUpload && (
+        <BulkUploadModal onClose={() => setShowBulkUpload(false)} />
       )}
 
       {/* Toast stack */}
