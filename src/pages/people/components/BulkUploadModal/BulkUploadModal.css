@@ -246,6 +246,11 @@
   color: var(--text-tertiary);
   font-size: 11px;
   border-bottom: 1px solid var(--neutral-200);
+  border-right: 1px solid var(--neutral-200);
+}
+
+.csv-preview-table th:last-child {
+  border-right: none;
 }
 
 .csv-preview-table tbody tr {
@@ -259,6 +264,11 @@
 .csv-preview-table td {
   color: var(--text-primary);
   font-weight: 400;
+  border-right: 1px solid var(--neutral-100);
+}
+
+.csv-preview-table td:last-child {
+  border-right: none;
 }
 
 /* Row accents */

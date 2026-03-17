@@ -211,9 +211,9 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                           </thead>
                           <tbody>
                             <tr className="csv-preview-tr--success">
-                              <td>Sarah</td>
-                              <td>Connor</td>
-                              <td>sarah@new.com</td>
+                              <td>Jane</td>
+                              <td>Doe</td>
+                              <td>jane@example.com</td>
                               <td className="csv-col-ellipsis">...</td>
                               <td className="csv-col-empty" />
                               <td className="csv-col-result">
@@ -225,8 +225,8 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                             </tr>
                             <tr className="csv-preview-tr--warning">
                               <td>John</td>
-                              <td>Smith</td>
-                              <td>john@company.com</td>
+                              <td>Doe</td>
+                              <td>john@example.com</td>
                               <td className="csv-col-ellipsis">...</td>
                               <td>ACTIVE</td>
                               <td className="csv-col-result">
@@ -237,9 +237,9 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                               </td>
                             </tr>
                             <tr className="csv-preview-tr--danger">
-                              <td>Mark</td>
-                              <td>Johnson</td>
-                              <td>mark@company.com</td>
+                              <td>Alex</td>
+                              <td>Doe</td>
+                              <td>alex@example.com</td>
                               <td className="csv-col-ellipsis">...</td>
                               <td>INACTIVE</td>
                               <td className="csv-col-result">
@@ -250,9 +250,9 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                               </td>
                             </tr>
                             <tr className="csv-preview-tr--neutral">
-                              <td>Lisa</td>
-                              <td>Chen</td>
-                              <td>lisa@company.com</td>
+                              <td>Sam</td>
+                              <td>Doe</td>
+                              <td>sam@example.com</td>
                               <td className="csv-col-ellipsis">...</td>
                               <td className="csv-col-empty" />
                               <td className="csv-col-result">
