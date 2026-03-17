@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowDown2, ImportCurve, Danger } from 'iconsax-react'
+import { ArrowDown2, ArrowLeft2, ArrowRight2, ImportCurve, Danger } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import { FileUploader } from '../../../../components/FileUploader/FileUploader'
 import './BulkUploadModal.css'
@@ -70,6 +70,8 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
   const [errorMessage, setErrorMessage] = useState('')
   const [step, setStep] = useState<Step>('upload')
   const [previewFilter, setPreviewFilter] = useState<PreviewFilter>('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const rowsPerPage = 10
   const [showCsvPreview, setShowCsvPreview] = useState(false)
 
   // Preview counts
@@ -84,6 +86,16 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
   const filteredEntries = previewFilter === 'all'
     ? [...mockPreviewData].sort((a, b) => (a.type === 'error' ? -1 : b.type === 'error' ? 1 : 0))
     : mockPreviewData.filter(e => e.type === previewFilter)
+
+  const totalPages = Math.ceil(filteredEntries.length / rowsPerPage)
+  const paginatedEntries = filteredEntries.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+  const paginationStart = (currentPage - 1) * rowsPerPage + 1
+  const paginationEnd = Math.min(currentPage * rowsPerPage, filteredEntries.length)
+
+  const handleFilterChange = (filter: PreviewFilter) => {
+    setPreviewFilter(filter)
+    setCurrentPage(1)
+  }
 
   const handleDownloadTemplate = () => {
     const headers = ['first_name', 'last_name', 'email', 'status', 'team_name', 'role', 'start_date', 'region', 'teamRights']
@@ -412,7 +424,7 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                   <button
                     key={tab.key}
                     className={`bulk-preview-tab ${previewFilter === tab.key ? 'bulk-preview-tab--active' : ''} ${tab.key === 'error' && tab.count > 0 ? 'bulk-preview-tab--error' : ''}`}
-                    onClick={() => setPreviewFilter(tab.key)}
+                    onClick={() => handleFilterChange(tab.key)}
                   >
                     {tab.label}
                     <span className="bulk-preview-tab-count">{tab.count}</span>
@@ -420,49 +432,74 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                 ))}
               </div>
 
-              {/* Data table */}
-              <div className="bulk-preview-table-wrap">
-                <table className="bulk-preview-table">
-                  <thead>
-                    <tr>
-                      <th className="bulk-preview-th-row">Row</th>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Status</th>
-                      <th>Team</th>
-                      <th>Action</th>
-                      <th>Details</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredEntries.map((entry, i) => (
-                      <tr key={i} className={`bulk-preview-tr ${entry.type === 'error' ? 'bulk-preview-tr--error' : ''}`}>
-                        <td className="bulk-preview-td-row">{entry.row}</td>
-                        <td className={entry.type === 'error' && !entry.name ? 'bulk-preview-td-missing' : ''}>
-                          {entry.name || '—'}
-                        </td>
-                        <td className={entry.type === 'error' && !entry.email ? 'bulk-preview-td-missing' : ''}>
-                          {entry.email || '—'}
-                        </td>
-                        <td>{entry.status || '—'}</td>
-                        <td>{entry.team}</td>
-                        <td>
-                          <span className={`bulk-preview-type-badge bulk-preview-type-badge--${entry.type}`}>
-                            {entry.type === 'invite' && 'New invite'}
-                            {entry.type === 'update' && 'Update'}
-                            {entry.type === 'deactivation' && 'Deactivate'}
-                            {entry.type === 'no-change' && 'No change'}
-                            {entry.type === 'error' && 'Error'}
-                          </span>
-                        </td>
-                        <td className="bulk-preview-td-detail">
-                          {entry.error && <span className="bulk-preview-td-error">{entry.error}</span>}
-                          {entry.detail && <span className="bulk-preview-td-change">{entry.detail}</span>}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              {/* Data table — 5Mins card-row style */}
+              <div className="bulk-preview-table-5m">
+                {/* Header */}
+                <div className="bulk-preview-table-header">
+                  <span className="bulk-preview-col bulk-preview-col--row">Row</span>
+                  <span className="bulk-preview-col bulk-preview-col--name">Name</span>
+                  <span className="bulk-preview-col bulk-preview-col--email">Email</span>
+                  <span className="bulk-preview-col bulk-preview-col--status">Status</span>
+                  <span className="bulk-preview-col bulk-preview-col--team">Team</span>
+                  <span className="bulk-preview-col bulk-preview-col--action">Action</span>
+                  <span className="bulk-preview-col bulk-preview-col--detail">Details</span>
+                </div>
+
+                {/* Rows */}
+                <div className="bulk-preview-table-rows">
+                  {paginatedEntries.map((entry, i) => (
+                    <div
+                      key={i}
+                      className={`bulk-preview-table-row ${entry.type === 'error' ? 'bulk-preview-table-row--error' : ''}`}
+                    >
+                      <span className="bulk-preview-col bulk-preview-col--row">{entry.row}</span>
+                      <span className={`bulk-preview-col bulk-preview-col--name ${entry.type === 'error' && !entry.name ? 'bulk-preview-col--missing' : ''}`}>
+                        {entry.name || '—'}
+                      </span>
+                      <span className={`bulk-preview-col bulk-preview-col--email ${entry.type === 'error' && !entry.email ? 'bulk-preview-col--missing' : ''}`}>
+                        {entry.email || '—'}
+                      </span>
+                      <span className="bulk-preview-col bulk-preview-col--status">{entry.status || '—'}</span>
+                      <span className="bulk-preview-col bulk-preview-col--team">{entry.team}</span>
+                      <span className="bulk-preview-col bulk-preview-col--action">
+                        <span className={`bulk-preview-type-badge bulk-preview-type-badge--${entry.type}`}>
+                          {entry.type === 'invite' && 'New invite'}
+                          {entry.type === 'update' && 'Update'}
+                          {entry.type === 'deactivation' && 'Deactivate'}
+                          {entry.type === 'no-change' && 'No change'}
+                          {entry.type === 'error' && 'Error'}
+                        </span>
+                      </span>
+                      <span className="bulk-preview-col bulk-preview-col--detail">
+                        {entry.error && <span className="bulk-preview-detail-error">{entry.error}</span>}
+                        {entry.detail && <span className="bulk-preview-detail-change">{entry.detail}</span>}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {filteredEntries.length > rowsPerPage && (
+                  <div className="bulk-preview-pagination">
+                    <span className="bulk-preview-pagination-text">
+                      {paginationStart}-{paginationEnd} of {filteredEntries.length}
+                    </span>
+                    <button
+                      className="bulk-preview-pagination-btn"
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage(p => p - 1)}
+                    >
+                      <ArrowLeft2 size={16} color="currentColor" />
+                    </button>
+                    <button
+                      className="bulk-preview-pagination-btn"
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage(p => p + 1)}
+                    >
+                      <ArrowRight2 size={16} color="currentColor" />
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Action bar */}
