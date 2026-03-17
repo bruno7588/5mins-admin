@@ -384,20 +384,20 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
               {/* Filter tabs */}
               <div className="bulk-preview-tabs">
                 {([
-                  { key: 'all', label: 'All', count: totalEntries },
-                  { key: 'error', label: 'Errors', count: errorCount },
-                  { key: 'invite', label: 'New invites', count: inviteCount },
-                  { key: 'update', label: 'Updates', count: updateCount },
-                  { key: 'deactivation', label: 'Deactivations', count: deactivationCount },
-                  { key: 'no-change', label: 'No changes', count: noChangeCount },
-                ] as { key: PreviewFilter; label: string; count: number }[]).map(tab => (
+                  { key: 'all', label: 'All Invites', count: totalEntries, color: 'neutral' },
+                  { key: 'error', label: 'Errors', count: errorCount, color: 'error' },
+                  { key: 'invite', label: 'New Invites', count: inviteCount, color: 'success' },
+                  { key: 'update', label: 'Updates', count: updateCount, color: 'primary' },
+                  { key: 'deactivation', label: 'Deactivations', count: deactivationCount, color: 'warning' },
+                  { key: 'no-change', label: 'No Changes', count: noChangeCount, color: 'neutral' },
+                ] as { key: PreviewFilter; label: string; count: number; color: string }[]).map(tab => (
                   <button
                     key={tab.key}
-                    className={`bulk-preview-tab ${previewFilter === tab.key ? 'bulk-preview-tab--active' : ''} ${tab.key === 'error' && tab.count > 0 ? 'bulk-preview-tab--error' : ''}`}
+                    className={`bulk-preview-tab ${previewFilter === tab.key ? 'bulk-preview-tab--active' : ''}`}
                     onClick={() => handleFilterChange(tab.key)}
                   >
                     {tab.label}
-                    <span className="bulk-preview-tab-count">{tab.count}</span>
+                    <span className={`bulk-preview-tab-counter bulk-preview-tab-counter--${tab.color}`}>{tab.count}</span>
                   </button>
                 ))}
               </div>

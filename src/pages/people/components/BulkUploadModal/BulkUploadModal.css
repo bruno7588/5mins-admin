@@ -555,61 +555,94 @@ th.csv-col-result {
 /* Filter tabs */
 .bulk-preview-tabs {
   display: flex;
-  gap: var(--space-xs);
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 0;
+  gap: 24px;
+  align-items: flex-start;
 }
 
 .bulk-preview-tab {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  padding: var(--space-s) var(--space-sm);
+  padding: 0;
+  padding-bottom: 6px;
   border: none;
   background: none;
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-tertiary);
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  transition: color 150ms ease, border-color 150ms ease;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  white-space: nowrap;
+  position: relative;
+  transition: color 150ms ease;
+}
+
+.bulk-preview-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  border-radius: 1px;
+  transition: background 150ms ease;
 }
 
 .bulk-preview-tab:hover {
-  color: var(--text-secondary);
+  color: var(--text-primary);
 }
 
 .bulk-preview-tab--active {
+  font-weight: 700;
   color: var(--text-primary);
-  border-bottom-color: var(--secondary-500);
 }
 
-.bulk-preview-tab--error {
-  color: var(--danger-500);
+.bulk-preview-tab--active::after {
+  background: var(--secondary-500);
 }
 
-.bulk-preview-tab--error.bulk-preview-tab--active {
-  border-bottom-color: var(--danger-500);
+/* Color-coded counter pills */
+.bulk-preview-tab-counter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border-radius: 100px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
-.bulk-preview-tab-count {
-  font-size: 11px;
-  font-weight: 600;
-  color: inherit;
-  background: var(--neutral-50);
-  padding: 1px 6px;
-  border-radius: var(--radius-full);
+.bulk-preview-tab--active .bulk-preview-tab-counter {
+  font-weight: 700;
 }
 
-.bulk-preview-tab--active .bulk-preview-tab-count {
+.bulk-preview-tab-counter--neutral {
   background: var(--input-background);
+  color: var(--text-secondary);
 }
 
-.bulk-preview-tab--error .bulk-preview-tab-count {
-  background: var(--danger-100);
-  color: var(--danger-500);
+.bulk-preview-tab-counter--error {
+  background: rgba(223, 22, 66, 0.16);
+  color: var(--danger-400);
+}
+
+.bulk-preview-tab-counter--success {
+  background: rgba(24, 169, 87, 0.16);
+  color: var(--text-success, #18A957);
+}
+
+.bulk-preview-tab-counter--primary {
+  background: rgba(0, 206, 230, 0.16);
+  color: var(--primary-700);
+}
+
+.bulk-preview-tab-counter--warning {
+  background: rgba(255, 165, 56, 0.16);
+  color: var(--text-warning, #FFA538);
 }
 
 /* ─── 5Mins card-row table ─── */
@@ -699,8 +732,8 @@ th.csv-col-result {
 }
 
 .bulk-preview-type-badge--invite { background: rgba(24, 169, 87, 0.16); color: var(--text-success, #18A957); }
-.bulk-preview-type-badge--update { background: rgba(0, 206, 230, 0.16); color: #00CEE6; }
-.bulk-preview-type-badge--deactivation { background: rgba(223, 22, 66, 0.16); color: var(--danger-400, #E95C7B); }
+.bulk-preview-type-badge--update { background: rgba(0, 206, 230, 0.16); color: var(--primary-700); }
+.bulk-preview-type-badge--deactivation { background: rgba(255, 165, 56, 0.16); color: var(--text-warning, #FFA538); }
 .bulk-preview-type-badge--no-change { background: var(--input-background, rgba(69, 76, 94, 0.16)); color: var(--text-secondary, #BFC2CC); }
 .bulk-preview-type-badge--error { background: rgba(223, 22, 66, 0.16); color: var(--danger-400, #E95C7B); }
 
