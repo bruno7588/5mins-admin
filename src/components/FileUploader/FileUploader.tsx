@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
-import { CloudAdd, ClipboardText } from 'iconsax-react'
+import { DocumentUpload, ClipboardText } from 'iconsax-react'
 import './FileUploader.css'
 
 type FileUploaderSize = 'L' | 'S'
@@ -38,7 +38,7 @@ export function FileUploader({
   const isHover = state === 'Hover' || isDragging
 
   const openPicker = () => {
-    onChangeFile?.()
+    if (state === 'Filled') onChangeFile?.()
     inputRef.current?.click()
   }
 
@@ -99,7 +99,7 @@ export function FileUploader({
       {(state === 'Enabled' || state === 'Hover') && (
         <>
           <div className="file-uploader__icon-group">
-            <CloudAdd size={iconSize} color="var(--text-secondary)" variant="Linear" />
+            <DocumentUpload size={iconSize} color="var(--text-secondary)" variant="Linear" />
             <p className="file-uploader__body">
               Drag and drop file here or click to upload
             </p>
@@ -116,7 +116,7 @@ export function FileUploader({
       {/* ERROR */}
       {state === 'Error' && (
         <>
-          <CloudAdd size={iconSize} color="var(--danger-500)" variant="Linear" />
+          <DocumentUpload size={iconSize} color="var(--danger-500)" variant="Linear" />
           <p className="file-uploader__error-text">{errorMessage}</p>
           <button className="file-uploader__btn-outlined" onClick={openPicker}>
             Select File

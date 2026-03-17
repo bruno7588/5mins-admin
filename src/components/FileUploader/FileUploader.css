@@ -111,7 +111,6 @@
   color: var(--danger-400);
   text-align: center;
   margin: 0;
-  white-space: nowrap;
 }
 
 .file-uploader--L .file-uploader__error-text {

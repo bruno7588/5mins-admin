@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowDown2, ImportCurve, UserAdd, UserEdit, UserRemove, MinusCirlce, ArrowRight2 } from 'iconsax-react'
+import { ArrowDown2, ImportCurve, Danger } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import { FileUploader } from '../../../../components/FileUploader/FileUploader'
 import './BulkUploadModal.css'
@@ -14,31 +14,52 @@ const automations = [
   { name: 'Q1 Safety Training', badges: ['Region'] },
 ]
 
-type UploaderState = 'Enabled' | 'Uploading' | 'Filled'
+type UploaderState = 'Enabled' | 'Uploading' | 'Filled' | 'Error'
 type Step = 'upload' | 'preview'
 
-// Mock preview data
-const mockPreview = {
-  invites: [
-    { name: 'Sarah Connor', email: 'sarah@company.com', team: 'Engineering', role: 'Developer', region: 'North America' },
-    { name: 'James Wilson', email: 'james@company.com', team: 'Sales', role: 'Account Exec', region: 'Europe' },
-    { name: 'Ana Garcia', email: 'ana@company.com', team: 'Marketing', role: 'Designer', region: 'South America' },
-  ],
-  updates: [
-    { name: 'John Smith', email: 'john@company.com', changes: 'Team: Sales → Marketing, Role: Rep → Manager' },
-    { name: 'Emma Davis', email: 'emma@company.com', changes: 'Region: Europe → North America' },
-  ],
-  noChanges: [
-    { name: 'Michael Brown', email: 'michael@company.com' },
-    { name: 'Lisa Chen', email: 'lisa@company.com' },
-    { name: 'David Kim', email: 'david@company.com' },
-    { name: 'Rachel Torres', email: 'rachel@company.com' },
-    { name: 'Tom Anderson', email: 'tom@company.com' },
-  ],
-  deactivations: [
-    { name: 'Mark Johnson', email: 'mark@company.com', team: 'Support', reason: 'Status set to INACTIVE' },
-  ],
+// Mock preview data at scale
+type PreviewEntry = {
+  row: number
+  name: string
+  email: string
+  status: string
+  team: string
+  type: 'invite' | 'update' | 'deactivation' | 'no-change' | 'error'
+  detail?: string
+  error?: string
 }
+
+const mockPreviewData: PreviewEntry[] = [
+  // Errors (shown first, block upload)
+  { row: 3, name: 'Bob', email: '', status: 'Active', team: 'Sales', type: 'error', error: 'Email is required' },
+  { row: 7, name: '', email: 'noname@company.com', status: 'Active', team: 'Engineering', type: 'error', error: 'First name is required' },
+  { row: 15, name: 'Carol', email: 'carol@company', status: 'Active', team: 'Marketing', type: 'error', error: 'Invalid email format' },
+  { row: 22, name: 'Dave', email: 'dave@company.com', status: 'Maybe', team: 'Sales', type: 'error', error: 'Invalid status value. Use Active or Inactive.' },
+  // Deactivations
+  { row: 5, name: 'Mark Johnson', email: 'mark@company.com', status: 'Inactive', team: 'Support', type: 'deactivation' },
+  { row: 41, name: 'Paula West', email: 'paula@company.com', status: 'Inactive', team: 'Finance', type: 'deactivation' },
+  // New invites
+  { row: 1, name: 'Jane Doe', email: 'jane@example.com', status: '', team: 'Engineering', type: 'invite' },
+  { row: 2, name: 'Sarah Lee', email: 'sarah.lee@example.com', status: 'Active', team: 'Design', type: 'invite' },
+  { row: 8, name: 'Tom Park', email: 'tom.p@example.com', status: '', team: 'Product', type: 'invite' },
+  { row: 12, name: 'Nina Rao', email: 'nina@example.com', status: 'Active', team: 'Sales', type: 'invite' },
+  { row: 19, name: 'Alex Moreno', email: 'alex.m@example.com', status: '', team: 'Engineering', type: 'invite' },
+  // Updates
+  { row: 4, name: 'John Smith', email: 'john@company.com', status: 'Active', team: 'Marketing', type: 'update', detail: 'Team: Sales → Marketing' },
+  { row: 6, name: 'Emma Davis', email: 'emma@company.com', status: 'Active', team: 'North America', type: 'update', detail: 'Region: Europe → North America' },
+  { row: 9, name: 'Wei Zhang', email: 'wei@company.com', status: 'Active', team: 'Engineering', type: 'update', detail: 'Role: Junior → Senior' },
+  // No changes (bulk)
+  ...Array.from({ length: 38 }, (_, i) => ({
+    row: 30 + i,
+    name: `Employee ${30 + i}`,
+    email: `employee${30 + i}@company.com`,
+    status: 'Active',
+    team: ['Sales', 'Engineering', 'Marketing', 'Support', 'Finance'][i % 5],
+    type: 'no-change' as const,
+  })),
+]
+
+type PreviewFilter = 'all' | 'error' | 'invite' | 'update' | 'deactivation' | 'no-change'
 
 function BulkUploadModal({ onClose }: BulkUploadModalProps) {
   const [showMoreAutomations, setShowMoreAutomations] = useState(false)
@@ -46,8 +67,23 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
   const [uploaderState, setUploaderState] = useState<UploaderState>('Enabled')
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadedFileName, setUploadedFileName] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
   const [step, setStep] = useState<Step>('upload')
-  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({})
+  const [previewFilter, setPreviewFilter] = useState<PreviewFilter>('all')
+  const [showCsvPreview, setShowCsvPreview] = useState(false)
+
+  // Preview counts
+  const errorCount = mockPreviewData.filter(e => e.type === 'error').length
+  const inviteCount = mockPreviewData.filter(e => e.type === 'invite').length
+  const updateCount = mockPreviewData.filter(e => e.type === 'update').length
+  const deactivationCount = mockPreviewData.filter(e => e.type === 'deactivation').length
+  const noChangeCount = mockPreviewData.filter(e => e.type === 'no-change').length
+  const hasErrors = errorCount > 0
+  const totalEntries = mockPreviewData.length
+
+  const filteredEntries = previewFilter === 'all'
+    ? [...mockPreviewData].sort((a, b) => (a.type === 'error' ? -1 : b.type === 'error' ? 1 : 0))
+    : mockPreviewData.filter(e => e.type === previewFilter)
 
   const handleDownloadTemplate = () => {
     const headers = ['first_name', 'last_name', 'email', 'status', 'team_name', 'role', 'start_date', 'region', 'teamRights']
@@ -69,28 +105,64 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
     setOpenSection(prev => prev === key ? null : key)
   }
 
-  const toggleCard = (key: string) => {
-    setExpandedCards(prev => ({ ...prev, [key]: !prev[key] }))
+  const expectedHeaders = ['first_name', 'last_name', 'email', 'status', 'team_name', 'role', 'start_date', 'region', 'teamRights']
+  const requiredHeaders = ['first_name', 'last_name', 'email']
+
+  const validateCsvHeaders = (text: string): string | null => {
+    const firstLine = text.replace(/^\uFEFF/, '').split('\n')[0]
+    if (!firstLine?.trim()) return 'The file appears to be empty.'
+
+    const headers = firstLine.split(',').map(h => h.trim().replace(/^"|"$/g, ''))
+    const headersLower = headers.map(h => h.toLowerCase())
+    const expectedLower = expectedHeaders.map(h => h.toLowerCase())
+
+    const missingRequired = requiredHeaders.filter(r => !headersLower.includes(r.toLowerCase()))
+    if (missingRequired.length > 0) {
+      return `Missing required columns: ${missingRequired.join(', ')}. Please use the CSV template.`
+    }
+
+    const unknownHeaders = headers.filter((_, i) => !expectedLower.includes(headersLower[i]))
+    if (unknownHeaders.length > 0) {
+      return `Unrecognized columns: ${unknownHeaders.join(', ')}. Please use the CSV template.`
+    }
+
+    return null
   }
 
   const handleFileSelect = async (file: File) => {
     setUploadedFileName(file.name)
+    setErrorMessage('')
+
+    // Validate CSV headers match our template
+    try {
+      const text = await file.text()
+      const headerError = validateCsvHeaders(text)
+      if (headerError) {
+        setUploaderState('Error')
+        setErrorMessage(headerError)
+        return
+      }
+    } catch {
+      setUploaderState('Error')
+      setErrorMessage('Unable to read the file. Please try again.')
+      return
+    }
+
     setUploaderState('Uploading')
     for (let i = 0; i <= 100; i += 10) {
       await new Promise(r => setTimeout(r, 120))
       setUploadProgress(i)
     }
     setUploaderState('Filled')
+    // Valid template — go directly to preview
+    setStep('preview')
   }
 
   const handleChangeFile = () => {
     setUploaderState('Enabled')
     setUploadedFileName('')
     setUploadProgress(0)
-  }
-
-  const handleContinueToPreview = () => {
-    setStep('preview')
+    setErrorMessage('')
   }
 
   const handleBackToUpload = () => {
@@ -194,7 +266,7 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                   </div>
                   <div className={`bulk-upload-accordion-panel${openSection === 'fill' ? ' bulk-upload-accordion-panel--open' : ''}`}>
                     <div className="bulk-upload-accordion-body">
-                      <p className="bulk-upload-accordion-desc">Fill in the CSV template with your people's details. The <strong>status</strong> column controls what happens to each user:</p>
+                      <p className="bulk-upload-accordion-desc">Fill in the CSV template with your people's details. The <strong>status</strong> column controls what happens to each user. <button className="bulk-upload-preview-link" onClick={(e) => { e.stopPropagation(); setShowCsvPreview(true) }}>Preview CSV</button></p>
 
                       {/* Annotated example CSV */}
                       <div className="csv-preview">
@@ -219,7 +291,7 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                               <td className="csv-col-result">
 
                                 <span className="csv-preview-badge csv-preview-badge--success">New email address</span>
-                                <span className="csv-preview-arrow">→</span>
+
                                 <span className="csv-preview-result-text">User will receive an invitation email</span>
                               </td>
                             </tr>
@@ -228,11 +300,11 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                               <td>Doe</td>
                               <td>john@example.com</td>
                               <td className="csv-col-ellipsis">...</td>
-                              <td>ACTIVE</td>
+                              <td>Active</td>
                               <td className="csv-col-result">
 
-                                <span className="csv-preview-badge csv-preview-badge--warning">Existing email + ACTIVE status</span>
-                                <span className="csv-preview-arrow">→</span>
+                                <span className="csv-preview-badge csv-preview-badge--warning">Existing email + Active status</span>
+
                                 <span className="csv-preview-result-text">User information will be updated</span>
                               </td>
                             </tr>
@@ -241,11 +313,11 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                               <td>Doe</td>
                               <td>alex@example.com</td>
                               <td className="csv-col-ellipsis">...</td>
-                              <td>INACTIVE</td>
+                              <td>Inactive</td>
                               <td className="csv-col-result">
 
-                                <span className="csv-preview-badge csv-preview-badge--danger">Existing email + INACTIVE status</span>
-                                <span className="csv-preview-arrow">→</span>
+                                <span className="csv-preview-badge csv-preview-badge--danger">Existing email + Inactive status</span>
+
                                 <span className="csv-preview-result-text">User will lose access immediately</span>
                               </td>
                             </tr>
@@ -258,8 +330,8 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                               <td className="csv-col-result">
 
                                 <span className="csv-preview-badge csv-preview-badge--neutral">No status specified</span>
-                                <span className="csv-preview-arrow">→</span>
-                                <span className="csv-preview-result-text">Defaults to ACTIVE</span>
+
+                                <span className="csv-preview-result-text">Defaults to Active</span>
                               </td>
                             </tr>
                           </tbody>
@@ -276,18 +348,11 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                     state={uploaderState}
                     fileName={uploadedFileName}
                     progress={uploadProgress}
+                    errorMessage={errorMessage}
                     accept=".csv"
                     onFileSelect={handleFileSelect}
                     onChangeFile={handleChangeFile}
                   />
-                  {uploaderState === 'Filled' && (
-                    <div className="bulk-upload-continue">
-                      <button className="bulk-upload-btn-primary" onClick={handleContinueToPreview}>
-                        Continue
-                        <ArrowRight2 size={20} color="var(--neutral-25)" />
-                      </button>
-                    </div>
-                  )}
                 </div>
               </div>
             </>
@@ -296,131 +361,108 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
           {/* ─── PREVIEW STEP ─── */}
           {step === 'preview' && (
             <div className="bulk-preview">
-              <p className="bulk-preview-subtitle">
-                We compared <strong>{uploadedFileName}</strong> against your current people list. Here's what will happen:
-              </p>
-
-              {/* Summary cards */}
-              <div className="bulk-preview-cards">
-                {/* Invites */}
-                <div
-                  className={`bulk-preview-card bulk-preview-card--success ${expandedCards.invites ? 'bulk-preview-card--expanded' : ''}`}
-                  onClick={() => toggleCard('invites')}
-                >
-                  <div className="bulk-preview-card-header">
-                    <div className="bulk-preview-card-icon bulk-preview-card-icon--success">
-                      <UserAdd size={20} color="var(--success-500)" />
-                    </div>
-                    <div className="bulk-preview-card-info">
-                      <span className="bulk-preview-card-count">{mockPreview.invites.length}</span>
-                      <span className="bulk-preview-card-label">New Invites</span>
-                    </div>
-                    <div className={`bulk-preview-card-chevron ${expandedCards.invites ? 'bulk-preview-card-chevron--open' : ''}`}>
-                      <ArrowDown2 size={16} color="var(--text-tertiary)" />
-                    </div>
-                  </div>
-                  {expandedCards.invites && (
-                    <div className="bulk-preview-card-body">
-                      {mockPreview.invites.map((p, i) => (
-                        <div className="bulk-preview-row" key={i}>
-                          <span className="bulk-preview-row-name">{p.name}</span>
-                          <span className="bulk-preview-row-detail">{p.email}</span>
-                          <span className="bulk-preview-row-detail">{p.team}</span>
-                          <span className="bulk-preview-row-detail">{p.region}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+              {/* Error banner */}
+              {hasErrors && (
+                <div className="bulk-preview-error-banner">
+                  <Danger size={20} color="var(--danger-500)" variant="Bold" />
+                  <span>{errorCount} row{errorCount > 1 ? 's have' : ' has'} errors that must be fixed before uploading.</span>
                 </div>
+              )}
 
-                {/* Updates */}
-                <div
-                  className={`bulk-preview-card bulk-preview-card--warning ${expandedCards.updates ? 'bulk-preview-card--expanded' : ''}`}
-                  onClick={() => toggleCard('updates')}
-                >
-                  <div className="bulk-preview-card-header">
-                    <div className="bulk-preview-card-icon bulk-preview-card-icon--warning">
-                      <UserEdit size={20} color="var(--secondary-500)" />
-                    </div>
-                    <div className="bulk-preview-card-info">
-                      <span className="bulk-preview-card-count">{mockPreview.updates.length}</span>
-                      <span className="bulk-preview-card-label">Updates</span>
-                    </div>
-                    <div className={`bulk-preview-card-chevron ${expandedCards.updates ? 'bulk-preview-card-chevron--open' : ''}`}>
-                      <ArrowDown2 size={16} color="var(--text-tertiary)" />
-                    </div>
-                  </div>
-                  {expandedCards.updates && (
-                    <div className="bulk-preview-card-body">
-                      {mockPreview.updates.map((p, i) => (
-                        <div className="bulk-preview-row" key={i}>
-                          <span className="bulk-preview-row-name">{p.name}</span>
-                          <span className="bulk-preview-row-detail">{p.email}</span>
-                          <span className="bulk-preview-row-changes">{p.changes}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+              {/* Summary bar */}
+              <div className="bulk-preview-summary">
+                <div className="bulk-preview-summary-item">
+                  <span className="bulk-preview-summary-count">{totalEntries}</span>
+                  <span className="bulk-preview-summary-label">Total rows</span>
                 </div>
+                {errorCount > 0 && (
+                  <div className="bulk-preview-summary-item bulk-preview-summary-item--danger">
+                    <span className="bulk-preview-summary-count">{errorCount}</span>
+                    <span className="bulk-preview-summary-label">Errors</span>
+                  </div>
+                )}
+                <div className="bulk-preview-summary-item bulk-preview-summary-item--success">
+                  <span className="bulk-preview-summary-count">{inviteCount}</span>
+                  <span className="bulk-preview-summary-label">New invites</span>
+                </div>
+                <div className="bulk-preview-summary-item bulk-preview-summary-item--primary">
+                  <span className="bulk-preview-summary-count">{updateCount}</span>
+                  <span className="bulk-preview-summary-label">Updates</span>
+                </div>
+                <div className="bulk-preview-summary-item bulk-preview-summary-item--danger-alt">
+                  <span className="bulk-preview-summary-count">{deactivationCount}</span>
+                  <span className="bulk-preview-summary-label">Deactivations</span>
+                </div>
+                <div className="bulk-preview-summary-item">
+                  <span className="bulk-preview-summary-count">{noChangeCount}</span>
+                  <span className="bulk-preview-summary-label">No changes</span>
+                </div>
+              </div>
 
-                {/* No Changes */}
-                <div
-                  className={`bulk-preview-card bulk-preview-card--neutral ${expandedCards.noChanges ? 'bulk-preview-card--expanded' : ''}`}
-                  onClick={() => toggleCard('noChanges')}
-                >
-                  <div className="bulk-preview-card-header">
-                    <div className="bulk-preview-card-icon bulk-preview-card-icon--neutral">
-                      <MinusCirlce size={20} color="var(--text-tertiary)" />
-                    </div>
-                    <div className="bulk-preview-card-info">
-                      <span className="bulk-preview-card-count">{mockPreview.noChanges.length}</span>
-                      <span className="bulk-preview-card-label">No Changes</span>
-                    </div>
-                    <div className={`bulk-preview-card-chevron ${expandedCards.noChanges ? 'bulk-preview-card-chevron--open' : ''}`}>
-                      <ArrowDown2 size={16} color="var(--text-tertiary)" />
-                    </div>
-                  </div>
-                  {expandedCards.noChanges && (
-                    <div className="bulk-preview-card-body">
-                      {mockPreview.noChanges.map((p, i) => (
-                        <div className="bulk-preview-row" key={i}>
-                          <span className="bulk-preview-row-name">{p.name}</span>
-                          <span className="bulk-preview-row-detail">{p.email}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+              {/* Filter tabs */}
+              <div className="bulk-preview-tabs">
+                {([
+                  { key: 'all', label: 'All', count: totalEntries },
+                  { key: 'error', label: 'Errors', count: errorCount },
+                  { key: 'invite', label: 'New invites', count: inviteCount },
+                  { key: 'update', label: 'Updates', count: updateCount },
+                  { key: 'deactivation', label: 'Deactivations', count: deactivationCount },
+                  { key: 'no-change', label: 'No changes', count: noChangeCount },
+                ] as { key: PreviewFilter; label: string; count: number }[]).map(tab => (
+                  <button
+                    key={tab.key}
+                    className={`bulk-preview-tab ${previewFilter === tab.key ? 'bulk-preview-tab--active' : ''} ${tab.key === 'error' && tab.count > 0 ? 'bulk-preview-tab--error' : ''}`}
+                    onClick={() => setPreviewFilter(tab.key)}
+                  >
+                    {tab.label}
+                    <span className="bulk-preview-tab-count">{tab.count}</span>
+                  </button>
+                ))}
+              </div>
 
-                {/* Deactivations */}
-                <div
-                  className={`bulk-preview-card bulk-preview-card--danger ${expandedCards.deactivations ? 'bulk-preview-card--expanded' : ''}`}
-                  onClick={() => toggleCard('deactivations')}
-                >
-                  <div className="bulk-preview-card-header">
-                    <div className="bulk-preview-card-icon bulk-preview-card-icon--danger">
-                      <UserRemove size={20} color="var(--danger-500)" />
-                    </div>
-                    <div className="bulk-preview-card-info">
-                      <span className="bulk-preview-card-count">{mockPreview.deactivations.length}</span>
-                      <span className="bulk-preview-card-label">Deactivations</span>
-                    </div>
-                    <div className={`bulk-preview-card-chevron ${expandedCards.deactivations ? 'bulk-preview-card-chevron--open' : ''}`}>
-                      <ArrowDown2 size={16} color="var(--text-tertiary)" />
-                    </div>
-                  </div>
-                  {expandedCards.deactivations && (
-                    <div className="bulk-preview-card-body">
-                      {mockPreview.deactivations.map((p, i) => (
-                        <div className="bulk-preview-row" key={i}>
-                          <span className="bulk-preview-row-name">{p.name}</span>
-                          <span className="bulk-preview-row-detail">{p.email}</span>
-                          <span className="bulk-preview-row-changes">{p.reason}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+              {/* Data table */}
+              <div className="bulk-preview-table-wrap">
+                <table className="bulk-preview-table">
+                  <thead>
+                    <tr>
+                      <th className="bulk-preview-th-row">Row</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Status</th>
+                      <th>Team</th>
+                      <th>Action</th>
+                      <th>Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredEntries.map((entry, i) => (
+                      <tr key={i} className={`bulk-preview-tr ${entry.type === 'error' ? 'bulk-preview-tr--error' : ''}`}>
+                        <td className="bulk-preview-td-row">{entry.row}</td>
+                        <td className={entry.type === 'error' && !entry.name ? 'bulk-preview-td-missing' : ''}>
+                          {entry.name || '—'}
+                        </td>
+                        <td className={entry.type === 'error' && !entry.email ? 'bulk-preview-td-missing' : ''}>
+                          {entry.email || '—'}
+                        </td>
+                        <td>{entry.status || '—'}</td>
+                        <td>{entry.team}</td>
+                        <td>
+                          <span className={`bulk-preview-type-badge bulk-preview-type-badge--${entry.type}`}>
+                            {entry.type === 'invite' && 'New invite'}
+                            {entry.type === 'update' && 'Update'}
+                            {entry.type === 'deactivation' && 'Deactivate'}
+                            {entry.type === 'no-change' && 'No change'}
+                            {entry.type === 'error' && 'Error'}
+                          </span>
+                        </td>
+                        <td className="bulk-preview-td-detail">
+                          {entry.error && <span className="bulk-preview-td-error">{entry.error}</span>}
+                          {entry.detail && <span className="bulk-preview-td-change">{entry.detail}</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
 
               {/* Action bar */}
@@ -428,14 +470,57 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                 <button className="bulk-upload-btn-outlined" onClick={handleBackToUpload}>
                   Back
                 </button>
-                <button className="bulk-upload-btn-primary" onClick={onClose}>
-                  Confirm & Execute
+                <button
+                  className={`bulk-upload-btn-primary ${hasErrors ? 'bulk-upload-btn-primary--disabled' : ''}`}
+                  onClick={hasErrors ? undefined : onClose}
+                  disabled={hasErrors}
+                >
+                  {hasErrors ? `Fix ${errorCount} error${errorCount > 1 ? 's' : ''} to continue` : 'Confirm & Execute'}
                 </button>
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* CSV Preview overlay */}
+      {showCsvPreview && (
+        <div className="csv-overlay">
+          <div className="csv-overlay-inner">
+            <button className="csv-overlay-close" onClick={() => setShowCsvPreview(false)} aria-label="Close preview">
+              <span className="csv-overlay-close-icon">&times;</span>
+            </button>
+            <div className="csv-overlay-scroll">
+              <table className="csv-overlay-table">
+                <thead>
+                  <tr>
+                    <th>First name <span className="csv-overlay-required">(required)</span></th>
+                    <th>Last name <span className="csv-overlay-required">(required)</span></th>
+                    <th>Work email <span className="csv-overlay-required">(required)</span></th>
+                    <th>Team name</th>
+                    <th>Reports to (manager email)</th>
+                    <th>Region</th>
+                    <th>Start date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Jonh</strong></td>
+                    <td><strong>Doe</strong></td>
+                    <td>The person's work email address, e.g. <strong>jonh@company.com</strong></td>
+                    <td>The person's team, e.g. <strong>Sales</strong></td>
+                    <td>Work email of the Team Manager, e.g. <strong>manager@company.com</strong></td>
+                    <td><strong>North America</strong></td>
+                    <td>When did the person joined 5Mins.ai, e.g. <strong>01-01-2025</strong></td>
+                    <td>Use one of these exact words in the status column: <strong>Active / Inactive</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
