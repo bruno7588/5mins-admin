@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowDown2, ArrowLeft2, ArrowRight2, ImportCurve, Danger } from 'iconsax-react'
+import { ArrowDown2, ArrowLeft2, ArrowRight2, ImportCurve, UserMinus } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import { FileUploader } from '../../../../components/FileUploader/FileUploader'
 import './BulkUploadModal.css'
@@ -188,7 +188,7 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
           {/* Header */}
           <div className="bulk-upload-header">
             <h2 className="bulk-upload-title">
-              {step === 'upload' ? 'Bulk manage people' : 'Preview changes'}
+              {step === 'upload' ? 'Bulk manage people' : 'Review CSV file'}
             </h2>
             <CloseButton onClick={onClose} />
           </div>
@@ -373,43 +373,13 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
           {/* ─── PREVIEW STEP ─── */}
           {step === 'preview' && (
             <div className="bulk-preview">
-              {/* Error banner */}
-              {hasErrors && (
-                <div className="bulk-preview-error-banner">
-                  <Danger size={20} color="var(--danger-500)" variant="Bold" />
-                  <span>{errorCount} row{errorCount > 1 ? 's have' : ' has'} errors that must be fixed before uploading.</span>
+              {/* Deactivation warning banner */}
+              {deactivationCount > 0 && (
+                <div className="bulk-preview-warning-banner">
+                  <UserMinus size={24} color="var(--text-warning)" variant="Linear" />
+                  <span>Warning: {deactivationCount} {deactivationCount > 1 ? 'people' : 'person'} will lose access immediately after processing.</span>
                 </div>
               )}
-
-              {/* Summary bar */}
-              <div className="bulk-preview-summary">
-                <div className="bulk-preview-summary-item">
-                  <span className="bulk-preview-summary-count">{totalEntries}</span>
-                  <span className="bulk-preview-summary-label">Total rows</span>
-                </div>
-                {errorCount > 0 && (
-                  <div className="bulk-preview-summary-item bulk-preview-summary-item--danger">
-                    <span className="bulk-preview-summary-count">{errorCount}</span>
-                    <span className="bulk-preview-summary-label">Errors</span>
-                  </div>
-                )}
-                <div className="bulk-preview-summary-item bulk-preview-summary-item--success">
-                  <span className="bulk-preview-summary-count">{inviteCount}</span>
-                  <span className="bulk-preview-summary-label">New invites</span>
-                </div>
-                <div className="bulk-preview-summary-item bulk-preview-summary-item--primary">
-                  <span className="bulk-preview-summary-count">{updateCount}</span>
-                  <span className="bulk-preview-summary-label">Updates</span>
-                </div>
-                <div className="bulk-preview-summary-item bulk-preview-summary-item--danger-alt">
-                  <span className="bulk-preview-summary-count">{deactivationCount}</span>
-                  <span className="bulk-preview-summary-label">Deactivations</span>
-                </div>
-                <div className="bulk-preview-summary-item">
-                  <span className="bulk-preview-summary-count">{noChangeCount}</span>
-                  <span className="bulk-preview-summary-label">No changes</span>
-                </div>
-              </div>
 
               {/* Filter tabs */}
               <div className="bulk-preview-tabs">
@@ -436,13 +406,14 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
               <div className="bulk-preview-table-5m">
                 {/* Header */}
                 <div className="bulk-preview-table-header">
-                  <span className="bulk-preview-col bulk-preview-col--row">Row</span>
                   <span className="bulk-preview-col bulk-preview-col--name">Name</span>
                   <span className="bulk-preview-col bulk-preview-col--email">Email</span>
                   <span className="bulk-preview-col bulk-preview-col--status">Status</span>
                   <span className="bulk-preview-col bulk-preview-col--team">Team</span>
+                  {(previewFilter === 'all' || previewFilter === 'error') && (
+                    <span className="bulk-preview-col bulk-preview-col--detail">Details</span>
+                  )}
                   <span className="bulk-preview-col bulk-preview-col--action">Action</span>
-                  <span className="bulk-preview-col bulk-preview-col--detail">Details</span>
                 </div>
 
                 {/* Rows */}
@@ -452,7 +423,6 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                       key={i}
                       className={`bulk-preview-table-row ${entry.type === 'error' ? 'bulk-preview-table-row--error' : ''}`}
                     >
-                      <span className="bulk-preview-col bulk-preview-col--row">{entry.row}</span>
                       <span className={`bulk-preview-col bulk-preview-col--name ${entry.type === 'error' && !entry.name ? 'bulk-preview-col--missing' : ''}`}>
                         {entry.name || '—'}
                       </span>
@@ -461,6 +431,12 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                       </span>
                       <span className="bulk-preview-col bulk-preview-col--status">{entry.status || '—'}</span>
                       <span className="bulk-preview-col bulk-preview-col--team">{entry.team}</span>
+                      {(previewFilter === 'all' || previewFilter === 'error') && (
+                        <span className="bulk-preview-col bulk-preview-col--detail">
+                          {entry.error && <span className="bulk-preview-detail-error">{entry.error}</span>}
+                          {entry.detail && <span className="bulk-preview-detail-change">{entry.detail}</span>}
+                        </span>
+                      )}
                       <span className="bulk-preview-col bulk-preview-col--action">
                         <span className={`bulk-preview-type-badge bulk-preview-type-badge--${entry.type}`}>
                           {entry.type === 'invite' && 'New invite'}
@@ -469,10 +445,6 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                           {entry.type === 'no-change' && 'No change'}
                           {entry.type === 'error' && 'Error'}
                         </span>
-                      </span>
-                      <span className="bulk-preview-col bulk-preview-col--detail">
-                        {entry.error && <span className="bulk-preview-detail-error">{entry.error}</span>}
-                        {entry.detail && <span className="bulk-preview-detail-change">{entry.detail}</span>}
                       </span>
                     </div>
                   ))}
@@ -508,11 +480,12 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                   Back
                 </button>
                 <button
-                  className={`bulk-upload-btn-primary ${hasErrors ? 'bulk-upload-btn-primary--disabled' : ''}`}
-                  onClick={hasErrors ? undefined : onClose}
-                  disabled={hasErrors}
+                  className="bulk-upload-btn-primary"
+                  onClick={onClose}
                 >
-                  {hasErrors ? `Fix ${errorCount} error${errorCount > 1 ? 's' : ''} to continue` : 'Confirm & Execute'}
+                  {hasErrors
+                    ? `Upload ${totalEntries - errorCount} valid row${totalEntries - errorCount !== 1 ? 's' : ''}`
+                    : 'Confirm & Execute'}
                 </button>
               </div>
             </div>
