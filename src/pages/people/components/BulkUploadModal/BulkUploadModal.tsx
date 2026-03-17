@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowDown2, ImportCurve, InfoCircle, UserAdd, UserEdit, UserRemove, MinusCirlce, ArrowRight2 } from 'iconsax-react'
+import { ArrowDown2, ImportCurve, UserAdd, UserEdit, UserRemove, MinusCirlce, ArrowRight2 } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import { FileUploader } from '../../../../components/FileUploader/FileUploader'
 import './BulkUploadModal.css'
@@ -194,32 +194,76 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                   </div>
                   <div className={`bulk-upload-accordion-panel${openSection === 'fill' ? ' bulk-upload-accordion-panel--open' : ''}`}>
                     <div className="bulk-upload-accordion-body">
-                      <p className="bulk-upload-accordion-desc">Use one row per person and one column per detail (like name, email, etc.).</p>
+                      <p className="bulk-upload-accordion-desc">Fill in the CSV template with your people's details. The <strong>status</strong> column controls what happens to each user:</p>
 
-                      {/* Guidelines alert */}
-                      <div className="bulk-upload-guidelines">
-                        <InfoCircle size={20} color="var(--text-secondary)" variant="Linear" />
-                        <div className="bulk-upload-guidelines-body">
-                          <p className="bulk-upload-guidelines-title">Understanding how CSV works is important to avoid unintended changes:</p>
-                          <ul className="bulk-upload-guidelines-list">
-                            <li>
-                              <span className="bulk-upload-dot bulk-upload-dot--success" />
-                              New email address → User will receive an invitation email
-                            </li>
-                            <li>
-                              <span className="bulk-upload-dot bulk-upload-dot--warning" />
-                              Existing email + ACTIVE status → User information will be updated
-                            </li>
-                            <li>
-                              <span className="bulk-upload-dot bulk-upload-dot--danger" />
-                              Existing email + INACTIVE status → User will lose access immediately
-                            </li>
-                            <li>
-                              <span className="bulk-upload-dot bulk-upload-dot--neutral" />
-                              No status specified → Defaults to ACTIVE
-                            </li>
-                          </ul>
-                        </div>
+                      {/* Annotated example CSV */}
+                      <div className="csv-preview">
+                        <table className="csv-preview-table">
+                          <thead>
+                            <tr>
+                              <th>first_name</th>
+                              <th>last_name</th>
+                              <th>email</th>
+                              <th className="csv-col-ellipsis">...</th>
+                              <th>status</th>
+                              <th className="csv-col-result" />
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr className="csv-preview-tr--success">
+                              <td>Sarah</td>
+                              <td>Connor</td>
+                              <td>sarah@new.com</td>
+                              <td className="csv-col-ellipsis">...</td>
+                              <td className="csv-col-empty" />
+                              <td className="csv-col-result">
+
+                                <span className="csv-preview-badge csv-preview-badge--success">New email address</span>
+                                <span className="csv-preview-arrow">→</span>
+                                <span className="csv-preview-result-text">User will receive an invitation email</span>
+                              </td>
+                            </tr>
+                            <tr className="csv-preview-tr--warning">
+                              <td>John</td>
+                              <td>Smith</td>
+                              <td>john@company.com</td>
+                              <td className="csv-col-ellipsis">...</td>
+                              <td>ACTIVE</td>
+                              <td className="csv-col-result">
+
+                                <span className="csv-preview-badge csv-preview-badge--warning">Existing email + ACTIVE status</span>
+                                <span className="csv-preview-arrow">→</span>
+                                <span className="csv-preview-result-text">User information will be updated</span>
+                              </td>
+                            </tr>
+                            <tr className="csv-preview-tr--danger">
+                              <td>Mark</td>
+                              <td>Johnson</td>
+                              <td>mark@company.com</td>
+                              <td className="csv-col-ellipsis">...</td>
+                              <td>INACTIVE</td>
+                              <td className="csv-col-result">
+
+                                <span className="csv-preview-badge csv-preview-badge--danger">Existing email + INACTIVE status</span>
+                                <span className="csv-preview-arrow">→</span>
+                                <span className="csv-preview-result-text">User will lose access immediately</span>
+                              </td>
+                            </tr>
+                            <tr className="csv-preview-tr--neutral">
+                              <td>Lisa</td>
+                              <td>Chen</td>
+                              <td>lisa@company.com</td>
+                              <td className="csv-col-ellipsis">...</td>
+                              <td className="csv-col-empty" />
+                              <td className="csv-col-result">
+
+                                <span className="csv-preview-badge csv-preview-badge--neutral">No status specified</span>
+                                <span className="csv-preview-arrow">→</span>
+                                <span className="csv-preview-result-text">Defaults to ACTIVE</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   </div>
