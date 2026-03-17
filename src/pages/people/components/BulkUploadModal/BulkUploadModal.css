@@ -267,10 +267,15 @@
 .csv-preview-tr--danger { border-left-color: var(--danger-500); }
 .csv-preview-tr--neutral { border-left-color: var(--neutral-300); }
 
-.csv-preview-tr--success td { background: var(--success-100); }
-.csv-preview-tr--warning td { background: rgba(0, 206, 230, 0.06); }
-.csv-preview-tr--danger td { background: var(--danger-100); }
-.csv-preview-tr--neutral td { background: var(--neutral-50); }
+
+/* Highlighted cells */
+.csv-highlight {
+  font-weight: 600 !important;
+}
+
+.csv-highlight--success { color: var(--success-500) !important; }
+.csv-highlight--warning { color: var(--primary-600) !important; }
+.csv-highlight--danger { color: var(--danger-500) !important; }
 
 /* Ellipsis column */
 .csv-col-ellipsis {
