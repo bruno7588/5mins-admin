@@ -16,7 +16,8 @@ This directory contains the complete 5Mins.ai design system documentation.
 | `brand-colors.md` | Full color palette, gamification colors, usage rules | Choosing colors for any element |
 | `iconography.md` | Iconsax React icons, sizes, variants, common patterns | Adding or styling any icon |
 | `spacing.md` | Spacing scale, component padding, border radius | Layout, padding, margin, gap decisions |
-| `input.md` | Text inputs, form fields, search boxes, email fields, password fields, numeric inputs, or any user text-entry element |
+| `input.md` | Text inputs, form fields, search boxes, email/password/numeric fields — all states (Enabled, Hover, Active, Filled, Disabled), validation states, label, helper text, right-side icon | Any user text-entry element or form control |
+| `file-uploader.md` | File upload component — two sizes (L/S), all five states (Enabled, Hover, Error, Uploading, Filled), circular progress, filename display, Preview + Change File CTAs | Any file input, drag-and-drop zone, CSV import, document or media upload |
 
 ## Usage Pattern
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { ArrowDown2, ArrowLeft2, ArrowRight2, Danger, ImportCurve, UserMinus } from 'iconsax-react'
+import { ArrowDown2, ArrowLeft2, ArrowRight2, Danger, ImportCurve, InfoCircle, UserAdd, UserEdit, UserMinus } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import { FileUploader } from '../../../../components/FileUploader/FileUploader'
 import './BulkUploadModal.css'
@@ -22,9 +22,14 @@ const automations = [
 ]
 
 type UploaderState = 'Enabled' | 'Uploading' | 'Filled' | 'Error'
-type Step = 'upload' | 'preview'
+type Step = 'upload' | 'preview' | 'success'
 
 // Mock preview data at scale
+type CellWarning = {
+  kind: 'danger' | 'info'
+  message: string
+}
+
 type PreviewEntry = {
   row: number
   firstName: string
@@ -38,6 +43,7 @@ type PreviewEntry = {
   type: 'invite' | 'update' | 'deactivation' | 'no-change' | 'error'
   detail?: string
   error?: string
+  warnings?: Record<string, CellWarning>
   customFields?: Record<number, string>
 }
 
@@ -66,14 +72,14 @@ function buildMockPreviewData(fields: UserField[], includeErrors = true): Previe
     { row: 5, firstName: 'Mark', lastName: 'Johnson', email: 'mark@company.com', team: 'Support', role: 'HR Manager', reportsTo: 'director@company.com', startDate: '05/09/2024', region: 'Europe', type: 'deactivation', customFields: withCustom(4) },
     { row: 41, firstName: 'Paula', lastName: 'West', email: 'paula@company.com', team: 'Finance', role: 'Finance Analyst', reportsTo: 'lead@company.com', startDate: '12/02/2024', region: 'North America', type: 'deactivation', customFields: withCustom(5) },
     // New invites
-    { row: 1, firstName: 'Jane', lastName: 'Doe', email: 'jane@example.com', team: 'Engineering', role: 'Engineer', reportsTo: 'lead@company.com', startDate: '01/04/2025', region: 'Southeast Asia', type: 'invite', customFields: withCustom(6) },
-    { row: 2, firstName: 'Sarah', lastName: 'Lee', email: 'sarah.lee@example.com', team: 'Design', role: 'Designer', reportsTo: 'director@company.com', startDate: '15/04/2025', region: 'East Asia', type: 'invite', customFields: withCustom(7) },
+    { row: 1, firstName: 'Jane', lastName: 'Doe', email: 'jane@example.com', team: 'Commercial', role: 'Engineer', reportsTo: 'lead@company.com', startDate: '01/04/2025', region: 'Southeast Asia', type: 'invite', warnings: { team: { kind: 'danger', message: 'Team name not found!' } }, customFields: withCustom(6) },
+    { row: 2, firstName: 'Sarah', lastName: 'Lee', email: 'sarah.lee@example.com', team: 'Operations & Production', role: 'Designer', reportsTo: 'director@company.com', startDate: '15/04/2025', region: 'East Asia', type: 'invite', warnings: { team: { kind: 'danger', message: 'Team name not found!' }, region: { kind: 'info', message: 'New region will be created on invite' } }, customFields: withCustom(7) },
     { row: 8, firstName: 'Tom', lastName: 'Park', email: 'tom.p@example.com', team: 'Product', role: 'HR Manager', reportsTo: 'manager@company.com', startDate: '01/05/2025', region: 'North America', type: 'invite', customFields: withCustom(8) },
-    { row: 12, firstName: 'Nina', lastName: 'Rao', email: 'nina@example.com', team: 'Sales', role: 'Sales Rep', reportsTo: 'manager@company.com', startDate: '20/05/2025', region: 'Europe', type: 'invite', customFields: withCustom(9) },
-    { row: 19, firstName: 'Alex', lastName: 'Moreno', email: 'alex.m@example.com', team: 'Engineering', role: 'Engineer', reportsTo: 'lead@company.com', startDate: '10/06/2025', region: 'Latin America', type: 'invite', customFields: withCustom(10) },
+    { row: 12, firstName: 'Nina', lastName: 'Rao', email: 'nina@example.com', team: 'Sales', role: 'Sales Rep', reportsTo: 'manager@company.com', startDate: '20/05/2025', region: 'Europe', type: 'invite', warnings: { region: { kind: 'info', message: 'New region will be created on invite' } }, customFields: withCustom(9) },
+    { row: 19, firstName: 'Alex', lastName: 'Moreno', email: 'alex.m@example.com', team: 'Engineering', role: 'Engineer', reportsTo: 'lead@company.com', startDate: '10/06/2025', region: 'Latin America', type: 'invite', warnings: { region: { kind: 'info', message: 'New region will be created on invite' } }, customFields: withCustom(10) },
     // Updates
     { row: 4, firstName: 'John', lastName: 'Smith', email: 'john@company.com', team: 'Marketing', role: 'Designer', reportsTo: 'director@company.com', startDate: '08/08/2024', region: 'Europe', type: 'update', detail: 'Team: Sales → Marketing', customFields: withCustom(11) },
-    { row: 6, firstName: 'Emma', lastName: 'Davis', email: 'emma@company.com', team: 'Support', role: 'HR Manager', reportsTo: 'manager@company.com', startDate: '22/10/2024', region: 'North America', type: 'update', detail: 'Region: Europe → North America', customFields: withCustom(12) },
+    { row: 6, firstName: 'Emma', lastName: 'Davis', email: 'emma@company.com', team: 'Fron-Desk Services', role: 'HR Manager', reportsTo: 'manager@company.com', startDate: '22/10/2024', region: 'North America', type: 'update', detail: 'Region: Europe → North America', warnings: { team: { kind: 'danger', message: 'Team name not found!' } }, customFields: withCustom(12) },
     { row: 9, firstName: 'Wei', lastName: 'Zhang', email: 'wei@company.com', team: 'Engineering', role: 'Engineer', reportsTo: 'lead@company.com', startDate: '03/11/2024', region: 'East Asia', type: 'update', detail: 'Role: Junior → Senior', customFields: withCustom(13) },
     // No changes (bulk)
     ...Array.from({ length: 38 }, (_, i) => ({
@@ -93,6 +99,46 @@ function buildMockPreviewData(fields: UserField[], includeErrors = true): Previe
 }
 
 type PreviewFilter = 'all' | 'error' | 'invite' | 'update' | 'deactivation' | 'no-change'
+
+function CellWithWarning({ value, warning }: { value: string; warning?: CellWarning }) {
+  const iconRef = useRef<HTMLSpanElement>(null)
+  const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({ opacity: 0 })
+
+  const showTooltip = () => {
+    if (!iconRef.current) return
+    const rect = iconRef.current.getBoundingClientRect()
+    setTooltipStyle({
+      opacity: 1,
+      bottom: window.innerHeight - rect.top + 8,
+      left: rect.left + rect.width / 2,
+      transform: 'translateX(-50%)',
+    })
+  }
+
+  const hideTooltip = () => {
+    setTooltipStyle({ opacity: 0 })
+  }
+
+  return (
+    <>
+      {value}
+      {warning && (
+        <span
+          className="bulk-cell-warning"
+          ref={iconRef}
+          onMouseEnter={showTooltip}
+          onMouseLeave={hideTooltip}
+        >
+          {warning.kind === 'danger'
+            ? <Danger size={16} color="var(--danger-500)" variant="Linear" />
+            : <InfoCircle size={16} color="var(--primary-500)" variant="Linear" />
+          }
+          <span className="bulk-cell-warning-tooltip" style={tooltipStyle}>{warning.message}</span>
+        </span>
+      )}
+    </>
+  )
+}
 
 function loadUserFields(): UserField[] {
   try {
@@ -271,13 +317,15 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
     <div className="bulk-upload-modal">
       <div className={`bulk-upload-content${step === 'preview' ? ' bulk-upload-content--preview' : ''}`}>
         <div className={`bulk-upload-form${step === 'preview' ? ' bulk-upload-form--preview' : ''}`}>
-          {/* Header */}
-          <div className="bulk-upload-header">
-            <h2 className="bulk-upload-title">
-              {step === 'upload' ? 'Bulk manage people' : 'Review CSV file'}
-            </h2>
-            <CloseButton onClick={onClose} />
-          </div>
+          {/* Header (hidden on success) */}
+          {step !== 'success' && (
+            <div className="bulk-upload-header">
+              <h2 className="bulk-upload-title">
+                {step === 'upload' ? 'Bulk manage people' : 'Review CSV file'}
+              </h2>
+              <CloseButton onClick={onClose} />
+            </div>
+          )}
 
           {step === 'upload' && (
             <>
@@ -438,25 +486,12 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                   <span>{errorCount} invite{errorCount !== 1 ? 's have' : ' has'} errors. Fix your CSV and re-upload to continue.</span>
                   <button className="bulk-preview-error-banner-cta" onClick={handleReupload}>Re-upload CSV</button>
                 </div>
-              ) : (
-                <>
-                  <div className="bulk-preview-success-banner">
-                    <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M47.9438 92.9688C72.7967 92.9688 92.9438 72.8216 92.9438 47.9688C92.9438 23.1159 72.7967 2.96875 47.9438 2.96875C23.091 2.96875 2.94385 23.1159 2.94385 47.9688C2.94385 72.8216 23.091 92.9688 47.9438 92.9688Z" fill="#11763D"/>
-                      <path d="M45.0188 89.3687C68.2562 89.3687 87.0938 70.5311 87.0938 47.2937C87.0938 24.0564 68.2562 5.21875 45.0188 5.21875C21.7815 5.21875 2.94385 24.0564 2.94385 47.2937C2.94385 70.5311 21.7815 89.3687 45.0188 89.3687Z" fill="#18A957"/>
-                      <path d="M17.9746 22.2766C21.3496 16.9516 28.5496 12.5266 36.0496 11.1766C37.9246 10.8766 39.7996 10.7266 41.3746 11.3266C42.5746 11.7766 43.5496 12.9016 42.8746 14.1766C42.3496 15.2266 40.9246 15.6766 39.7996 16.0516C32.7646 18.3766 26.6971 22.9591 22.5496 29.1016C21.0496 31.3516 18.7996 37.5766 16.0246 36.0016C13.0996 34.2766 13.6996 28.8766 17.9746 22.2766Z" fill="#A3DDBC"/>
-                      <path d="M31 48.0075L42.32 59.3275L65 36.6875" stroke="#F9F9FA" strokeWidth="5.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    <span>All {totalEntries} users are valid and ready to process.</span>
-                  </div>
-                  {deactivationCount > 0 && (
-                    <div className="bulk-preview-warning-banner">
-                      <UserMinus size={20} color="var(--text-warning)" variant="Linear" />
-                      <span>Warning: {deactivationCount} {deactivationCount > 1 ? 'people' : 'person'} will lose access immediately after processing.</span>
-                    </div>
-                  )}
-                </>
-              )}
+              ) : deactivationCount > 0 ? (
+                <div className="bulk-preview-warning-banner">
+                  <UserMinus size={20} color="var(--text-warning)" variant="Linear" />
+                  <span>Warning: {deactivationCount} {deactivationCount > 1 ? 'people' : 'person'} will lose access immediately after processing.</span>
+                </div>
+              ) : null}
 
               {/* Filter tabs */}
               <div className="bulk-preview-tabs">
@@ -516,11 +551,19 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                         <span className={`bulk-preview-col bulk-preview-col--email ${entry.type === 'error' && !entry.email ? 'bulk-preview-col--missing' : ''}`}>
                           {entry.email || '—'}
                         </span>
-                        <span className="bulk-preview-col bulk-preview-col--team">{entry.team}</span>
-                        <span className="bulk-preview-col bulk-preview-col--role">{entry.role}</span>
-                        <span className="bulk-preview-col bulk-preview-col--reportsto">{entry.reportsTo}</span>
+                        <span className="bulk-preview-col bulk-preview-col--team">
+                          <CellWithWarning value={entry.team} warning={entry.warnings?.team} />
+                        </span>
+                        <span className="bulk-preview-col bulk-preview-col--role">
+                          <CellWithWarning value={entry.role} warning={entry.warnings?.role} />
+                        </span>
+                        <span className="bulk-preview-col bulk-preview-col--reportsto">
+                          <CellWithWarning value={entry.reportsTo} warning={entry.warnings?.reportsTo} />
+                        </span>
                         <span className="bulk-preview-col bulk-preview-col--startdate">{entry.startDate}</span>
-                        <span className="bulk-preview-col bulk-preview-col--region">{entry.region}</span>
+                        <span className="bulk-preview-col bulk-preview-col--region">
+                          <CellWithWarning value={entry.region} warning={entry.warnings?.region} />
+                        </span>
                         {userFields.map(f => (
                           <span key={f.id} className="bulk-preview-col bulk-preview-col--custom">
                             {entry.customFields?.[f.id] || '—'}
@@ -563,10 +606,10 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                 <div className="bulk-preview-btn-wrapper">
                   <button
                     className={`bulk-upload-btn-primary${hasErrors ? ' bulk-upload-btn-primary--disabled' : ''}`}
-                    onClick={hasErrors ? undefined : onClose}
+                    onClick={hasErrors ? undefined : () => setStep('success')}
                     disabled={hasErrors}
                   >
-                    Process {totalEntries - errorCount} Invitation{totalEntries - errorCount !== 1 ? 's' : ''}
+                    Process {totalEntries - errorCount} User{totalEntries - errorCount !== 1 ? 's' : ''}
                   </button>
                   {hasErrors && (
                     <div className="bulk-preview-tooltip">
@@ -575,6 +618,45 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                   )}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* ─── SUCCESS STEP ─── */}
+          {step === 'success' && (
+            <div className="bulk-success">
+              <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M47.9438 92.9688C72.7967 92.9688 92.9438 72.8216 92.9438 47.9688C92.9438 23.1159 72.7967 2.96875 47.9438 2.96875C23.091 2.96875 2.94385 23.1159 2.94385 47.9688C2.94385 72.8216 23.091 92.9688 47.9438 92.9688Z" fill="#11763D"/>
+                <path d="M45.0188 89.3687C68.2562 89.3687 87.0938 70.5311 87.0938 47.2937C87.0938 24.0564 68.2562 5.21875 45.0188 5.21875C21.7815 5.21875 2.94385 24.0564 2.94385 47.2937C2.94385 70.5311 21.7815 89.3687 45.0188 89.3687Z" fill="#18A957"/>
+                <path d="M17.9746 22.2766C21.3496 16.9516 28.5496 12.5266 36.0496 11.1766C37.9246 10.8766 39.7996 10.7266 41.3746 11.3266C42.5746 11.7766 43.5496 12.9016 42.8746 14.1766C42.3496 15.2266 40.9246 15.6766 39.7996 16.0516C32.7646 18.3766 26.6971 22.9591 22.5496 29.1016C21.0496 31.3516 18.7996 37.5766 16.0246 36.0016C13.0996 34.2766 13.6996 28.8766 17.9746 22.2766Z" fill="#A3DDBC"/>
+                <path d="M31 48.0075L42.32 59.3275L65 36.6875" stroke="#F9F9FA" strokeWidth="5.33333" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <h3 className="bulk-success-title">Users processed successfully!</h3>
+              <div className="bulk-success-card">
+                <div className="bulk-success-row">
+                  <div className="bulk-success-label">
+                    <UserAdd size={20} color="var(--text-secondary)" variant="Linear" />
+                    <span>New invites sent</span>
+                  </div>
+                  <span className="bulk-success-value">{inviteCount}</span>
+                </div>
+                <div className="bulk-success-row">
+                  <div className="bulk-success-label">
+                    <UserEdit size={20} color="var(--text-secondary)" variant="Linear" />
+                    <span>People updated</span>
+                  </div>
+                  <span className="bulk-success-value">{updateCount}</span>
+                </div>
+                <div className="bulk-success-row">
+                  <div className="bulk-success-label">
+                    <UserMinus size={20} color="var(--text-secondary)" variant="Linear" />
+                    <span>People deactivated</span>
+                  </div>
+                  <span className="bulk-success-value">{deactivationCount}</span>
+                </div>
+              </div>
+              <button className="bulk-upload-btn-primary" onClick={onClose}>
+                Done
+              </button>
             </div>
           )}
         </div>

@@ -259,7 +259,7 @@
 
 .csv-preview-table th {
   background: var(--neutral-50);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-tertiary);
   font-size: 14px;
   border-bottom: 1px solid var(--neutral-200);
@@ -329,7 +329,7 @@
 
 .csv-preview-result-text {
   font-family: 'Poppins', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
   color: var(--neutral-800);
   line-height: 1.4;
@@ -548,7 +548,7 @@
   background: rgba(255, 165, 56, 0.12);
   border-radius: var(--radius-sm);
   font-family: 'Poppins', sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-warning, #FFA538);
   line-height: 1.5;
@@ -746,6 +746,33 @@
   white-space: nowrap;
 }
 
+/* ─── Cell warning icon + tooltip ─── */
+.bulk-cell-warning {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.bulk-cell-warning-tooltip {
+  position: fixed;
+  padding: 8px 12px;
+  background: var(--neutral-900);
+  color: var(--neutral-0);
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+  z-index: 200;
+}
+
 .bulk-preview-table-header .bulk-preview-col {
   font-size: 14px;
   font-weight: 400;
@@ -938,5 +965,54 @@
   justify-content: center;
   gap: var(--space-sm);
   padding-top: var(--space-m);
+}
+
+/* ─── Success step ─── */
+.bulk-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-l);
+  flex: 1;
+}
+
+.bulk-success-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+  text-align: center;
+}
+
+.bulk-success-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+  width: 320px;
+  padding: var(--space-m);
+  background: var(--input-background);
+  border-radius: var(--radius-sm);
+}
+
+.bulk-success-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bulk-success-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.bulk-success-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 
