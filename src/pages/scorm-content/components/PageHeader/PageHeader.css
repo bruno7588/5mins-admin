@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-ml) 0;
+  padding: var(--space-m) 0;
 }
 
 .page-header-title {

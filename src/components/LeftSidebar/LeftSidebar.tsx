@@ -24,7 +24,7 @@ function LeftSidebar() {
   const location = useLocation()
   const activePage = location.pathname
 
-  const isPeopleSection = activePage === '/people' || activePage === '/user-fields'
+  const isPeopleSection = activePage === '/people' || activePage === '/user-fields' || activePage === '/roles'
 
   const [peopleOpen, setPeopleOpen] = useState(isPeopleSection)
   const [contentOpen, setContentOpen] = useState(true)
@@ -69,6 +69,12 @@ function LeftSidebar() {
               onClick={() => navigate('/user-fields')}
             >
               Custom Fields
+            </button>
+            <button
+              className={`sidebar-sub-item${activePage === '/roles' ? ' sidebar-sub-item--active' : ''}`}
+              onClick={() => navigate('/roles')}
+            >
+              Roles &amp; Mapping
             </button>
           </div>
         )}

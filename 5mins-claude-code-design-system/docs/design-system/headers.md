@@ -70,7 +70,7 @@ Primary header for page-level identification. Uses larger typography (24px title
 
 | Element | Value |
 |---------|-------|
-| Section gap | 20px (`--space-ml`) |
+| Section gap | 16px (`--space-m`) |
 | Breadcrumb item gap | 4px (`--space-xs`) |
 | Eyebrow item gap | 8px (`--space-s`) |
 | Eyebrow internal gap | 4px (`--space-xs`) |
@@ -591,7 +591,7 @@ Secondary header for content sections and modals. Uses smaller typography (20px 
 |---------|-------------|----------------|
 | Title | 24px Bold | 20px Bold |
 | Description | 16px Regular | 14px Regular |
-| Section gap | 20px | 16px |
+| Section gap | 16px | 16px |
 | Eyebrow icon | 21.333px | 26.667px |
 
 ### Types
@@ -874,7 +874,7 @@ export function SectionHeader({
 
 | Element | Page Header | Section Header |
 |---------|-------------|----------------|
-| Section gap | 20px | 16px |
+| Section gap | 16px | 16px |
 | Title/description gap | 4px | 4px |
 | CTA buttons gap | 16px | 16px |
 | Tabs gap | 24px | 24px |

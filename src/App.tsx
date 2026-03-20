@@ -7,6 +7,7 @@ import CreateCourse from './pages/your-courses/CreateCourse'
 
 import People from './pages/people/People'
 import UserFields from './pages/people/UserFields'
+import Roles from './pages/roles/Roles'
 
 import QBYourContent from './pages/questions-bank/YourContent'
 
@@ -51,6 +52,7 @@ function App() {
                 <Route path="/your-courses" element={<YourCourses />} />
                 <Route path="/people" element={<People />} />
                 <Route path="/user-fields" element={<UserFields />} />
+                <Route path="/roles" element={<Roles />} />
                 <Route path="/questions-bank" element={<QBYourContent />} />
                 <Route path="/scorm-content" element={<ScormYourContent />} />
               </Routes>
