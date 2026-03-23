@@ -6,7 +6,7 @@
 
 .roles-main {
   flex: 1;
-  overflow-y: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -101,6 +101,8 @@
   padding: var(--space-l);
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   gap: var(--space-l);
 }
 
@@ -231,6 +233,24 @@
   font-size: 13px;
 }
 
+.roles-btn-text {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.roles-btn-text:hover {
+  color: var(--primary-700);
+}
+
 .roles-btn-outlined {
   padding: 6px 16px;
   font-size: 13px;
@@ -283,11 +303,15 @@
 .roles-col--skills {
   width: 80px;
   flex-shrink: 0;
+  text-align: right;
+  justify-content: flex-end;
 }
 
 .roles-col--assigned {
   width: 80px;
   flex-shrink: 0;
+  text-align: right;
+  justify-content: flex-end;
 }
 
 .roles-col--action {
@@ -306,6 +330,8 @@
 .roles-col--employees {
   width: 100px;
   flex-shrink: 0;
+  text-align: right;
+  justify-content: flex-end;
 }
 
 .roles-col--actions {
@@ -386,11 +412,16 @@
 }
 
 .roles-expanded-label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.roles-expanded-label-meta {
+  font-weight: 400;
   color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .roles-expanded-tags {
@@ -445,13 +476,13 @@
 .roles-skill-cards {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-s);
+  gap: var(--space-sm);
 }
 
 .roles-skill-card {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-s);
   padding: var(--space-s) var(--space-sm);
   border: 1px solid var(--border);
   border-radius: var(--space-sm);
@@ -463,8 +494,8 @@
 }
 
 .roles-skill-card__icon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
 }
 
@@ -1014,27 +1045,19 @@
   gap: 0;
   min-height: 0;
   flex: 1;
+  overflow: hidden;
+  align-items: stretch;
 }
 
 /* ─── Left: Functions Panel ─── */
 .roles-functions-panel {
-  width: 220px;
+  width: 200px;
   flex-shrink: 0;
-  border-right: 1px solid var(--border);
-  padding: var(--space-m) 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-s);
-}
-
-.roles-functions-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 0 var(--space-m);
-  margin: 0;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .roles-functions-list {
@@ -1043,45 +1066,46 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-xs);
 }
 
 .roles-function-item {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: var(--space-s) var(--space-m);
+  padding: var(--space-s);
   font-size: 14px;
   font-weight: 400;
   color: var(--text-secondary);
   background: none;
   border: none;
-  border-left: 3px solid transparent;
+  border-radius: var(--space-s);
   cursor: pointer;
   text-align: left;
-  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  line-height: 1.5;
+  transition: background 150ms ease, color 150ms ease;
 }
 
 .roles-function-item:hover {
-  background: var(--neutral-50);
-  color: var(--text-primary);
+  background: var(--input-background);
 }
 
 .roles-function-item--active {
-  border-left-color: var(--secondary-500);
-  color: var(--text-primary);
+  color: var(--secondary-600);
   font-weight: 700;
-  background: rgba(255, 187, 56, 0.08);
+  background: var(--input-background);
 }
 
 /* ─── Right: Table Panel ─── */
 .roles-table-panel {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-m);
-  padding: var(--space-m) 0 0 var(--space-l);
+  padding: 0 0 0 var(--space-l);
+  overflow-y: auto;
 }
 
 .roles-table-toolbar {
@@ -1094,7 +1118,7 @@
 /* ─── Role Name Link ─── */
 .roles-role-link {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--text-primary);
   background: none;
   border: none;
@@ -1117,7 +1141,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  padding: var(--space-l);
   flex-shrink: 0;
 }
 
@@ -1156,6 +1179,28 @@
   border-radius: var(--radius-xs);
 }
 
+/* ─── Preview Panel Body Override ─── */
+.roles-preview-panel .roles-panel-body {
+  padding: 0;
+  gap: var(--space-sm);
+}
+
+/* ─── Preview Panel Footer ─── */
+.roles-preview-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-m);
+  flex-shrink: 0;
+}
+
+.roles-preview-footer__divider {
+  height: 1px;
+  width: 100%;
+  background: var(--border);
+  border-radius: var(--radius-xs);
+}
+
 /* ─── Preview Panel (slide-in) ─── */
 .roles-preview-panel {
   width: 600px;
@@ -1164,6 +1209,8 @@
   background: var(--neutral-0);
   display: flex;
   flex-direction: column;
+  gap: var(--space-ml);
+  padding: var(--space-ml) var(--space-l);
   box-shadow: var(--shadow-panel);
   animation: roles-panel-slide 250ms ease;
 }

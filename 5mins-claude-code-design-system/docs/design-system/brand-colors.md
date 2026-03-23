@@ -83,7 +83,8 @@ color: var(--primary-700);       /* Hover text */
 **Purpose:** Active states and selection indicators
 
 ### Key Token
-- `--secondary-500` (#FFBB38): Active/selected states
+- `--secondary-500` (#FFBB38): Active/selected state backgrounds, tab underlines
+- `--secondary-600` (#E6A830): Selected text color (text-selected)
 
 ### Usage Rules
 
@@ -244,7 +245,8 @@ input { border: 1px solid var(--neutral-100); }
 
 **Active & Selection States**
 - Input focus (dropdown, search) → `--secondary-500`
-- Active tab → `--secondary-500`
+- Active tab underline → `--secondary-500`
+- Selected text color → `--secondary-600`
 - Selected checkbox/radio → `--secondary-500`
 - Selected chip → `--secondary-500`
 
