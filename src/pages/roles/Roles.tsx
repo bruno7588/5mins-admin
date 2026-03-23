@@ -70,7 +70,7 @@ function Roles() {
         <header className="roles-header">
           <div className="roles-header__title-group">
             <h1 className="roles-header__title">Roles &amp; Mapping</h1>
-            <p className="roles-header__description">Browse 5Mins role library, and manage your company roles.</p>
+            <p className="roles-header__description">Browse pre-built roles from the 5Mins library and copy them to your company, or create and manage your own custom roles with tailored skill mappings.</p>
           </div>
           <div className="roles-header__divider" />
           <div className="roles-header__tabs" role="tablist">

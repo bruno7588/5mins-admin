@@ -43,7 +43,7 @@ function RolePanel({ mode, onClose, onSave }: Props) {
     return false
   }
 
-  const [step, setStep] = useState<1 | 2>(isEdit || isPrefilled ? 2 : 1)
+  const [step, setStep] = useState<1 | 2>(isEdit ? 2 : 1)
   const [name, setName] = useState(initName)
   const [leadership, setLeadership] = useState(initLeadership)
   const [description, setDescription] = useState('')
@@ -393,9 +393,12 @@ function RolePanel({ mode, onClose, onSave }: Props) {
             </button>
           )}
           <div className="roles-panel-footer-right">
+            <button className="roles-btn-ghost" onClick={onClose}>
+              Cancel
+            </button>
             {!isEdit && step === 1 && isCopy && (
               <button className="roles-btn-primary" onClick={() => setStep(2)}>
-                Continue
+                Continue →
               </button>
             )}
             {(isEdit || step === 2) && (

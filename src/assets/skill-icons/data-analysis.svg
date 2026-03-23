@@ -1,0 +1,22 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 95.881 88.2106" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="analytics">
+<rect id="Rectangle" y="8.55941" width="8.5303" height="51.3574" fill="var(--fill-0, #FFBB38)"/>
+<rect id="Rectangle_2" x="17.0609" y="25.6785" width="8.5303" height="34.2383" fill="var(--fill-0, #E95C7B)"/>
+<rect id="Rectangle_3" x="51.1827" width="8.5303" height="59.9168" fill="var(--fill-0, #FFBB38)"/>
+<path id="Path" fill-rule="evenodd" clip-rule="evenodd" d="M93.7389 86.0609V86.0609C90.8823 88.9271 86.2507 88.9271 83.3942 86.0609L57.5331 60.1115L67.8777 49.7315L93.7389 75.6809C96.5951 78.5474 96.5951 83.1946 93.7389 86.0609Z" fill="var(--fill-0, #00D3BF)"/>
+<path id="Path_2" fill-rule="evenodd" clip-rule="evenodd" d="M57.5331 60.1112L83.3942 86.0606C86.2507 88.9268 90.8823 88.9268 93.7389 86.0606C93.7752 86.0241 93.8054 85.9844 93.8411 85.9468L62.8131 54.8132L57.5331 60.1112Z" fill="var(--fill-0, #00A999)"/>
+<ellipse id="Oval" cx="45.3095" cy="37.4647" rx="29.2569" ry="29.3567" fill="var(--fill-0, #324A5E)"/>
+<path id="Path_3" d="M24.729 16.5991C24.6927 16.6349 24.6546 16.668 24.6183 16.7045C13.1922 28.1696 13.1922 46.7587 24.6183 58.2238C36.0445 69.6889 54.5704 69.6889 65.9968 58.2238C66.0331 58.1874 66.0661 58.1492 66.1018 58.1128L24.729 16.5991Z" fill="var(--fill-0, #2B3B4E)"/>
+<ellipse id="Oval_2" cx="45.3095" cy="37.4647" rx="21.9465" ry="22.0214" fill="var(--fill-0, #99F1FB)"/>
+<path id="Path_4" fill-rule="evenodd" clip-rule="evenodd" d="M29.901 21.7888C29.8648 21.8246 29.8267 21.8577 29.7904 21.8941C21.2208 30.493 21.2208 44.4347 29.7904 53.0338C38.36 61.6326 52.2543 61.6326 60.8241 53.0338C60.8604 52.9974 60.8934 52.9595 60.9291 52.9228L29.901 21.7888Z" fill="var(--fill-0, #66E9F9)"/>
+<path id="Rectangle_4" fill-rule="evenodd" clip-rule="evenodd" d="M91.2309 73.1672L80.8855 83.548L63.3311 65.9337L73.6766 55.553L91.2309 73.1672Z" fill="var(--fill-0, #66E5D9)"/>
+<g id="Group">
+<path id="Rectangle_5" fill-rule="evenodd" clip-rule="evenodd" d="M86.1671 78.2462L80.8873 83.544L63.333 65.9297L68.6128 60.6319L86.1671 78.2462Z" fill="var(--fill-0, #33DCCC)"/>
+<path id="Path_5" fill-rule="evenodd" clip-rule="evenodd" d="M42.6524 59.3161V25.6785H34.1221V56.4132C36.7726 57.9906 39.6825 58.955 42.6524 59.3161Z" fill="var(--fill-0, #F2A2B3)"/>
+</g>
+<path id="Path_6" fill-rule="evenodd" clip-rule="evenodd" d="M34.1218 56.4132C36.772 57.9906 39.6825 58.955 42.6521 59.3161V34.5843L34.1218 26.0249V56.4132Z" fill="var(--fill-0, #E95C7B)"/>
+<path id="Path_7" d="M51.1827 58.677C54.2552 57.823 57.1768 56.2865 59.713 54.0669V20.862C57.1768 18.6421 54.2552 17.105 51.1827 16.2519V58.677Z" fill="var(--fill-0, #F9B54C)"/>
+<path id="Path_8" d="M51.1827 58.677C54.2552 57.823 57.1768 56.2865 59.713 54.0669V51.7034L51.1827 43.1437V58.677Z" fill="var(--fill-0, #E59E41)"/>
+<path id="Path_9" fill-rule="evenodd" clip-rule="evenodd" d="M25.5915 27.7976C22.6285 33.8817 22.6285 41.0472 25.5915 47.1312V27.7976Z" fill="var(--fill-0, #E95C7B)"/>
+</g>
+</svg>
