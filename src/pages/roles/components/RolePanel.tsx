@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { SearchNormal1, Danger } from 'iconsax-react'
+import { SearchNormal1, Danger, ArrowLeft } from 'iconsax-react'
 import ConfirmModal from '../../../components/ConfirmModal/ConfirmModal'
 import Checkbox from '../../../components/Checkbox/Checkbox'
 import InputField from '../../../components/InputField/InputField'
@@ -61,8 +61,17 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
   // Skill search
   const [skillSearch, setSkillSearch] = useState('')
   const [skillDropdownOpen, setSkillDropdownOpen] = useState(false)
+  const [recentlyAdded, setRecentlyAdded] = useState<Record<number, 'added' | 'already'>>({})
+  const [dropdownDirection, setDropdownDirection] = useState<'above' | 'below'>('below')
 
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+  const calcDropdownDirection = () => {
+    if (!dropdownRef.current) return
+    const rect = dropdownRef.current.getBoundingClientRect()
+    const spaceBelow = window.innerHeight - rect.bottom
+    setDropdownDirection(spaceBelow < 280 ? 'above' : 'below')
+  }
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -160,13 +169,24 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
   }
 
   const addSkill = (skill: Skill) => {
-    if (!selectedSkills.find(sk => sk.id === skill.id)) {
+    const alreadySelected = selectedSkills.find(sk => sk.id === skill.id)
+    if (!alreadySelected) {
       setSelectedSkills(prev => [...prev, skill])
+      setRecentlyAdded(prev => ({ ...prev, [skill.id]: 'added' }))
+    } else {
+      setRecentlyAdded(prev => ({ ...prev, [skill.id]: 'already' }))
     }
+    setTimeout(() => {
+      setRecentlyAdded(prev => {
+        const next = { ...prev }
+        delete next[skill.id]
+        return next
+      })
+    }, 1000)
   }
 
   const filteredCatalogue = skillCatalogue.filter(sk => {
-    if (selectedSkills.find(sel => sel.id === sk.id)) return false
+    if (selectedSkills.find(sel => sel.id === sk.id) && !recentlyAdded[sk.id]) return false
     if (skillSearch && !sk.name.toLowerCase().includes(skillSearch.toLowerCase())) return false
     return true
   })
@@ -204,23 +224,28 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
             onChange={e => {
               setSkillSearch(e.target.value)
               setSkillDropdownOpen(true)
+              calcDropdownDirection()
             }}
-            onFocus={() => setSkillDropdownOpen(true)}
+            onFocus={() => { setSkillDropdownOpen(true); calcDropdownDirection() }}
           />
         </div>
         {skillDropdownOpen && filteredCatalogue.length > 0 && (
-          <div className="roles-panel-skill-dropdown">
+          <div className={`roles-panel-skill-dropdown roles-panel-skill-dropdown--${dropdownDirection}`}>
             {filteredCatalogue.slice(0, 10).map(sk => (
               <button
                 key={sk.id}
-                className="roles-panel-skill-option"
+                className={`roles-panel-skill-option${recentlyAdded[sk.id] ? ' roles-panel-skill-option--added' : ''}`}
                 onClick={() => {
                   addSkill(sk)
                   setSkillSearch('')
                 }}
               >
                 <span className="roles-panel-skill-option-name">{sk.name}</span>
-                <span className="roles-panel-skill-option-cat">{sk.category}</span>
+                {recentlyAdded[sk.id] && (
+                  <span className={`roles-panel-skill-option-tag${recentlyAdded[sk.id] === 'already' ? ' roles-panel-skill-option-tag--already' : ''}`}>
+                    {recentlyAdded[sk.id] === 'already' ? 'Already added' : 'Added'}
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -268,9 +293,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
           <div className="roles-panel-section-header__headline">
             {showBackInHeader && (
               <button className="roles-panel-back-circle" onClick={() => setStep(1)}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M15 19.92L8.48 13.4C7.71 12.63 7.71 11.37 8.48 10.6L15 4.08" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+                <ArrowLeft size={20} color="currentColor" />
               </button>
             )}
             <div className="roles-panel-section-header__title-group">
@@ -542,7 +565,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                     </svg>
                   </button>
                   <button
-                    className="roles-btn-primary"
+                    className="roles-btn-outlined-primary"
                     disabled={!name.trim()}
                     onClick={handleSkipToManual}
                   >

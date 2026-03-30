@@ -1146,7 +1146,6 @@
 
 .roles-panel-skill-dropdown {
   position: absolute;
-  top: calc(100% + 4px);
   left: 0;
   right: 0;
   background: var(--neutral-0);
@@ -1157,6 +1156,14 @@
   overflow-y: auto;
   z-index: 200;
   animation: roles-dropdown-fade 150ms ease;
+}
+
+.roles-panel-skill-dropdown--below {
+  top: calc(100% + 4px);
+}
+
+.roles-panel-skill-dropdown--above {
+  bottom: calc(100% + 4px);
 }
 
 @keyframes roles-dropdown-fade {
@@ -1190,6 +1197,32 @@
 .roles-panel-skill-option-cat {
   font-size: 12px;
   color: var(--text-tertiary);
+}
+
+.roles-panel-skill-option--added {
+  opacity: 0.6;
+  pointer-events: auto;
+}
+
+.roles-panel-skill-option-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--success-600, #18A957);
+  background: var(--success-50, #E8F9EF);
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+  animation: roles-tag-fade-in 200ms ease;
+}
+
+.roles-panel-skill-option-tag--already {
+  color: var(--text-tertiary);
+  background: var(--neutral-50);
+}
+
+@keyframes roles-tag-fade-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /* ===== Skills Header (edit mode) ===== */
