@@ -492,12 +492,17 @@
 
 .roles-leader-badge {
   display: inline-flex;
-  padding: 3px 8px;
-  border-radius: 40px;
-  font-size: 11px;
-  font-weight: 600;
-  background: rgba(129, 88, 236, 0.12);
-  color: #8158EC;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: var(--xxl, 40px);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  background: var(--input-background, rgba(69, 76, 94, 0.16));
+  color: var(--text-secondary, #BFC2CC);
   flex-shrink: 0;
 }
 
