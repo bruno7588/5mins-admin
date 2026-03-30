@@ -118,7 +118,7 @@ function Roles() {
               onDuplicateRole={(role) =>
                 setPanelMode({
                   type: 'create-prefilled',
-                  name: `${role.name} (copy)`,
+                  name: `Copy of ${role.name}`,
                   skills: [...role.skills],
                   leadership: role.leadership,
                 })
