@@ -22,6 +22,13 @@ interface Props {
 }
 
 function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
+  const [closing, setClosing] = useState(false)
+
+  const handleClose = () => {
+    setClosing(true)
+    setTimeout(() => onClose(), 250)
+  }
+
   const isEdit = mode.type === 'edit'
   const isCopy = mode.type === 'copy'
   const isPrefilled = mode.type === 'create-prefilled'
@@ -87,7 +94,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
   // Escape key to close panel
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') handleClose()
     }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
@@ -286,8 +293,8 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
   const showBackInHeader = !isEdit && step === 2
 
   return (
-    <div className="roles-panel-overlay" onClick={onClose}>
-      <div className="roles-panel" onClick={e => e.stopPropagation()}>
+    <div className={`roles-panel-overlay${closing ? ' roles-panel-overlay--closing' : ''}`} onClick={handleClose}>
+      <div className={`roles-panel${closing ? ' roles-panel--closing' : ''}`} onClick={e => e.stopPropagation()}>
         {/* Header — section-header style */}
         <div className="roles-panel-section-header">
           <div className="roles-panel-section-header__headline">
@@ -303,7 +310,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
               )}
             </div>
             {!showBackInHeader && (
-              <button className="roles-panel-close" onClick={onClose}>
+              <button className="roles-panel-close" onClick={handleClose}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M17.25 17.25L6.75 6.75M17.25 6.75L6.75 17.25" stroke="#454C5E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -599,7 +606,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                   >
                     {isCopy ? 'Copy Role' : 'Create Role'}
                   </button>
-                  <button className="roles-btn-outlined-primary" onClick={onClose}>
+                  <button className="roles-btn-outlined-primary" onClick={handleClose}>
                     Cancel
                   </button>
                 </>

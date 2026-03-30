@@ -727,6 +727,15 @@
   to { opacity: 1; }
 }
 
+.roles-panel-overlay--closing {
+  animation: roles-overlay-fade-out 250ms ease forwards;
+}
+
+@keyframes roles-overlay-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
 /* ===== Panel ===== */
 .roles-panel {
   position: fixed;
@@ -747,6 +756,15 @@
 @keyframes roles-panel-slide {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
+}
+
+.roles-panel--closing {
+  animation: roles-panel-slide-out 250ms ease forwards;
+}
+
+@keyframes roles-panel-slide-out {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
 }
 
 .roles-panel-header {

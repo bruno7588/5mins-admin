@@ -74,7 +74,7 @@ function LeftSidebar() {
               className={`sidebar-sub-item${activePage === '/roles' ? ' sidebar-sub-item--active' : ''}`}
               onClick={() => navigate('/roles')}
             >
-              Roles &amp; Mapping
+              Roles
             </button>
           </div>
         )}
