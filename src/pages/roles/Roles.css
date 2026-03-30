@@ -321,6 +321,25 @@
   background: var(--neutral-50);
 }
 
+.roles-btn-outlined-neutral800 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--neutral-800);
+  background: transparent;
+  border: 1px solid var(--neutral-800);
+  border-radius: var(--space-s);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.roles-btn-outlined-neutral800:hover {
+  background: var(--neutral-50);
+}
+
 .roles-btn-primary-with-icon {
   display: flex;
   align-items: center;

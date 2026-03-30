@@ -153,7 +153,7 @@ function FiveMinsRolesTab({ onCopy }: Props) {
               onChange={e => handleSearch(e.target.value)}
             />
           </div>
-          <button className="roles-btn-text">
+          <button className="roles-btn-outlined-neutral800">
             Export Roles
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <g clipPath="url(#clip0_export)">
