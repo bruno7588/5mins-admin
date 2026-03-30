@@ -398,6 +398,42 @@
   cursor: not-allowed;
 }
 
+.roles-btn-tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.roles-btn-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  background: var(--neutral-800, #2D3142);
+  color: var(--neutral-0, #fff);
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+
+.roles-btn-tooltip-wrapper:hover .roles-btn-tooltip {
+  opacity: 1;
+}
+
+.roles-btn-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--neutral-800, #2D3142);
+}
+
 /* ===== Table column widths (5Mins Roles) ===== */
 .roles-col--name {
   flex: 1;
@@ -615,6 +651,7 @@
 }
 
 .roles-skill-card__remove {
+  position: relative;
   display: flex;
   padding: 2px;
   border: none;
@@ -627,8 +664,39 @@
 }
 
 .roles-skill-card__remove:hover {
-  color: var(--text-primary);
+  color: var(--text-error, #E95C7B);
   background: var(--neutral-50);
+}
+
+.roles-skill-card__remove-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  background: var(--neutral-800, #2D3142);
+  color: var(--neutral-0, #fff);
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+
+.roles-skill-card__remove:hover .roles-skill-card__remove-tooltip {
+  opacity: 1;
+}
+
+.roles-skill-card__remove-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--neutral-800, #2D3142);
 }
 
 .roles-skill-card__name {

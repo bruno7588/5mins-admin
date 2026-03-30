@@ -212,6 +212,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M17.25 17.25L6.75 6.75M17.25 6.75L6.75 17.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
+            <span className="roles-skill-card__remove-tooltip">Remove skill</span>
           </button>
         </div>
       ))}
@@ -582,9 +583,18 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
               )}
               {/* Step 1 Copy: Continue button */}
               {!isEdit && step === 1 && isCopy && (
-                <button className="roles-btn-primary" onClick={() => setStep(2)}>
-                  Continue
-                </button>
+                <div className="roles-btn-tooltip-wrapper">
+                  <button
+                    className="roles-btn-primary"
+                    disabled={!name.trim()}
+                    onClick={() => setStep(2)}
+                  >
+                    Continue
+                  </button>
+                  {!name.trim() && (
+                    <span className="roles-btn-tooltip">Role name is required to continue</span>
+                  )}
+                </div>
               )}
               {/* Edit: Save */}
               {isEdit && (
