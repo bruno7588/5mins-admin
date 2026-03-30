@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { SearchNormal1, Danger, ArrowLeft } from 'iconsax-react'
+import { SearchNormal1, Danger, ArrowLeft, DocumentUpload } from 'iconsax-react'
 import ConfirmModal from '../../../components/ConfirmModal/ConfirmModal'
 import Checkbox from '../../../components/Checkbox/Checkbox'
 import InputField from '../../../components/InputField/InputField'
@@ -54,6 +54,19 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
   }
 
   const [step, setStep] = useState<1 | 2>(isEdit ? 2 : 1)
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleFile = (file: File) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setDescription(reader.result)
+        setUploadedFileName(file.name)
+      }
+    }
+    reader.readAsText(file)
+  }
   const [name, setName] = useState(initName)
   const [leadership, setLeadership] = useState(initLeadership)
   const [description, setDescription] = useState('')
@@ -434,7 +447,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                     <textarea
                       className="input-field__input roles-panel-textarea-inline"
                       rows={2}
-                      placeholder="Mention key activities, tools, and focus areas"
+                      placeholder="Type a job description..."
                       value={description}
                       onChange={e => {
                         setDescription(e.target.value)
@@ -443,29 +456,41 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                       }}
                     />
                   </div>
-                  <div className="roles-panel-description-hint">
-                    <span className="input-field__helper">Tip: paste a job description for better AI skill suggestions</span>
-                    <label className="roles-panel-upload-btn">
+                  {uploadedFileName ? (
+                    <div className="roles-panel-file-chip">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M14 2v6h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <span className="roles-panel-file-chip__name">{uploadedFileName}</span>
+                      <button
+                        className="roles-panel-file-chip__remove"
+                        onClick={() => { setUploadedFileName(null); setDescription('') }}
+                        aria-label="Remove file"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        className="roles-panel-upload-btn"
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        Upload Job Description
+                        <DocumentUpload size={20} color="currentColor" variant="Linear" />
+                      </button>
                       <input
+                        ref={fileInputRef}
                         type="file"
                         accept=".txt,.pdf,.doc,.docx"
                         style={{ display: 'none' }}
                         onChange={e => {
                           const file = e.target.files?.[0]
-                          if (!file) return
-                          const reader = new FileReader()
-                          reader.onload = () => {
-                            if (typeof reader.result === 'string') {
-                              setDescription(reader.result)
-                            }
-                          }
-                          reader.readAsText(file)
+                          if (file) handleFile(file)
                           e.target.value = ''
                         }}
                       />
-                      Upload JD
-                    </label>
-                  </div>
+                    </>
+                  )}
                 </div>
               )}
 

@@ -198,7 +198,7 @@ function FiveMinsRolesTab({ onCopy }: Props) {
             <div className="people-table-header">
               <div className="people-table-cell roles-col--name">{selectedFunction === 'All' ? 'All roles' : `${selectedFunction} roles`}</div>
               <div className="people-table-cell roles-col--skills">Skills</div>
-              <div className="people-table-cell roles-col--assigned">Assigned</div>
+              <div className="people-table-cell roles-col--assigned">Learners</div>
               <div className="people-table-cell roles-col--action"></div>
             </div>
 
