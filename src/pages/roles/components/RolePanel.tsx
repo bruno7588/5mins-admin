@@ -267,7 +267,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
   const renderTitle = () => {
     if (isEdit) return `Edit Role: ${mode.role.name}`
     if (isCopy && step === 2) return 'Copy to Company Roles'
-    if (isCopy) return `Add ${mode.source.name} to Company Roles`
+    if (isCopy) return 'Copy to Company Roles'
     return 'Create Role'
   }
 
