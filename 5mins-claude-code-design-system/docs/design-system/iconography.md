@@ -154,6 +154,30 @@ Use for active states, selected items, emphasis.
 </button>
 ```
 
+### Interactive Icon Hover States
+
+When an icon is used as a standalone clickable element (e.g. close button, action icon), the hover background must always be **circular** (`border-radius: 50%`), never squared.
+
+```css
+/* Icon button hover — ALWAYS use border-radius: 50% */
+.icon-button {
+  display: flex;
+  padding: 4px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.icon-button:hover {
+  background: var(--neutral-50);
+}
+```
+
+✓ Always use `border-radius: 50%` for icon hover backgrounds
+✗ Never use squared corners (`border-radius: 4px` or `8px`) for icon hover states
+
 ### Input Icons
 
 ```jsx

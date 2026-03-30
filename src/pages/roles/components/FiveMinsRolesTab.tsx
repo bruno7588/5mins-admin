@@ -1,10 +1,47 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { SearchNormal1, ArrowLeft2, ArrowRight2 } from 'iconsax-react'
+import {
+  SearchNormal1, ArrowLeft2, ArrowRight2,
+  Judge, Headphone, Magicpen, DeviceMessage, Like1,
+  Colorfilter, Code, Coin, Box2, SecuritySafe,
+  Profile2User, Convert3DCube, ShoppingCart,
+  Discover, People, Mobile, MoneySend, StatusUp
+} from 'iconsax-react'
 import { fiveMinsRoles, roleCategories, type FiveMinsRole } from '../data/mockRoles'
 import { getSkillIllustration } from '../../../assets/skill-icons'
 
 interface Props {
   onCopy: (role: FiveMinsRole) => void
+}
+
+const iconSize = 16
+const iconColor = 'currentColor'
+
+const functionIconMap: Record<string, React.ComponentType<{ size: number; color: string; variant: 'Linear' | 'Bold' }>> = {
+  'Compliance': Judge,
+  'Contact Centre': Headphone,
+  'Creative': Magicpen,
+  'Customer Service': DeviceMessage,
+  'Customer Success': Like1,
+  'Dynamic': Colorfilter,
+  'Engineering': Code,
+  'Finance': Coin,
+  'General Admin': Box2,
+  'IT, Networking & Security': SecuritySafe,
+  'Leadership': Profile2User,
+  'Logistics & Supply Chain': Convert3DCube,
+  'Marketing': ShoppingCart,
+  'Operations & Strategy': Discover,
+  'Partnerships': People,
+  'People': People,
+  'Product': Mobile,
+  'RevOps': MoneySend,
+  'Sales': StatusUp,
+}
+
+function FunctionIcon({ name, active }: { name: string; active: boolean }) {
+  const Icon = functionIconMap[name]
+  if (!Icon) return null
+  return <Icon size={iconSize} color={iconColor} variant={active ? 'Bold' : 'Linear'} />
 }
 
 /* ─── Derive function list (excluding "All") with counts ── */
@@ -83,6 +120,7 @@ function FiveMinsRolesTab({ onCopy }: Props) {
             <button
               className={`roles-function-item${selectedFunction === 'All' ? ' roles-function-item--active' : ''}`}
               onClick={() => handleFunctionSelect('All')}
+              data-label="All"
             >
               All
             </button>
@@ -92,7 +130,9 @@ function FiveMinsRolesTab({ onCopy }: Props) {
               <button
                 className={`roles-function-item${selectedFunction === fn.name ? ' roles-function-item--active' : ''}`}
                 onClick={() => handleFunctionSelect(fn.name)}
+                data-label={fn.name}
               >
+                <span className="roles-function-item__icon"><FunctionIcon name={fn.name} active={selectedFunction === fn.name} /></span>
                 {fn.name}
               </button>
             </li>
@@ -241,7 +281,7 @@ function FiveMinsRolesTab({ onCopy }: Props) {
                 className="roles-btn-primary"
                 onClick={() => handleCopyFromPreview(previewRole)}
               >
-                Copy To My Roles
+                Copy to Company Roles
               </button>
             </div>
           </div>

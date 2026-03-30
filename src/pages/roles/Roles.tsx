@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import ToastContainer, { useToast } from '../../components/Toast/Toast'
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
+import { Danger } from 'iconsax-react'
 import FiveMinsRolesTab from './components/FiveMinsRolesTab'
 import CompanyRolesTab from './components/CompanyRolesTab'
 import RolePanel, { type PanelMode } from './components/RolePanel'
@@ -16,8 +18,20 @@ function Roles() {
   const [companyRoles, setCompanyRoles] = useState<CompanyRole[]>(initialCompanyRoles)
   const [panelMode, setPanelMode] = useState<PanelMode | null>(null)
   const { toasts, show: showToast } = useToast()
+  const [deleteRole, setDeleteRole] = useState<CompanyRole | null>(null)
+  const [deleteConfirmInput, setDeleteConfirmInput] = useState('')
 
   const nextId = () => Math.max(0, ...companyRoles.map(r => r.id)) + 1
+
+  const handleDeleteConfirm = () => {
+    if (deleteRole) {
+      setCompanyRoles(prev => prev.filter(r => r.id !== deleteRole.id))
+      showToast('success', `"${deleteRole.name}" deleted`)
+      setDeleteRole(null)
+      setDeleteConfirmInput('')
+      setPanelMode(null)
+    }
+  }
 
   /* ─── Copy from library (quick copy via table button) ── */
   const handleCopyRole = (role: FiveMinsRole) => {
@@ -109,6 +123,7 @@ function Roles() {
                   leadership: role.leadership,
                 })
               }
+              onDeleteRole={(role) => setDeleteRole(role)}
               onBrowseLibrary={() => setActiveTab('library')}
             />
           )}
@@ -122,6 +137,53 @@ function Roles() {
           onSave={handlePanelSave}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmModal
+        open={!!deleteRole}
+        onClose={() => { setDeleteRole(null); setDeleteConfirmInput('') }}
+      >
+        {deleteRole && (
+          <>
+            <div className="confirm-modal-header confirm-modal-header--center">
+              <Danger size={72} color="var(--danger-500)" variant="Linear" />
+              <h3 className="confirm-modal-title">Delete role</h3>
+              <p className="confirm-modal-body">
+                {deleteRole.employeeCount > 0
+                  ? `This role is assigned to ${deleteRole.employeeCount} employee${deleteRole.employeeCount !== 1 ? 's' : ''}. Deleting it will remove their role assignment.`
+                  : 'This action cannot be undone.'
+                }
+              </p>
+            </div>
+            <div className="confirm-modal-input-group">
+              <label className="confirm-modal-label">
+                Type <span className="confirm-modal-label-danger">'Delete'</span> below, to confirm
+              </label>
+              <input
+                className="confirm-modal-input"
+                type="text"
+                value={deleteConfirmInput}
+                onChange={(e) => setDeleteConfirmInput(e.target.value)}
+              />
+            </div>
+            <div className="confirm-modal-actions confirm-modal-actions--center">
+              <button
+                className="confirm-modal-btn confirm-modal-btn--outlined-neutral"
+                onClick={() => { setDeleteRole(null); setDeleteConfirmInput('') }}
+              >
+                Cancel
+              </button>
+              <button
+                className="confirm-modal-btn confirm-modal-btn--danger"
+                disabled={deleteConfirmInput !== 'Delete'}
+                onClick={handleDeleteConfirm}
+              >
+                Delete Role
+              </button>
+            </div>
+          </>
+        )}
+      </ConfirmModal>
 
       <ToastContainer toasts={toasts} />
     </div>
