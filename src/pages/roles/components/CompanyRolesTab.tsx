@@ -61,7 +61,7 @@ function CompanyRolesTab({ roles, onCreateRole, onEditRole, onDuplicateRole, onD
         </div>
 
         <div className="roles-filter-right">
-          <button className="roles-btn-outlined-neutral800">
+          <button className="roles-btn-text">
             Export Roles
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <g clipPath="url(#clip0_export_co)">
