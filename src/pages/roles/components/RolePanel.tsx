@@ -26,7 +26,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
 
   const handleClose = () => {
     setClosing(true)
-    setTimeout(() => onClose(), 250)
+    setTimeout(() => onClose(), 300)
   }
 
   const isEdit = mode.type === 'edit'
@@ -224,7 +224,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
       <p className="roles-panel-label">Search and add more skills</p>
       <div className="roles-panel-skill-search" ref={dropdownRef}>
         <div className="roles-search" style={{ width: '100%' }}>
-          <SearchNormal1 size={16} color="var(--text-tertiary)" />
+          <SearchNormal1 size={18} variant="Outline" color="var(--text-tertiary)" />
           <input
             className="roles-search-input"
             placeholder="Search skills…"
@@ -236,6 +236,11 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
             }}
             onFocus={() => { setSkillDropdownOpen(true); calcDropdownDirection() }}
           />
+          {skillSearch && (
+            <button className="roles-search__clear" onClick={() => setSkillSearch('')} aria-label="Clear search">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+          )}
         </div>
         {skillDropdownOpen && filteredCatalogue.length > 0 && (
           <div className={`roles-panel-skill-dropdown roles-panel-skill-dropdown--${dropdownDirection}`}>
@@ -418,6 +423,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                 value={name}
                 onChange={e => setName(e.target.value)}
                 helperText={isCopy ? "You can rename this role to match your company's terminology" : undefined}
+                autoFocus
               />
 
               {/* Description only in create modes, not copy */}
@@ -560,25 +566,35 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
               {/* Step 1 Create: AI + Manual buttons */}
               {!isEdit && !isCopy && step === 1 && (
                 <>
-                  <button
-                    className="roles-btn-ai-gradient"
-                    disabled={!name.trim() || aiLoading}
-                    onClick={handleAISuggest}
-                  >
-                    Add Skills With AI
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10 2.5L11.25 6.25L15 7.5L11.25 8.75L10 12.5L8.75 8.75L5 7.5L8.75 6.25L10 2.5Z" fill="currentColor"/>
-                      <path d="M15 12.5L15.625 14.375L17.5 15L15.625 15.625L15 17.5L14.375 15.625L12.5 15L14.375 14.375L15 12.5Z" fill="currentColor"/>
-                      <path d="M5 12.5L5.625 14.375L7.5 15L5.625 15.625L5 17.5L4.375 15.625L2.5 15L4.375 14.375L5 12.5Z" fill="currentColor"/>
-                    </svg>
-                  </button>
-                  <button
-                    className="roles-btn-outlined-primary"
-                    disabled={!name.trim()}
-                    onClick={handleSkipToManual}
-                  >
-                    Add Skills Manually
-                  </button>
+                  <div className="roles-btn-tooltip-wrapper">
+                    <button
+                      className="roles-btn-ai-gradient"
+                      disabled={!name.trim() || aiLoading}
+                      onClick={handleAISuggest}
+                    >
+                      Add Skills With AI
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 2.5L11.25 6.25L15 7.5L11.25 8.75L10 12.5L8.75 8.75L5 7.5L8.75 6.25L10 2.5Z" fill="currentColor"/>
+                        <path d="M15 12.5L15.625 14.375L17.5 15L15.625 15.625L15 17.5L14.375 15.625L12.5 15L14.375 14.375L15 12.5Z" fill="currentColor"/>
+                        <path d="M5 12.5L5.625 14.375L7.5 15L5.625 15.625L5 17.5L4.375 15.625L2.5 15L4.375 14.375L5 12.5Z" fill="currentColor"/>
+                      </svg>
+                    </button>
+                    {!name.trim() && (
+                      <span className="roles-btn-tooltip"><span className="roles-btn-tooltip__asterisk">*</span> Role name is required</span>
+                    )}
+                  </div>
+                  <div className="roles-btn-tooltip-wrapper">
+                    <button
+                      className="roles-btn-outlined-primary"
+                      disabled={!name.trim()}
+                      onClick={handleSkipToManual}
+                    >
+                      Add Skills Manually
+                    </button>
+                    {!name.trim() && (
+                      <span className="roles-btn-tooltip"><span className="roles-btn-tooltip__asterisk">*</span> Role name is required</span>
+                    )}
+                  </div>
                 </>
               )}
               {/* Step 1 Copy: Continue button */}

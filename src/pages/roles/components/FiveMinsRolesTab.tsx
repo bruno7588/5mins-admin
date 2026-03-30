@@ -57,6 +57,7 @@ function FiveMinsRolesTab({ onCopy }: Props) {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [previewRole, setPreviewRole] = useState<FiveMinsRole | null>(null)
+  const [previewClosing, setPreviewClosing] = useState(false)
   const perPage = 10
 
   /* ─── Filtered roles ─────────────────────────────────── */
@@ -93,7 +94,11 @@ function FiveMinsRolesTab({ onCopy }: Props) {
   }
 
   const closePreview = useCallback(() => {
-    setPreviewRole(null)
+    setPreviewClosing(true)
+    setTimeout(() => {
+      setPreviewRole(null)
+      setPreviewClosing(false)
+    }, 300)
   }, [])
 
   const handleCopyFromPreview = (role: FiveMinsRole) => {
@@ -145,13 +150,18 @@ function FiveMinsRolesTab({ onCopy }: Props) {
         {/* Toolbar */}
         <div className="roles-table-toolbar">
           <div className="roles-search" style={{ width: 260 }}>
-            <SearchNormal1 size={16} color="var(--text-tertiary)" />
+            <SearchNormal1 size={18} variant="Outline" color="var(--text-tertiary)" />
             <input
               className="roles-search-input"
               placeholder="Search roles..."
               value={search}
               onChange={e => handleSearch(e.target.value)}
             />
+            {search && (
+              <button className="roles-search__clear" onClick={() => handleSearch('')} aria-label="Clear search">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+            )}
           </div>
           <button className="roles-btn-text">
             Export Roles
@@ -170,7 +180,18 @@ function FiveMinsRolesTab({ onCopy }: Props) {
 
         {/* Table */}
         {filtered.length === 0 ? (
-          <div className="roles-empty">No roles match your search</div>
+          <div className="roles-empty">
+            <div className="roles-empty__illustration">
+              <span className="roles-empty__zero">0</span>
+              <svg className="roles-empty__accents" width="61" height="50" viewBox="0 0 61 50" fill="none">
+                <path d="M5.5 30C3.5 32 1.5 35.5 1 38" stroke="var(--neutral-600, #454C5E)" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M10 37C8.5 38.5 7 41 6.5 43" stroke="var(--neutral-600, #454C5E)" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M51 8C53 5.5 55.5 2.5 56 1" stroke="var(--neutral-600, #454C5E)" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M55.5 15C57 13 59 10.5 59.5 9" stroke="var(--neutral-600, #454C5E)" strokeWidth="3" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <p className="roles-empty__text">No results found!</p>
+          </div>
         ) : (
           <div className="people-table">
             {/* Header */}
@@ -237,9 +258,9 @@ function FiveMinsRolesTab({ onCopy }: Props) {
 
       {/* ─── Preview Panel Overlay ─────────────────────── */}
       {previewRole && (
-        <div className="roles-panel-overlay" onClick={closePreview}>
+        <div className={`roles-panel-overlay${previewClosing ? ' roles-panel-overlay--closing' : ''}`} onClick={closePreview}>
           <div
-            className="roles-preview-panel"
+            className={`roles-preview-panel${previewClosing ? ' roles-panel--closing' : ''}`}
             onClick={e => e.stopPropagation()}
           >
             {/* Header — section-header per Figma */}

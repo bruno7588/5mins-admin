@@ -13,6 +13,7 @@ interface InputFieldProps {
   disabled?: boolean
   type?: string
   className?: string
+  autoFocus?: boolean
 }
 
 function InputField({
@@ -26,6 +27,7 @@ function InputField({
   disabled = false,
   type = 'text',
   className,
+  autoFocus,
 }: InputFieldProps) {
   const id = useId()
   const helperId = helperText ? `${id}-helper` : undefined
@@ -46,6 +48,7 @@ function InputField({
           value={value}
           onChange={onChange}
           disabled={disabled}
+          autoFocus={autoFocus}
           aria-invalid={validation === 'error' ? true : undefined}
           aria-describedby={helperId}
         />

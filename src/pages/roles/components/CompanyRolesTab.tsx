@@ -31,14 +31,31 @@ function CompanyRolesTab({ roles, onCreateRole, onEditRole, onDuplicateRole, onD
 
   if (roles.length === 0) {
     return (
-      <div className="roles-empty">
-        <p>No roles yet. Create your first role or copy one from the 5Mins library.</p>
-        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+      <div className="roles-empty-state">
+        <div className="roles-empty-state__illustration">
+          <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Lines on top */}
+            <line x1="38" y1="8" x2="38" y2="20" stroke="var(--neutral-400, #9EA4B3)" strokeWidth="2.5" strokeLinecap="round"/>
+            <line x1="30" y1="12" x2="25" y2="6" stroke="var(--neutral-400, #9EA4B3)" strokeWidth="2.5" strokeLinecap="round"/>
+            <line x1="56" y1="12" x2="61" y2="6" stroke="var(--neutral-400, #9EA4B3)" strokeWidth="2.5" strokeLinecap="round"/>
+            {/* Tray body */}
+            <rect x="18" y="36" width="50" height="36" rx="4" fill="var(--neutral-200, #BFC2CC)" stroke="var(--neutral-400, #9EA4B3)" strokeWidth="2"/>
+            {/* Tray opening */}
+            <path d="M18 52H32C32 56.418 35.582 60 40 60H46C50.418 60 54 56.418 54 52H68" stroke="var(--neutral-400, #9EA4B3)" strokeWidth="2" fill="var(--neutral-100, #E8E9ED)"/>
+            {/* Tray rim */}
+            <rect x="14" y="48" width="58" height="8" rx="2" fill="var(--neutral-300, #BFC2CC)" stroke="var(--neutral-400, #9EA4B3)" strokeWidth="2"/>
+          </svg>
+        </div>
+        <div className="roles-empty-state__info">
+          <h3 className="roles-empty-state__title">No roles yet!</h3>
+          <p className="roles-empty-state__description">Create your first role or copy one from the 5Mins library.</p>
+        </div>
+        <div className="roles-empty-state__cta">
           <button className="roles-btn-outlined-primary" onClick={onBrowseLibrary}>
             Browse 5Mins Roles
           </button>
           <button className="roles-btn-primary-with-icon" onClick={onCreateRole}>
-            Create Role
+            Create New Role
             <Add size={20} color="var(--neutral-25)" />
           </button>
         </div>
@@ -51,13 +68,18 @@ function CompanyRolesTab({ roles, onCreateRole, onEditRole, onDuplicateRole, onD
       {/* Toolbar */}
       <div className="roles-filter-bar">
         <div className="roles-search" style={{ width: 300 }}>
-          <SearchNormal1 size={16} color="var(--text-tertiary)" />
+          <SearchNormal1 size={18} variant="Outline" color="var(--text-tertiary)" />
           <input
             className="roles-search-input"
             placeholder="Search roles…"
             value={search}
             onChange={e => handleSearch(e.target.value)}
           />
+          {search && (
+            <button className="roles-search__clear" onClick={() => handleSearch('')} aria-label="Clear search">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+          )}
         </div>
 
         <div className="roles-filter-right">
@@ -83,7 +105,18 @@ function CompanyRolesTab({ roles, onCreateRole, onEditRole, onDuplicateRole, onD
 
       {/* Table */}
       {filtered.length === 0 ? (
-        <div className="roles-empty">No roles match your search</div>
+        <div className="roles-empty">
+          <div className="roles-empty__illustration">
+            <span className="roles-empty__zero">0</span>
+            <svg className="roles-empty__accents" width="61" height="50" viewBox="0 0 61 50" fill="none">
+              <path d="M5.5 30C3.5 32 1.5 35.5 1 38" stroke="var(--neutral-600, #454C5E)" strokeWidth="3" strokeLinecap="round"/>
+              <path d="M10 37C8.5 38.5 7 41 6.5 43" stroke="var(--neutral-600, #454C5E)" strokeWidth="3" strokeLinecap="round"/>
+              <path d="M51 8C53 5.5 55.5 2.5 56 1" stroke="var(--neutral-600, #454C5E)" strokeWidth="3" strokeLinecap="round"/>
+              <path d="M55.5 15C57 13 59 10.5 59.5 9" stroke="var(--neutral-600, #454C5E)" strokeWidth="3" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <p className="roles-empty__text">No results found!</p>
+        </div>
       ) : (
         <div className="people-table">
           {/* Header */}
