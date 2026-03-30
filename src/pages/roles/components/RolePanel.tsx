@@ -219,7 +219,6 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                   setSkillSearch('')
                 }}
               >
-                <Checkbox checked={false} />
                 <span className="roles-panel-skill-option-name">{sk.name}</span>
                 <span className="roles-panel-skill-option-cat">{sk.category}</span>
               </button>
