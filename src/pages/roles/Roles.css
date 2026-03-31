@@ -179,7 +179,7 @@
 .roles-filter-right {
   display: flex;
   align-items: center;
-  gap: var(--space-s);
+  gap: var(--space-m);
 }
 
 /* ===== Search ===== */
@@ -528,6 +528,7 @@
   flex-shrink: 0;
   justify-content: flex-end;
   gap: var(--space-sm);
+  margin-left: var(--space-m);
 }
 
 /* ===== Expandable row overrides ===== */
@@ -1134,6 +1135,7 @@
 }
 
 .roles-panel-file-chip__remove {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1150,6 +1152,35 @@
 .roles-panel-file-chip__remove:hover {
   color: var(--text-error, #E95C7B);
   background: var(--neutral-100);
+}
+
+.roles-panel-file-chip__remove-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  padding: 6px 12px;
+  background: var(--neutral-800);
+  color: var(--neutral-25);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: var(--radius-s);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+
+.roles-panel-file-chip__remove:hover .roles-panel-file-chip__remove-tooltip {
+  opacity: 1;
+}
+
+.roles-panel-file-chip__remove-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  right: 8px;
+  border: 5px solid transparent;
+  border-bottom-color: var(--neutral-800);
 }
 
 .roles-panel-textarea-inline {
@@ -1473,7 +1504,7 @@
   background: var(--neutral-0);
   border: 1px solid var(--neutral-100);
   border-radius: var(--space-sm);
-  box-shadow: 0 4px 16px rgba(32, 34, 42, 0.12), 0 1px 4px rgba(32, 34, 42, 0.08);
+  box-shadow: 0 8px 24px rgba(32, 34, 42, 0.18), 0 2px 8px rgba(32, 34, 42, 0.10);
   max-height: 240px;
   overflow-y: auto;
   z-index: 200;
@@ -1512,8 +1543,25 @@
   background: var(--neutral-25);
 }
 
+.roles-panel-skill-option__icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
 .roles-panel-skill-option-name {
   flex: 1;
+}
+
+.roles-panel-skill-option__add {
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.roles-panel-skill-option:hover .roles-panel-skill-option__add {
+  opacity: 1;
 }
 
 .roles-panel-skill-option-cat {
@@ -1700,6 +1748,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-m);
+  margin-left: auto;
 }
 
 .roles-panel-footer-row {
@@ -1869,7 +1918,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-s);
-  padding: var(--space-sm) var(--space-ml);
+  padding: 9px 19px;
   font-size: 14px;
   font-weight: 700;
   color: var(--primary-600);
@@ -2065,7 +2114,7 @@
 .roles-preview-footer {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: var(--space-m);
   flex-shrink: 0;
 }

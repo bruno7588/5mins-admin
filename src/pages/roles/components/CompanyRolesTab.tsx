@@ -122,8 +122,8 @@ function CompanyRolesTab({ roles, onCreateRole, onEditRole, onDuplicateRole, onD
           {/* Header */}
           <div className="people-table-header">
             <div className="people-table-cell roles-col--name-co">Role Name</div>
-            <div className="people-table-cell roles-col--employees">Employees</div>
             <div className="people-table-cell roles-col--skills">Skills</div>
+            <div className="people-table-cell roles-col--employees">Learners</div>
             <div className="people-table-cell roles-col--actions"></div>
           </div>
 
@@ -139,11 +139,11 @@ function CompanyRolesTab({ roles, onCreateRole, onEditRole, onDuplicateRole, onD
                 </button>
                 {role.leadership && <span className="roles-leader-badge">Leadership</span>}
               </div>
-              <div className="people-table-cell roles-col--employees">
-                {role.employeeCount}
-              </div>
               <div className="people-table-cell roles-col--skills">
                 {role.skills.length}
+              </div>
+              <div className="people-table-cell roles-col--employees">
+                {role.employeeCount}
               </div>
               <div className="people-table-cell roles-col--actions">
                 <span className="roles-icon-btn-wrapper">

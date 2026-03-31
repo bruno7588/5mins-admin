@@ -310,7 +310,7 @@
 
 .uf-drawer-save-wrapper {
   position: relative;
-  align-self: flex-start;
+  align-self: flex-end;
 }
 
 .uf-drawer-save {

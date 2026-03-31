@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { SearchNormal1, Danger, ArrowLeft, DocumentUpload } from 'iconsax-react'
+import { SearchNormal1, Danger, ArrowLeft, DocumentUpload, DocumentText } from 'iconsax-react'
 import ConfirmModal from '../../../components/ConfirmModal/ConfirmModal'
 import Checkbox from '../../../components/Checkbox/Checkbox'
 import InputField from '../../../components/InputField/InputField'
@@ -266,11 +266,14 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                   setSkillSearch('')
                 }}
               >
+                <img className="roles-panel-skill-option__icon" src={getSkillIllustration(sk.id)} alt="" />
                 <span className="roles-panel-skill-option-name">{sk.name}</span>
-                {recentlyAdded[sk.id] && (
+                {recentlyAdded[sk.id] ? (
                   <span className={`roles-panel-skill-option-tag${recentlyAdded[sk.id] === 'already' ? ' roles-panel-skill-option-tag--already' : ''}`}>
                     {recentlyAdded[sk.id] === 'already' ? 'Already added' : 'Added'}
                   </span>
+                ) : (
+                  <svg className="roles-panel-skill-option__add" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 )}
               </button>
             ))}
@@ -458,14 +461,15 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                   </div>
                   {uploadedFileName ? (
                     <div className="roles-panel-file-chip">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M14 2v6h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <DocumentText size={18} color="var(--text-secondary)" variant="Bold" />
                       <span className="roles-panel-file-chip__name">{uploadedFileName}</span>
                       <button
                         className="roles-panel-file-chip__remove"
                         onClick={() => { setUploadedFileName(null); setDescription('') }}
-                        aria-label="Remove file"
+                        aria-label="Remove document"
                       >
                         <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        <span className="roles-panel-file-chip__remove-tooltip">Remove Document</span>
                       </button>
                     </div>
                   ) : (
@@ -558,7 +562,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                 <>
                   {aiUsed && (
                     <div className="roles-panel-ai-banner">
-                      <span>We found {aiCount} skills for this role. Remove any that don't apply or add more.</span>
+                      <span>You have {selectedSkills.length} skill{selectedSkills.length !== 1 ? 's' : ''} for this role. Remove any that don't apply or add more.</span>
                       <button className="roles-panel-ai-resuggest" onClick={handleResuggest}>
                         <span>Try Again</span>
                         <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -587,10 +591,25 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
         <div className="roles-panel-footer">
           <div className="roles-panel-footer-divider" />
           <div className="roles-panel-footer-row">
+            {!isEdit && (
+              <span className="roles-panel-step-indicator">Step {step} of 2</span>
+            )}
             <div className="roles-panel-footer-right">
               {/* Step 1 Create: AI + Manual buttons */}
               {!isEdit && !isCopy && step === 1 && (
                 <>
+                  <div className="roles-btn-tooltip-wrapper">
+                    <button
+                      className="roles-btn-outlined-primary"
+                      disabled={!name.trim()}
+                      onClick={handleSkipToManual}
+                    >
+                      Add Skills Manually
+                    </button>
+                    {!name.trim() && (
+                      <span className="roles-btn-tooltip"><span className="roles-btn-tooltip__asterisk">*</span> Role name is required</span>
+                    )}
+                  </div>
                   <div className="roles-btn-tooltip-wrapper">
                     <button
                       className="roles-btn-ai-gradient"
@@ -603,18 +622,6 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                         <path d="M15 12.5L15.625 14.375L17.5 15L15.625 15.625L15 17.5L14.375 15.625L12.5 15L14.375 14.375L15 12.5Z" fill="currentColor"/>
                         <path d="M5 12.5L5.625 14.375L7.5 15L5.625 15.625L5 17.5L4.375 15.625L2.5 15L4.375 14.375L5 12.5Z" fill="currentColor"/>
                       </svg>
-                    </button>
-                    {!name.trim() && (
-                      <span className="roles-btn-tooltip"><span className="roles-btn-tooltip__asterisk">*</span> Role name is required</span>
-                    )}
-                  </div>
-                  <div className="roles-btn-tooltip-wrapper">
-                    <button
-                      className="roles-btn-outlined-primary"
-                      disabled={!name.trim()}
-                      onClick={handleSkipToManual}
-                    >
-                      Add Skills Manually
                     </button>
                     {!name.trim() && (
                       <span className="roles-btn-tooltip"><span className="roles-btn-tooltip__asterisk">*</span> Role name is required</span>
@@ -650,6 +657,9 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
               {/* Step 2: Create/Copy + Cancel */}
               {!isEdit && step === 2 && (
                 <>
+                  <button className="roles-btn-outlined-primary" onClick={handleClose}>
+                    Cancel
+                  </button>
                   <button
                     className="roles-btn-primary"
                     disabled={!canSave}
@@ -657,15 +667,9 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                   >
                     {isCopy ? 'Copy Role' : 'Create Role'}
                   </button>
-                  <button className="roles-btn-outlined-primary" onClick={handleClose}>
-                    Cancel
-                  </button>
                 </>
               )}
             </div>
-            {!isEdit && (
-              <span className="roles-panel-step-indicator">Step {step} of 2</span>
-            )}
           </div>
         </div>
       </div>

@@ -283,7 +283,7 @@
   padding: var(--space-m) var(--space-l);
   border-top: 1px solid var(--border);
   display: flex;
-  justify-content: flex-start;
+  justify-content: flex-end;
   margin-top: auto;
 }
 

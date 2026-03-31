@@ -390,6 +390,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+  align-self: flex-end;
 }
 
 .ai-drawer-btn-discard {
