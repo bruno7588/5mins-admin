@@ -82,8 +82,6 @@ function RolePanel({ mode, existingRoleNames = [], onClose, onSave, onDelete }: 
 
   // AI state
   const [aiLoading, setAiLoading] = useState(false)
-  const [aiUsed, setAiUsed] = useState(false)
-  const [aiCount, setAiCount] = useState(0)
 
   // Skill search
   const [skillSearch, setSkillSearch] = useState('')
@@ -150,20 +148,10 @@ function RolePanel({ mode, existingRoleNames = [], onClose, onSave, onDelete }: 
       } else {
         setSelectedSkills(results)
       }
-      setAiCount(results.length)
-      setAiUsed(true)
       setAiLoading(false)
       setAiProgress(0)
       setAiStep(0)
     }, 400)
-  }
-
-  const handleResuggest = async () => {
-    setAiLoading(true)
-    const results = await simulateAISuggestion(name, description, jobDescription, leadership)
-    setSelectedSkills(results)
-    setAiCount(results.length)
-    setAiLoading(false)
   }
 
   // Edit mode: AI suggest with working animation
@@ -196,7 +184,6 @@ function RolePanel({ mode, existingRoleNames = [], onClose, onSave, onDelete }: 
   }
 
   const handleSkipToManual = () => {
-    setAiUsed(false)
     setStep(2)
   }
 
