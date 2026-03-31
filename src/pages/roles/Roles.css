@@ -1033,6 +1033,14 @@
   gap: var(--space-xs);
 }
 
+.roles-panel-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-s);
+  margin-bottom: 4px;
+}
+
 .roles-panel-label {
   font-size: 14px;
   font-weight: 500;
@@ -1301,16 +1309,41 @@
 }
 
 /* ===== AI Working Steps ===== */
+.roles-ai-working-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  padding: var(--space-m);
+  background: var(--input-background);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.roles-ai-working-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--radius-sm);
+  padding: 1px;
+  background: linear-gradient(135deg, #00CEE6 0%, #10BFE7 12.5%, #20B1E8 25%, #4193E9 50%, #6176EB 75%, #8158EC 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
 .roles-ai-steps {
   display: flex;
   flex-direction: column;
-  gap: var(--space-m);
+  gap: var(--space-s);
 }
 
 .roles-ai-step {
   display: flex;
   align-items: center;
-  gap: var(--space-s);
+  gap: var(--space-xs);
   height: 28px;
 }
 
@@ -1324,8 +1357,9 @@
 }
 
 .roles-ai-step__text {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
+  line-height: 1.5;
   color: var(--text-primary);
 }
 
@@ -1866,14 +1900,18 @@
 }
 
 .roles-btn-ai-text > span {
-  background-image: linear-gradient(135deg, #33E2F7 0%, #47C0F4 25%, #5A9DF2 50%, #6E7BEF 75%, #8158EC 100%);
+  background-image: linear-gradient(135deg, #00CEE6 0%, #10BFE7 12.5%, #20B1E8 25%, #4193E9 50%, #6176EB 75%, #8158EC 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.roles-btn-ai-text:hover {
-  opacity: 0.8;
+.roles-btn-ai-text:hover > span {
+  background-image: linear-gradient(135deg, #00AFC4 0%, #0DA0C5 12.5%, #1A92C6 25%, #377AC7 50%, #5462C9 75%, #6B45D1 100%);
+}
+
+.roles-btn-ai-text:hover > svg path {
+  fill: #6B45D1;
 }
 
 .roles-btn-ai-text:disabled {

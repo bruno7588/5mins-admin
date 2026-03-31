@@ -61,7 +61,7 @@ function Roles() {
         skills: [...skills],
         employeeCount: 0,
       }
-      setCompanyRoles(prev => [...prev, newRole])
+      setCompanyRoles(prev => [newRole, ...prev])
 
       if (panelMode.type === 'copy') {
         showToast('success', `"${name}" copied to your company roles`)
@@ -150,7 +150,7 @@ function Roles() {
               <h3 className="confirm-modal-title">Delete role</h3>
               <p className="confirm-modal-body">
                 {deleteRole.employeeCount > 0
-                  ? `This role is assigned to ${deleteRole.employeeCount} employee${deleteRole.employeeCount !== 1 ? 's' : ''}. Deleting it will remove their role assignment.`
+                  ? `This role is assigned to ${deleteRole.employeeCount} learner${deleteRole.employeeCount !== 1 ? 's' : ''}. Deleting it will remove their role assignment. This action cannot be undone.`
                   : 'This action cannot be undone.'
                 }
               </p>
