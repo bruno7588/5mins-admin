@@ -16,12 +16,13 @@ export type PanelMode =
 
 interface Props {
   mode: PanelMode
+  existingRoleNames?: string[]
   onClose: () => void
   onSave: (name: string, skills: Skill[], leadership: boolean) => void
   onDelete?: (roleId: number) => void
 }
 
-function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
+function RolePanel({ mode, existingRoleNames = [], onClose, onSave, onDelete }: Props) {
   const [closing, setClosing] = useState(false)
 
   const handleClose = () => {
@@ -72,6 +73,12 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
   const [description, setDescription] = useState('')
   const [jobDescription] = useState('')
   const [selectedSkills, setSelectedSkills] = useState<Skill[]>(initSkills)
+
+  // Check for duplicate role name (exclude current role when editing)
+  const nameTrimmed = name.trim().toLowerCase()
+  const isDuplicateName = nameTrimmed !== '' && existingRoleNames
+    .filter(n => !(isEdit && n === (mode as { role: CompanyRole }).role.name))
+    .some(n => n.toLowerCase() === nameTrimmed)
 
   // AI state
   const [aiLoading, setAiLoading] = useState(false)
@@ -220,7 +227,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
     return true
   })
 
-  const canSave = name.trim().length > 0 && selectedSkills.length > 0
+  const canSave = name.trim().length > 0 && selectedSkills.length > 0 && !isDuplicateName
 
   /* ─── Render helpers ──────────────────────────────────── */
 
@@ -368,6 +375,8 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                 label="Role Name"
                 value={name}
                 onChange={e => setName(e.target.value)}
+                validation={isDuplicateName ? 'error' : 'none'}
+                helperText={isDuplicateName ? `A role named "${name.trim()}" already exists in your company roles` : undefined}
               />
 
               <div className="roles-panel-field">
@@ -450,7 +459,8 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                 placeholder="e.g. Sales Development Rep"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                helperText={isCopy ? "You can rename this role to match your company's terminology" : undefined}
+                helperText={isDuplicateName ? `A role named "${name.trim()}" already exists in your company roles` : isCopy ? "You can rename this role to match your company's terminology" : undefined}
+                validation={isDuplicateName ? 'error' : 'none'}
                 autoFocus
               />
 
@@ -534,6 +544,8 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                     placeholder="e.g. Sales Development Rep"
                     value={name}
                     onChange={e => setName(e.target.value)}
+                    validation={isDuplicateName ? 'error' : 'none'}
+                    helperText={isDuplicateName ? `A role named "${name.trim()}" already exists in your company roles` : undefined}
                     autoFocus
                   />
                   <div className="input-field">
@@ -701,7 +713,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                   <div className="roles-btn-tooltip-wrapper">
                     <button
                       className="roles-btn-outlined-primary"
-                      disabled={!name.trim()}
+                      disabled={!name.trim() || isDuplicateName}
                       onClick={handleSkipToManual}
                     >
                       Add Skills Manually
@@ -713,7 +725,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                   <div className="roles-btn-tooltip-wrapper">
                     <button
                       className="roles-btn-ai-gradient"
-                      disabled={!name.trim() || aiLoading}
+                      disabled={!name.trim() || aiLoading || isDuplicateName}
                       onClick={handleAISuggest}
                     >
                       Add Skills With AI
@@ -734,7 +746,7 @@ function RolePanel({ mode, onClose, onSave, onDelete }: Props) {
                 <div className="roles-btn-tooltip-wrapper">
                   <button
                     className="roles-btn-primary"
-                    disabled={!name.trim()}
+                    disabled={!name.trim() || isDuplicateName}
                     onClick={() => setStep(2)}
                   >
                     Continue

@@ -133,6 +133,7 @@ function Roles() {
       {panelMode && (
         <RolePanel
           mode={panelMode}
+          existingRoleNames={companyRoles.map(r => r.name)}
           onClose={() => setPanelMode(null)}
           onSave={handlePanelSave}
         />
