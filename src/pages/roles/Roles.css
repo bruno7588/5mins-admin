@@ -2004,79 +2004,13 @@
   color: var(--text-primary);
 }
 
-/* ===== Two-Panel Layout (5Mins Roles) ===== */
-.roles-two-panel {
+/* ===== Single-Panel Layout (5Mins Roles) ===== */
+.roles-single-panel {
   display: flex;
-  gap: 0;
-  min-height: 0;
+  flex-direction: column;
+  gap: 20px;
   flex: 1;
-  overflow: hidden;
-  align-items: stretch;
-}
-
-/* ─── Left: Functions Panel ─── */
-.roles-functions-panel {
-  width: 200px;
-  flex-shrink: 0;
-  padding: 0 var(--space-s) 0 0;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
   min-height: 0;
-}
-
-.roles-functions-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.roles-function-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s);
-  width: 100%;
-  padding: var(--space-s);
-  font-size: 14px;
-  font-weight: 400;
-  color: var(--text-tertiary);
-  background: none;
-  border: none;
-  border-radius: var(--space-s);
-  cursor: pointer;
-  text-align: left;
-  line-height: 1.5;
-  transition: background 150ms ease, color 150ms ease;
-}
-
-
-.roles-function-item__icon {
-  display: flex;
-  flex-shrink: 0;
-}
-
-.roles-function-item:hover {
-  background: var(--input-background);
-}
-
-.roles-function-item--active {
-  color: var(--secondary-600);
-  font-weight: 700;
-  background: var(--input-background);
-}
-
-/* ─── Right: Table Panel ─── */
-.roles-table-panel {
-  flex: 1;
-  min-width: 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-m);
-  padding: 0 0 0 var(--space-l);
   overflow-y: auto;
 }
 
@@ -2085,6 +2019,130 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-m);
+}
+
+.roles-toolbar-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ─── Function Dropdown ─── */
+.roles-function-dropdown__label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+.roles-function-dropdown {
+  position: relative;
+}
+
+.roles-function-dropdown__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-sm);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.5;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.roles-function-dropdown__trigger:hover {
+  border-color: var(--neutral-200);
+  background: var(--neutral-25);
+}
+
+.roles-function-dropdown__trigger--active {
+  color: var(--text-primary);
+  font-weight: 400;
+  border-color: var(--border);
+}
+
+.roles-function-dropdown__icon {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.roles-function-dropdown__menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 100;
+  min-width: 240px;
+  max-height: 360px;
+  overflow-y: auto;
+  background: var(--neutral-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 16px rgba(32, 34, 42, 0.12);
+  padding: var(--space-xs);
+  display: flex;
+  flex-direction: column;
+}
+
+.roles-function-dropdown__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-sm);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.5;
+  white-space: nowrap;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.roles-function-dropdown__option:hover {
+  background: var(--input-background);
+}
+
+.roles-function-dropdown__option--active {
+  color: var(--neutral-800, #20222a);
+  font-weight: 400;
+  background: var(--selected, #ffbb38);
+}
+
+.roles-function-dropdown__option--active:hover {
+  background: var(--selected, #ffbb38);
+}
+
+.roles-function-dropdown__option-icon {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.roles-function-dropdown__count {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+}
+
+/* ─── Table Panel (reused by Company Roles too) ─── */
+.roles-table-panel {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+  overflow-y: auto;
 }
 
 /* ─── Role Name Link ─── */
