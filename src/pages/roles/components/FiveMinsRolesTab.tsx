@@ -55,6 +55,7 @@ const functionList = roleCategories
 
 function FiveMinsRolesTab({ onCopy, onCreateRole }: Props) {
   const [selectedFunction, setSelectedFunction] = useState<string>('All')
+  const [previousFunction, setPreviousFunction] = useState<string>('All')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [previewRole, setPreviewRole] = useState<FiveMinsRole | null>(null)
@@ -83,13 +84,21 @@ function FiveMinsRolesTab({ onCopy, onCreateRole }: Props) {
   /* ─── Reset page when filters change ─────────────────── */
   const handleFunctionSelect = (fn: string) => {
     setSelectedFunction(fn)
+    setPreviousFunction(fn)
     setDropdownOpen(false)
     setPage(1)
   }
 
   const handleSearch = (val: string) => {
     setSearch(val)
-    if (val) setSelectedFunction('All')
+    if (val && !search) {
+      // Starting a search — remember current function and switch to All
+      setPreviousFunction(selectedFunction)
+      setSelectedFunction('All')
+    } else if (!val && search) {
+      // Clearing search — restore previous function
+      setSelectedFunction(previousFunction)
+    }
     setPage(1)
   }
 

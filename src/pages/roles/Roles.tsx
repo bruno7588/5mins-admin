@@ -24,7 +24,7 @@ function getMockLearnersForRole(roleName: string, count: number) {
   let seed = 0
   for (let i = 0; i < roleName.length; i++) seed += roleName.charCodeAt(i)
   const shuffled = [...mockLearnerNames].sort(() => Math.sin(seed++) - 0.5)
-  return shuffled.slice(0, Math.min(count, shuffled.length)).map((name, i) => ({
+  return shuffled.slice(0, Math.min(count, shuffled.length)).map((name) => ({
     name,
     email: `${name.toLowerCase().replace(' ', '.')}@company.com`,
   }))
