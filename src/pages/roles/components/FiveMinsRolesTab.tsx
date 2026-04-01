@@ -156,7 +156,7 @@ function FiveMinsRolesTab({ onCopy, onCreateRole }: Props) {
             >
               {selectedFunction !== 'All' && (
                 <span className="roles-function-dropdown__icon">
-                  <FunctionIcon name={selectedFunction} active />
+                  <FunctionIcon name={selectedFunction} active={false} />
                 </span>
               )}
               {selectedFunction === 'All' ? 'All Functions' : selectedFunction}
