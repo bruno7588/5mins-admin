@@ -362,8 +362,8 @@ function RolePanel({ mode, existingRoleNames = [], onClose, onSave, onDelete }: 
                 label="Role Name"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                validation={isDuplicateName ? 'error' : 'none'}
-                helperText={isDuplicateName ? `A role named "${name.trim()}" already exists in your company roles` : undefined}
+                validation={isDuplicateName ? 'warning' : 'none'}
+                helperText={isDuplicateName ? `A role named "${name.trim()}" already exists in your company roles. Change the name to continue.` : undefined}
               />
 
               <div className="roles-panel-field">
@@ -446,8 +446,8 @@ function RolePanel({ mode, existingRoleNames = [], onClose, onSave, onDelete }: 
                 placeholder="e.g. Sales Development Rep"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                helperText={isDuplicateName ? `A role named "${name.trim()}" already exists in your company roles` : isCopy ? "You can rename this role to match your company's terminology" : undefined}
-                validation={isDuplicateName ? 'error' : 'none'}
+                helperText={isDuplicateName ? `A role named "${name.trim()}" already exists in your company roles. Change the name to continue.` : isCopy ? "You can rename this role to match your company's terminology" : undefined}
+                validation={isDuplicateName ? 'warning' : 'none'}
                 autoFocus
               />
 
@@ -531,8 +531,8 @@ function RolePanel({ mode, existingRoleNames = [], onClose, onSave, onDelete }: 
                     placeholder="e.g. Sales Development Rep"
                     value={name}
                     onChange={e => setName(e.target.value)}
-                    validation={isDuplicateName ? 'error' : 'none'}
-                    helperText={isDuplicateName ? `A role named "${name.trim()}" already exists in your company roles` : undefined}
+                    validation={isDuplicateName ? 'warning' : 'none'}
+                    helperText={isDuplicateName ? `A role named "${name.trim()}" already exists in your company roles. Change the name to continue.` : undefined}
                     autoFocus
                   />
                   <div className="input-field">

@@ -116,6 +116,10 @@ function CompanyRolesTab({ roles, onCreateRole, onEditRole, onDuplicateRole, onD
             </svg>
           </div>
           <p className="roles-empty__text">No results found!</p>
+          <p className="roles-empty__subtext">Try a different search, or create a custom role</p>
+          <button className="roles-btn-primary" onClick={onCreateRole}>
+            Create New Role
+          </button>
         </div>
       ) : (
         <div className="people-table">

@@ -8,7 +8,7 @@ interface InputFieldProps {
   value?: string
   onChange?: ChangeEventHandler<HTMLInputElement>
   helperText?: string
-  validation?: 'none' | 'error' | 'success'
+  validation?: 'none' | 'error' | 'warning' | 'success'
   iconRight?: ReactNode
   disabled?: boolean
   type?: string
@@ -55,6 +55,7 @@ function InputField({
         {(validation !== 'none' || iconRight) && (
           <div className="input-field__icons">
             {validation === 'error' && <Danger size={20} color="var(--text-error)" variant="Bold" />}
+            {validation === 'warning' && <Danger size={20} color="var(--text-warning)" variant="Linear" />}
             {validation === 'success' && <TickCircle size={20} color="var(--text-success)" variant="Bold" />}
             {iconRight}
           </div>

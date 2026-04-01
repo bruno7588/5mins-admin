@@ -798,6 +798,15 @@
   margin: 0;
 }
 
+.roles-empty__subtext {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+}
+
 .roles-empty-link {
   font-size: 14px;
   font-weight: 500;

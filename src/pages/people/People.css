@@ -1065,6 +1065,9 @@
 }
 
 .confirm-modal-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   padding: var(--space-sm) var(--space-l);
   font-size: 14px;
   font-weight: 700;

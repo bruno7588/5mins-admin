@@ -330,7 +330,38 @@ export const fiveMinsRoles: FiveMinsRole[] = [
 
 /* ─── Company Roles (starts empty) ─────────────────────── */
 
-export const initialCompanyRoles: CompanyRole[] = []
+export const initialCompanyRoles: CompanyRole[] = [
+  {
+    id: 1001,
+    name: 'Account Executive',
+    leadership: false,
+    skills: [
+      { id: 1, name: 'Consultative Selling', category: 'Sales' },
+      { id: 2, name: 'Pipeline Management', category: 'Sales' },
+      { id: 4, name: 'Negotiation', category: 'Sales' },
+    ],
+    employeeCount: 8,
+  },
+  {
+    id: 1002,
+    name: 'Customer Success Manager',
+    leadership: false,
+    skills: [
+      { id: 6, name: 'Account Management', category: 'Sales' },
+      { id: 8, name: 'Conflict Resolution', category: 'Hospitality' },
+    ],
+    employeeCount: 5,
+  },
+  {
+    id: 1003,
+    name: 'Junior Designer',
+    leadership: false,
+    skills: [
+      { id: 30, name: 'Brand Management', category: 'Marketing' },
+    ],
+    employeeCount: 0,
+  },
+]
 
 /* ─── Categories ───────────────────────────────────────── */
 

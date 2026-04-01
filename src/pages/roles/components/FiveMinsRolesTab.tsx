@@ -11,6 +11,7 @@ import { getSkillIllustration } from '../../../assets/skill-icons'
 
 interface Props {
   onCopy: (role: FiveMinsRole) => void
+  onCreateRole: () => void
 }
 
 const iconSize = 16
@@ -52,7 +53,7 @@ const functionList = roleCategories
     count: fiveMinsRoles.filter(r => r.category === cat).length,
   }))
 
-function FiveMinsRolesTab({ onCopy }: Props) {
+function FiveMinsRolesTab({ onCopy, onCreateRole }: Props) {
   const [selectedFunction, setSelectedFunction] = useState<string>('All')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -85,6 +86,7 @@ function FiveMinsRolesTab({ onCopy }: Props) {
 
   const handleSearch = (val: string) => {
     setSearch(val)
+    if (val) setSelectedFunction('All')
     setPage(1)
   }
 
@@ -191,12 +193,16 @@ function FiveMinsRolesTab({ onCopy }: Props) {
               </svg>
             </div>
             <p className="roles-empty__text">No results found!</p>
+            <p className="roles-empty__subtext">Try a different search, or create a custom role</p>
+            <button className="roles-btn-primary" onClick={onCreateRole}>
+              Create New Role
+            </button>
           </div>
         ) : (
           <div className="people-table">
             {/* Header */}
             <div className="people-table-header">
-              <div className="people-table-cell roles-col--name">{selectedFunction === 'All' ? `All roles (${filtered.length})` : `${selectedFunction} roles (${filtered.length})`}</div>
+              <div className="people-table-cell roles-col--name">{search ? `${filtered.length} roles match '${search}'` : selectedFunction === 'All' ? `All roles (${filtered.length})` : `${selectedFunction} roles (${filtered.length})`}</div>
               <div className="people-table-cell roles-col--skills">Skills</div>
               <div className="people-table-cell roles-col--assigned">Learners</div>
               <div className="people-table-cell roles-col--action"></div>
@@ -283,7 +289,7 @@ function FiveMinsRolesTab({ onCopy }: Props) {
             <div className="roles-panel-body">
               {/* Skills */}
               <div className="roles-expanded-section">
-                <span className="roles-expanded-label">Skills {previewRole.assignedCount > 0 && <span className="roles-expanded-label-meta">({previewRole.assignedCount} learners currently assigned)</span>}</span>
+                <span className="roles-expanded-label">Skills</span>
                 <div className="roles-skill-cards">
                   {previewRole.skills.map(sk => (
                     <div key={sk.id} className="roles-skill-card">

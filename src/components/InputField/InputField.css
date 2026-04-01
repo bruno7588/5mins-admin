@@ -72,6 +72,16 @@
   color: var(--danger-500);
 }
 
+/* Warning */
+.input-field--warning .input-field__wrapper {
+  border-color: var(--text-warning);
+}
+
+.input-field--warning .input-field__label,
+.input-field--warning .input-field__helper {
+  color: var(--text-warning);
+}
+
 /* Disabled */
 .input-field--disabled .input-field__label,
 .input-field--disabled .input-field__input,
