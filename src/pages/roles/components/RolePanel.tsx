@@ -690,25 +690,10 @@ function RolePanel({ mode, existingRoleNames = [], onClose, onSave, onDelete }: 
         <div className="roles-panel-footer">
           <div className="roles-panel-footer-divider" />
           <div className="roles-panel-footer-row">
-            {!isEdit && !isPrefilled && (
-              <span className="roles-panel-step-indicator">Step {step} of 2</span>
-            )}
-            <div className="roles-panel-footer-right">
+            <div className="roles-panel-footer-left">
               {/* Step 1 Create: AI + Manual buttons */}
               {!isEdit && !isCopy && step === 1 && (
                 <>
-                  <div className="roles-btn-tooltip-wrapper">
-                    <button
-                      className="roles-btn-outlined-primary"
-                      disabled={!name.trim() || isDuplicateName}
-                      onClick={handleSkipToManual}
-                    >
-                      Add Skills Manually
-                    </button>
-                    {!name.trim() && (
-                      <span className="roles-btn-tooltip"><span className="roles-btn-tooltip__asterisk">*</span> Role name is required</span>
-                    )}
-                  </div>
                   <div className="roles-btn-tooltip-wrapper">
                     <button
                       className="roles-btn-ai-gradient"
@@ -721,6 +706,18 @@ function RolePanel({ mode, existingRoleNames = [], onClose, onSave, onDelete }: 
                         <path d="M15 12.5L15.625 14.375L17.5 15L15.625 15.625L15 17.5L14.375 15.625L12.5 15L14.375 14.375L15 12.5Z" fill="currentColor"/>
                         <path d="M5 12.5L5.625 14.375L7.5 15L5.625 15.625L5 17.5L4.375 15.625L2.5 15L4.375 14.375L5 12.5Z" fill="currentColor"/>
                       </svg>
+                    </button>
+                    {!name.trim() && (
+                      <span className="roles-btn-tooltip"><span className="roles-btn-tooltip__asterisk">*</span> Role name is required</span>
+                    )}
+                  </div>
+                  <div className="roles-btn-tooltip-wrapper">
+                    <button
+                      className="roles-btn-outlined-primary"
+                      disabled={!name.trim() || isDuplicateName}
+                      onClick={handleSkipToManual}
+                    >
+                      Add Skills Manually
                     </button>
                     {!name.trim() && (
                       <span className="roles-btn-tooltip"><span className="roles-btn-tooltip__asterisk">*</span> Role name is required</span>
@@ -753,17 +750,28 @@ function RolePanel({ mode, existingRoleNames = [], onClose, onSave, onDelete }: 
                   Save Changes
                 </button>
               )}
-              {/* Step 2: Create/Copy/Duplicate */}
-              {!isEdit && step === 2 && (
-                <button
-                  className="roles-btn-primary"
-                  disabled={!canSave}
-                  onClick={() => onSave(name, selectedSkills, leadership)}
-                >
-                  {isCopy ? 'Copy Role' : 'Create Role'}
-                </button>
+              {/* Step 2: Create/Copy + Cancel */}
+              {!isEdit && step === 2 && !aiLoading && (
+                <>
+                  <button
+                    className="roles-btn-primary"
+                    disabled={!canSave}
+                    onClick={() => onSave(name, selectedSkills, leadership)}
+                  >
+                    {isCopy ? 'Copy Role' : 'Create Role'}
+                  </button>
+                  <button
+                    className="roles-btn-outlined-neutral800"
+                    onClick={handleClose}
+                  >
+                    Cancel
+                  </button>
+                </>
               )}
             </div>
+            {!isEdit && !isPrefilled && (
+              <span className="roles-panel-step-indicator">Step {step} of 2</span>
+            )}
           </div>
         </div>
       </div>

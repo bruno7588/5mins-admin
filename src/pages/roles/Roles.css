@@ -1324,7 +1324,7 @@
   flex-direction: column;
   gap: var(--space-s);
   padding: var(--space-m);
-  background: var(--input-background);
+  background: transparent;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
   background-clip: padding-box;
@@ -1787,11 +1787,10 @@
   gap: var(--space-m);
 }
 
-.roles-panel-footer-right {
+.roles-panel-footer-left {
   display: flex;
   align-items: center;
   gap: var(--space-m);
-  margin-left: auto;
 }
 
 .roles-panel-footer-row {
