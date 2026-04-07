@@ -146,6 +146,21 @@ function FiveMinsRolesTab({ onCopy, onCreateRole }: Props) {
     <div className="roles-single-panel">
       {/* Toolbar */}
       <div className="roles-table-toolbar">
+        <div className="roles-search" style={{ width: 320 }}>
+          <SearchNormal1 size={18} variant="Outline" color="var(--text-tertiary)" />
+          <input
+            className="roles-search-input"
+            placeholder="Search roles..."
+            value={search}
+            onChange={e => handleSearch(e.target.value)}
+          />
+          {search && (
+            <button className="roles-search__clear" onClick={() => handleSearch('')} aria-label="Clear search">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+          )}
+        </div>
+
         <div className="roles-toolbar-filters">
           {/* Function dropdown */}
           <span className="roles-function-dropdown__label">Function is</span>
@@ -186,23 +201,7 @@ function FiveMinsRolesTab({ onCopy, onCreateRole }: Props) {
             )}
           </div>
 
-          <div className="roles-search" style={{ width: 260 }}>
-            <SearchNormal1 size={18} variant="Outline" color="var(--text-tertiary)" />
-            <input
-              className="roles-search-input"
-              placeholder="Search roles..."
-              value={search}
-              onChange={e => handleSearch(e.target.value)}
-            />
-            {search && (
-              <button className="roles-search__clear" onClick={() => handleSearch('')} aria-label="Clear search">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
-            )}
-          </div>
-        </div>
-
-        <button className="roles-btn-text">
+          <button className="roles-btn-text">
           Export Roles
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g clipPath="url(#clip0_export)">
@@ -215,6 +214,7 @@ function FiveMinsRolesTab({ onCopy, onCreateRole }: Props) {
             </defs>
           </svg>
         </button>
+        </div>
       </div>
 
       {/* Table */}

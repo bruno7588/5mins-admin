@@ -67,7 +67,7 @@ function CompanyRolesTab({ roles, onCreateRole, onEditRole, onDuplicateRole, onD
     <>
       {/* Toolbar */}
       <div className="roles-filter-bar">
-        <div className="roles-search" style={{ width: 300 }}>
+        <div className="roles-search" style={{ width: 320 }}>
           <SearchNormal1 size={18} variant="Outline" color="var(--text-tertiary)" />
           <input
             className="roles-search-input"
