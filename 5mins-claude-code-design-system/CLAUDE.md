@@ -18,15 +18,20 @@ When building any UI component, feature, or screen, you MUST read the relevant d
    - `docs/design-system/overlays.md` — Dialog, Modal, and Side Drawer
    - `docs/design-system/lesson-cards.md` — Lesson/course card component
    - `docs/design-system/typography.md` — Type scale, weights, colors
-   - `docs/design-system/brand-colors.md` — Full color palette and usage rules
+   - `docs/design-system/brand-colors.md` — Full color palette and usage rules (Primary, Neutral-0→900, Semantic, Gamification)
+   - `docs/design-system/surface-colors.md` — Semantic surface tokens for backgrounds, borders, and button states
+   - `docs/design-system/text-colors.md` — Semantic text color tokens for all text roles (hierarchy, buttons, status, interactive, quiz)
    - `docs/design-system/iconography.md` — Iconsax React icons, sizes, variants
    - `docs/design-system/spacing.md` — Spacing scale and border radius system
-   - `input.md` - Text inputs, form fields, search boxes, email/password/numeric fields — all states (Enabled, Hover, Active, Filled, Disabled), validation states, label, helper text, right-side icon | Any user text-entry element or form control
-   - `file-uploader.md` - File upload component — two sizes (L/S), all five states (Enabled, Hover, Error, Uploading, Filled), circular progress, filename display, Preview + Change File CTAs | Any file input, drag-and-drop zone, CSV import, document or media upload
+   - `docs/design-system/input.md` - Text inputs, form fields, search boxes, email/password/numeric fields — all states (Enabled, Hover, Active, Filled, Disabled), validation states, label, helper text, right-side icon | Any user text-entry element or form control
+   - `docs/design-system/file-uploader.md` - File upload component — two sizes (L/S), all five states (Enabled, Hover, Error, Uploading, Filled), circular progress, filename display, Preview + Change File CTAs | Any file input, drag-and-drop zone, CSV import, document or media upload
+   - `docs/design-system/alerts.md` — Alert and Callout banner — both types, all prop combos, CSS, React implementation | Building any inline notification, warning banner, callout, or info strip
+   - `docs/design-system/search.md` — Search input — two sizes (M/L), three states (Enabled, Hover, Active), filled/empty modes, clear button | Building any search field, filter input, or keyword search bar
 
 ### Strict rules
 
 - **Never improvise design values.** Use only tokens defined in the design system (colors, spacing, radius, font sizes).
+- **Always use semantic tokens over raw palette values.** Prefer `--text-primary` over `--neutral-800`, `--surface-card` over `--neutral-0`, `--border-default` over `--neutral-100`.
 - **Always use Poppins** as the font family. Weights: 400, 500, 700 only.
 - **Always use Iconsax React** for icons. Standard sizes: 16, 20, 24, 32px only.
 - **All spacing must be multiples of 4px.** Use the spacing scale tokens.

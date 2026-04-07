@@ -1,3 +1,7 @@
+---
+name: 5mins-brand-colors
+description: 5Mins.ai brand color system and usage guidelines. Use when selecting colors for any 5Mins.ai UI element, determining button colors, choosing status indicator colors, or deciding on text/background colors. Provides the complete color palette including primary cyan, gamification colors for quiz types, semantic colors (success/warning/danger), and neutral grays with specific usage rules for each.
+---
 
 # 5Mins.ai Brand Colors
 
@@ -83,8 +87,7 @@ color: var(--primary-700);       /* Hover text */
 **Purpose:** Active states and selection indicators
 
 ### Key Token
-- `--secondary-500` (#FFBB38): Active/selected state backgrounds, tab underlines
-- `--secondary-600` (#E6A830): Selected text color (text-selected)
+- `--secondary-500` (#FFBB38): Active/selected states
 
 ### Usage Rules
 
@@ -190,42 +193,60 @@ border-color: var(--danger-500);
 
 **Purpose:** Text hierarchy, backgrounds, borders, UI structure
 
+### Complete Neutral Scale
+
+| Token | Hex | Primary Usage |
+|---|---|---|
+| `--neutral-900` | `#0F1014` | Deepest dark — sidebar background, nav rail |
+| `--neutral-800` | `#20222A` | Primary text, headings |
+| `--neutral-700` | `#2D313D` | Secondary surface backgrounds (panels, drawers) |
+| `--neutral-600` | `#383D4C` | Elevated surfaces, table headers |
+| `--neutral-500` | `#454C5E` | Body text, secondary text |
+| `--neutral-400` | `#656B7C` | Tertiary text, placeholders, captions |
+| `--neutral-300` | `#9EA4B3` | Disabled text, muted icons |
+| `--neutral-200` | `#BFC2CC` | Subtle borders, skeleton loaders |
+| `--neutral-100` | `#DFE1E6` | Input borders, dividers, separators |
+| `--neutral-50`  | `#EFF0F2` | Hover backgrounds (rows, sidebar items, cards) |
+| `--neutral-25`  | `#F9F9FA` | Page background |
+| `--neutral-0`   | `#FFFFFF` | Card backgrounds, pure white |
+
 ### Text Colors
-- `--neutral-800` (#20222A): Main text color, headings
-- `--neutral-500` (#454C5E): Body text, secondary text
-- `--neutral-400` (#656B7C): Tertiary text, placeholders
-- `--neutral-300` (#9EA4B3): Disabled text
+- `--neutral-800` (`#20222A`): Primary text, headings
+- `--neutral-500` (`#454C5E`): Body text, secondary text
+- `--neutral-400` (`#656B7C`): Tertiary text, placeholders
+- `--neutral-300` (`#9EA4B3`): Disabled text
 
 ### Background Colors
-- `--neutral-0` (#FFFFFF): Card backgrounds, pure white
-- `--neutral-25` (#F9F9FA): Page backgrounds
-- `--neutral-50` (#EFF0F2): Card hover states
+- `--neutral-900` (`#0F1014`): Deepest surfaces — sidebar, nav
+- `--neutral-700` (`#2D313D`): Panel and drawer backgrounds
+- `--neutral-600` (`#383D4C`): Elevated surfaces, table headers
+- `--neutral-25`  (`#F9F9FA`): Page background
+- `--neutral-0`   (`#FFFFFF`): Card and modal backgrounds
+- `--neutral-50`  (`#EFF0F2`): Hover state backgrounds
 
 ### Border & Divider Colors
-- `--neutral-100` (#DFE1E6): Input borders, dividers, separators
+- `--neutral-100` (`#DFE1E6`): Standard borders, dividers
+- `--neutral-200` (`#BFC2CC`): Subtle borders, skeleton loaders
 
 ### Usage Rules
 ```css
 /* Text Hierarchy */
-h1, h2, h3 { color: var(--neutral-800); }  /* Headings */
-p, body { color: var(--neutral-500); }     /* Body text */
-.secondary { color: var(--neutral-400); }   /* Secondary text */
-.disabled { color: var(--neutral-300); }    /* Disabled text */
-
-/* Links */
-a { 
-  color: var(--primary-600); 
-  &:hover { color: var(--primary-700); }
-}
+h1, h2, h3               { color: var(--neutral-800); }
+p, body                  { color: var(--neutral-500); }
+.caption, ::placeholder  { color: var(--neutral-400); }
+.disabled                { color: var(--neutral-300); }
 
 /* Backgrounds */
-body { background: var(--neutral-25); }     /* Page background */
-.card { background: var(--neutral-0); }     /* Card background */
-.card:hover { background: var(--neutral-50); } /* Hover state */
+.sidebar, .nav-rail      { background: var(--neutral-900); }
+.panel, .side-drawer     { background: var(--neutral-700); }
+.table-header            { background: var(--neutral-600); }
+body                     { background: var(--neutral-25); }
+.card, .modal            { background: var(--neutral-0); }
+.card:hover, .row:hover  { background: var(--neutral-50); }
 
 /* Borders */
-input { border: 1px solid var(--neutral-100); }
-.divider { border-top: 1px solid var(--neutral-100); }
+input, .card, .divider   { border: 1px solid var(--neutral-100); }
+.skeleton                { background: var(--neutral-200); }
 ```
 
 ## Color Selection Quick Reference
@@ -245,8 +266,7 @@ input { border: 1px solid var(--neutral-100); }
 
 **Active & Selection States**
 - Input focus (dropdown, search) → `--secondary-500`
-- Active tab underline → `--secondary-500`
-- Selected text color → `--secondary-600`
+- Active tab → `--secondary-500`
 - Selected checkbox/radio → `--secondary-500`
 - Selected chip → `--secondary-500`
 
@@ -264,9 +284,16 @@ input { border: 1px solid var(--neutral-100); }
 - Disabled → `--neutral-300`
 
 **Backgrounds**
+- Sidebar / nav rail → `--neutral-900`
+- Panel / side drawer → `--neutral-700`
+- Table header → `--neutral-600`
 - Page → `--neutral-25`
-- Cards → `--neutral-0`
-- Card hover → `--neutral-50`
+- Cards / modals → `--neutral-0`
+- Row / card hover → `--neutral-50`
+
+**Borders**
+- Standard borders, dividers → `--neutral-100`
+- Subtle borders, skeletons → `--neutral-200`
 
 **Badges**
 - Success badge bg → `--success-100`, text → `--success-600`
@@ -284,9 +311,12 @@ input { border: 1px solid var(--neutral-100); }
 ✓ `--neutral-500` on `--neutral-0` (body text on white)
 ✓ `--neutral-0` on `--primary-600` (white text on primary button)
 ✓ `--neutral-0` on semantic colors (white on success/warning/danger)
+✓ `--neutral-25` on `--neutral-700` (page-bg text on panel/drawer)
+✓ `--neutral-300` on `--neutral-800` (disabled text on dark surface)
 
 ✗ `--primary-500` on `--neutral-0` (insufficient contrast)
 ✗ `--neutral-400` on `--neutral-0` for body text (use for secondary only)
+✗ `--neutral-400` on `--neutral-600` (insufficient contrast)
 
 ## Assets
 
