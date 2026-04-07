@@ -350,3 +350,288 @@
   color: var(--text-primary);
   line-height: 1.5;
 }
+
+/* ── Filter bar ── */
+.automations-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-m);
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.automations-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-sm);
+  background: var(--input-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 320px;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.automations-search:hover {
+  background: var(--input-background-hover);
+  border-color: var(--border-hover);
+}
+
+.automations-search:focus-within {
+  border-color: var(--secondary-500);
+  background: var(--input-background);
+}
+
+.automations-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  outline: none;
+  min-width: 0;
+}
+
+.automations-search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.automations-search-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+/* ── Dropdown ── */
+.automations-dropdown {
+  position: relative;
+  width: 230px;
+  flex-shrink: 0;
+}
+
+.automations-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  width: 100%;
+  padding: var(--space-s) var(--space-m);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.automations-dropdown-trigger:hover {
+  background: var(--input-background-hover);
+  border-color: var(--border-hover);
+}
+
+.automations-dropdown--open .automations-dropdown-trigger {
+  border-color: var(--secondary-500);
+  background: transparent;
+}
+
+.automations-dropdown-value {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.automations-listbox {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  width: max-content;
+  background: var(--cards-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: -4px 0 24px 0 rgba(32, 34, 42, 0.12);
+  padding: var(--space-s);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 10;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.automations-listbox-item {
+  display: flex;
+  align-items: center;
+  padding: var(--space-sm) var(--space-m);
+  border: none;
+  border-radius: var(--radius-s);
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 150ms ease;
+}
+
+.automations-listbox-item:hover {
+  background: var(--cards-background-hover);
+}
+
+.automations-listbox-item--selected {
+  background: var(--cards-background-hover);
+  font-weight: 700;
+}
+
+/* ── Activity table cells ── */
+.automations-table-cell--user {
+  flex: 1.4 0 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+
+.automations-user-name {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.automations-user-email {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+.automations-table-cell--automation {
+  flex: 1.6 0 0;
+  gap: var(--space-s);
+  min-width: 0;
+  color: var(--text-primary);
+}
+
+.automations-status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.automations-status-dot--active {
+  background: var(--success-500);
+}
+
+.automations-status-dot--inactive {
+  background: var(--text-disabled);
+}
+
+
+.automations-table-cell--automation-muted {
+  color: var(--text-disabled);
+}
+
+/* ===== Badge component (per docs/design-system/badges.md) ===== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badge--informative {
+  background: var(--input-background);
+  color: var(--text-secondary);
+}
+
+.automations-table-cell--triggered {
+  width: 180px;
+  flex-shrink: 0;
+  color: var(--text-primary);
+}
+
+.automations-table-cell--sortable {
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  gap: var(--space-xs);
+  text-align: left;
+}
+
+.automations-table-cell--sortable:hover {
+  color: var(--text-primary);
+}
+
+.automations-table-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-m);
+  font-size: 14px;
+  color: var(--text-tertiary);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-s);
+}
+
+/* ── Pagination ── */
+.automations-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-m);
+  padding: var(--space-s) var(--space-m);
+}
+
+.automations-pagination-info {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.automations-pagination-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.automations-pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
