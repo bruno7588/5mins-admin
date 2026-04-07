@@ -1,0 +1,352 @@
+.automations-layout {
+  display: flex;
+  flex: 1;
+}
+
+.automations-main {
+  flex: 1;
+  padding: var(--space-xl);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+}
+
+.automations-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.automations-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.automations-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.automations-description {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.automations-description-link {
+  color: var(--text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.automations-description-link:hover {
+  color: var(--primary-700);
+}
+
+.automations-tabs {
+  display: flex;
+  gap: 24px;
+}
+
+.automations-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.automations-tab::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: transparent;
+  border-radius: var(--radius-xs);
+}
+
+.automations-tab:hover {
+  color: var(--text-primary);
+}
+
+.automations-tab--active {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.automations-tab--active::after {
+  background: var(--secondary-500);
+}
+
+/* ===== Manage tab body ===== */
+.automations-manage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-ml); /* 20px */
+}
+
+/* ── Template cards ── */
+.automations-templates {
+  display: flex;
+  gap: var(--space-l); /* 24px */
+  width: 100%;
+}
+
+.automations-template {
+  flex: 1 0 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-m); /* 16px */
+  padding: var(--space-m); /* 16px */
+  border: none;
+  border-radius: var(--radius-sm); /* 12px */
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 150ms ease;
+}
+
+.automations-template--purple {
+  background: rgba(129, 88, 236, 0.16);
+}
+
+.automations-template--purple:hover {
+  background: rgba(129, 88, 236, 0.32);
+}
+
+.automations-template--blue {
+  background: rgba(42, 144, 216, 0.16);
+}
+
+.automations-template--blue:hover {
+  background: rgba(42, 144, 216, 0.32);
+}
+
+.automations-template-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.automations-template-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs); /* 4px */
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.automations-template-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.automations-template-desc {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ── Table ── */
+.automations-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm); /* 12px */
+  width: 100%;
+}
+
+.automations-table-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.automations-table-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s); /* 8px */
+  transition: background 150ms ease;
+}
+
+.automations-table-row:hover {
+  background: var(--cards-background-hover);
+}
+
+.automations-table-cell {
+  display: flex;
+  align-items: center;
+  padding: var(--space-sm) var(--space-m); /* 12px 16px */
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.automations-table-header .automations-table-cell {
+  color: var(--text-secondary);
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.automations-table-cell--name {
+  flex: 1 0 0;
+  color: var(--text-primary);
+}
+
+.automations-table-cell--date {
+  flex: 1 0 0;
+  color: var(--text-primary);
+}
+
+.automations-table-cell--toggle {
+  width: 200px;
+  flex-shrink: 0;
+  gap: var(--space-m);
+  padding: var(--space-m);
+}
+
+.automations-table-cell--actions {
+  width: 64px;
+  flex-shrink: 0;
+  justify-content: center;
+}
+
+/* Inactive row → muted text */
+.automations-table-row--inactive .automations-table-cell--name,
+.automations-table-row--inactive .automations-table-cell--date {
+  color: var(--text-tertiary);
+}
+
+/* ── Toggle switch ── */
+.automations-toggle {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 9999px;
+  border: none;
+  background: var(--neutral-200);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 150ms ease;
+}
+
+.automations-toggle--on {
+  background: var(--success-500, #14B870);
+}
+
+.automations-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--neutral-0, #fff);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  transition: transform 150ms ease;
+}
+
+.automations-toggle--on .automations-toggle-thumb {
+  transform: translateX(16px);
+}
+
+.automations-toggle-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+/* ── Row action button ── */
+.automations-row-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.automations-row-action:hover {
+  background: var(--neutral-50);
+}
+
+/* ===== Activity tab body ===== */
+.automations-activity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-ml); /* 20px */
+}
+
+/* ── Stat cards ── */
+.automations-stat-cards {
+  display: flex;
+  gap: var(--space-m); /* 16px */
+  width: 100%;
+}
+
+.automations-stat-card {
+  flex: 1 0 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm); /* 12px */
+  padding: var(--space-m); /* 16px */
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm); /* 12px */
+  min-width: 0;
+}
+
+.automations-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+}
+
+.automations-stat-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
+  min-width: 0;
+  line-height: 1.5;
+}
+
+.automations-stat-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+.automations-stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}

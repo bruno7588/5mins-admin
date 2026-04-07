@@ -4,6 +4,7 @@ import {
   Home,
   Profile2User,
   Book1,
+  Flash,
   Diagram,
   Award,
   DocumentText,
@@ -110,6 +111,21 @@ function LeftSidebar() {
             </button>
           </div>
         )}
+
+        {/* Automations */}
+        <button
+          className={`sidebar-item${activePage === '/automations' ? ' sidebar-item--active' : ''}`}
+          onClick={() => navigate('/automations')}
+        >
+          <span className="sidebar-item-icon">
+            <Flash
+              size={iconSize}
+              color={activePage === '/automations' ? 'var(--secondary-600)' : iconColor}
+              variant={activePage === '/automations' ? 'Bold' : 'Linear'}
+            />
+          </span>
+          <span className="sidebar-item-label">Automations</span>
+        </button>
 
         {/* Reports */}
         <button className="sidebar-item">

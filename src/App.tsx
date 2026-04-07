@@ -9,6 +9,8 @@ import People from './pages/people/People'
 import UserFields from './pages/people/UserFields'
 import Roles from './pages/roles/Roles'
 
+import Automations from './pages/automations/Automations'
+
 import QBYourContent from './pages/questions-bank/YourContent'
 
 import ScormYourContent from './pages/scorm-content/YourContent'
@@ -53,6 +55,7 @@ function App() {
                 <Route path="/people" element={<People />} />
                 <Route path="/user-fields" element={<UserFields />} />
                 <Route path="/roles" element={<Roles />} />
+                <Route path="/automations" element={<Automations />} />
                 <Route path="/questions-bank" element={<QBYourContent />} />
                 <Route path="/scorm-content" element={<ScormYourContent />} />
               </Routes>

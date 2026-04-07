@@ -4,7 +4,7 @@ import { Add } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import './YourCourses.css'
 
-type Tab = 'created' | 'enrolments' | 'automations'
+type Tab = 'created' | 'enrolments'
 
 const courseImage = 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=480&h=300&fit=crop'
 
@@ -37,12 +37,6 @@ function YourCourses() {
               onClick={() => setActiveTab('enrolments')}
             >
               Active Enrolments
-            </button>
-            <button
-              className={`your-courses-tab${activeTab === 'automations' ? ' your-courses-tab--active' : ''}`}
-              onClick={() => setActiveTab('automations')}
-            >
-              Automations
             </button>
           </div>
         </div>
