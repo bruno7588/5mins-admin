@@ -67,8 +67,6 @@ const mockAutomations: AutomationRow[] = [
   { id: '14', name: 'Product Knowledge Bootcamp', lastUpdated: 'Jul 12, 2024', active: false },
 ]
 
-const TOTAL_TRIGGERS = 1247
-const THIS_MONTH_TRIGGERS = 83
 const PAGE_SIZE = 10
 const DELETED_AUTOMATION_ID = 'deleted-1'
 
@@ -127,9 +125,37 @@ function formatTriggerDate(iso: string): { day: string; year: string } {
   }
 }
 
+// Demo mode: read once on mount from ?demo= URL param.
+// Lets prototype reviewers preview empty states without editing source.
+//   ?demo=no-automations  → empty automations + empty triggers
+//   ?demo=no-triggers     → automations exist, no triggers
+//   (anything else / absent) → normal mock data
+type DemoMode = 'no-automations' | 'no-triggers' | null
+function readDemoMode(): DemoMode {
+  if (typeof window === 'undefined') return null
+  const value = new URLSearchParams(window.location.search).get('demo')
+  if (value === 'no-automations' || value === 'no-triggers') return value
+  return null
+}
+
 function Automations() {
   const [activeTab, setActiveTab] = useState<Tab>('manage')
-  const [automations, setAutomations] = useState<AutomationRow[]>(mockAutomations)
+  const [demoMode] = useState<DemoMode>(readDemoMode)
+  const [automations, setAutomations] = useState<AutomationRow[]>(
+    demoMode === 'no-automations' ? [] : mockAutomations,
+  )
+  const effectiveTriggers = useMemo(
+    () => (demoMode === 'no-automations' || demoMode === 'no-triggers' ? [] : mockTriggers),
+    [demoMode],
+  )
+  // Derived stats — kept in sync with effectiveTriggers so demo modes
+  // and real-world empty accounts both show 0 instead of stale constants.
+  const totalTriggersCount = effectiveTriggers.length
+  const thisMonthTriggersCount = useMemo(() => {
+    const now = new Date()
+    const yyyyMm = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+    return effectiveTriggers.filter((t) => t.triggeredAt.startsWith(yyyyMm)).length
+  }, [effectiveTriggers])
 
   // Activity tab state
   const [searchQuery, setSearchQuery] = useState('')
@@ -161,7 +187,7 @@ function Automations() {
   // Filter + sort + paginate triggers
   const filteredTriggers = useMemo(() => {
     const q = searchQuery.trim().toLowerCase()
-    let rows = mockTriggers
+    let rows = effectiveTriggers
     if (q) {
       rows = rows.filter(
         (t) =>
@@ -185,7 +211,7 @@ function Automations() {
       return sortDirection === 'asc' ? cmp : -cmp
     })
     return rows
-  }, [searchQuery, stateFilter, automationFilterId, sortDirection, automationsById])
+  }, [searchQuery, stateFilter, automationFilterId, sortDirection, automationsById, effectiveTriggers])
 
   const totalRows = filteredTriggers.length
   const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE))
@@ -264,7 +290,7 @@ function Automations() {
     setAutomationFilterId('all')
   }
 
-  const hasAnyTriggers = mockTriggers.length > 0
+  const hasAnyTriggers = effectiveTriggers.length > 0
   const hasActiveFilters =
     searchQuery.trim() !== '' || stateFilter !== 'all' || automationFilterId !== 'all'
   const currentMonthLabel = new Date().toLocaleDateString('en-US', {
@@ -356,6 +382,7 @@ function Automations() {
               </button>
             </div>
 
+            {automations.length > 0 && (
             <div className="automations-table">
               <div className="automations-table-header">
                 <div className="automations-table-cell automations-table-cell--name">Automation</div>
@@ -434,11 +461,13 @@ function Automations() {
                 </div>
               ))}
             </div>
+            )}
           </div>
         )}
 
         {activeTab === 'activity' && (
           <div className="automations-activity">
+            {automations.length > 0 && (
             <div className="automations-stat-cards">
               <div className="automations-stat-card">
                 <span className="automations-stat-icon">
@@ -446,7 +475,7 @@ function Automations() {
                 </span>
                 <div className="automations-stat-info">
                   <p className="automations-stat-label">Total triggers</p>
-                  <p className="automations-stat-value">{TOTAL_TRIGGERS.toLocaleString()}</p>
+                  <p className="automations-stat-value">{totalTriggersCount.toLocaleString()}</p>
                 </div>
               </div>
 
@@ -458,7 +487,7 @@ function Automations() {
                   <p className="automations-stat-label">
                     This month <span className="automations-stat-label-meta">({currentMonthLabel})</span>
                   </p>
-                  <p className="automations-stat-value">{THIS_MONTH_TRIGGERS}</p>
+                  <p className="automations-stat-value">{thisMonthTriggersCount}</p>
                 </div>
               </div>
 
@@ -475,6 +504,7 @@ function Automations() {
                 </div>
               </div>
             </div>
+            )}
 
             {/* Filter bar: search left, automation dropdown right */}
             {hasAnyTriggers && (
@@ -638,10 +668,21 @@ function Automations() {
                 !hasAnyTriggers ? (
                   <div className="automations-empty-state">
                     <Activity size={40} color="var(--text-tertiary)" variant="Linear" />
-                    <p className="automations-empty-state-title">No activity yet</p>
-                    <p className="automations-empty-state-body">
-                      Triggers will appear here when your automations enrol users in courses.
+                    <p className="automations-empty-state-title">
+                      {automations.length === 0 ? 'No automations yet' : 'No activity yet'}
                     </p>
+                    <p className="automations-empty-state-body">
+                      {automations.length === 0
+                        ? "You haven't created any automations yet. Once an automation runs, every enrolment will show up here."
+                        : "Your automations haven't run yet. Once one fires, every enrolment will show up here. If you were expecting activity, check that your automations are active in the Manage tab."}
+                    </p>
+                    <button
+                      type="button"
+                      className="automations-empty-state-action"
+                      onClick={() => setActiveTab('manage')}
+                    >
+                      Go to Manage tab
+                    </button>
                   </div>
                 ) : (
                   <div className="automations-empty-state">
