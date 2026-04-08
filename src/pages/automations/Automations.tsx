@@ -497,10 +497,7 @@ function Automations() {
                 </span>
                 <div className="automations-stat-info">
                   <p className="automations-stat-label">Active automations</p>
-                  <p className="automations-stat-value">
-                    {activeAutomationsCount}
-                    <span className="automations-stat-value-suffix">/{automations.length}</span>
-                  </p>
+                  <p className="automations-stat-value">{activeAutomationsCount}</p>
                 </div>
               </div>
             </div>

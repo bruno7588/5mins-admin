@@ -439,12 +439,6 @@
   font-weight: 400;
 }
 
-.automations-stat-value-suffix {
-  font-size: 14px;
-  font-weight: 400;
-  color: var(--text-tertiary);
-  margin-left: 2px;
-}
 
 /* ── Filter bar ── */
 .automations-filter-bar {
