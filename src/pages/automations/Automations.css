@@ -212,7 +212,8 @@
 }
 
 .automations-table-cell--date {
-  flex: 1 0 0;
+  width: 200px;
+  flex-shrink: 0;
   color: var(--text-primary);
 }
 
@@ -295,6 +296,88 @@
   background: var(--neutral-50);
 }
 
+/* ── Row action menu ── */
+.automations-more-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.automations-action-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  min-width: 220px;
+  background: var(--neutral-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: -4px 0px 24px 0px rgba(32, 34, 42, 0.12);
+  z-index: 100;
+  padding: 8px;
+}
+
+.automations-action-menu-caret {
+  position: absolute;
+  top: -6px;
+  right: 12px;
+  width: 12px;
+  height: 6px;
+}
+
+.automations-action-menu-caret::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid var(--border);
+}
+
+.automations-action-menu-caret::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid var(--neutral-0);
+}
+
+.automations-action-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: 12px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-s);
+  white-space: nowrap;
+  transition: background 150ms ease;
+}
+
+.automations-action-menu-item:hover {
+  background: var(--neutral-50);
+}
+
+.automations-action-menu-item--danger {
+  color: var(--danger-500);
+}
+
+.automations-action-menu-item svg {
+  flex-shrink: 0;
+}
+
 /* ===== Activity tab body ===== */
 .automations-activity {
   display: flex;
@@ -345,10 +428,22 @@
 }
 
 .automations-stat-value {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.5;
+}
+
+.automations-stat-label-meta {
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.automations-stat-value-suffix {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  margin-left: 2px;
 }
 
 /* ── Filter bar ── */
@@ -408,6 +503,7 @@
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
+  color: var(--text-secondary);
 }
 
 /* ── Dropdown ── */
@@ -495,8 +591,13 @@
 }
 
 .automations-listbox-item--selected {
-  background: var(--cards-background-hover);
-  font-weight: 700;
+  background: var(--secondary-500);
+  color: var(--text-primary);
+  font-weight: 400;
+}
+
+.automations-listbox-item--selected:hover {
+  background: var(--secondary-600);
 }
 
 /* ── Activity table cells ── */
@@ -576,6 +677,25 @@
   color: var(--text-primary);
 }
 
+.automations-trigger-date {
+  display: flex;
+  flex-direction: column;
+}
+
+.automations-trigger-date-day {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.automations-trigger-date-year {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--text-secondary);
+}
+
 .automations-table-cell--sortable {
   background: transparent;
   border: none;
@@ -600,6 +720,72 @@
   color: var(--text-tertiary);
   border: 1px dashed var(--border);
   border-radius: var(--radius-s);
+}
+
+.automations-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-xxl) var(--space-m);
+  text-align: center;
+}
+
+.automations-empty-state-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: var(--space-sm);
+  line-height: 1.5;
+}
+
+.automations-empty-state-body {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+/* Outlined-2 button — Figma library node 11609:8315 (Enabled/Hover/Pressed) */
+.automations-empty-state-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--space-sm);
+  padding: 10px var(--space-ml); /* 10px 20px to match figma height (41px) */
+  border: 1px solid var(--text-primary);
+  border-radius: var(--radius-s);
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.automations-empty-state-action:hover {
+  background: rgba(0, 206, 230, 0.16);
+  border-color: var(--primary-600);
+  color: var(--primary-600);
+}
+
+.automations-empty-state-action:active {
+  background: rgba(0, 206, 230, 0.16);
+  border-color: var(--primary-700);
+  color: var(--primary-700);
+}
+
+.automations-empty-state-action:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+}
+
+.automations-empty-state-action:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
 }
 
 /* ── Pagination ── */

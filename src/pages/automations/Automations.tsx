@@ -3,6 +3,9 @@ import {
   UserCirlceAdd,
   Medal,
   More,
+  Edit2,
+  Trash,
+  Danger,
   Activity,
   Calendar,
   Flash,
@@ -13,10 +16,10 @@ import {
   ArrowUp2,
   ArrowLeft2,
   ArrowRight2,
-  CloseCircle,
   Sort,
 } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import './Automations.css'
 
 type Tab = 'manage' | 'activity'
@@ -114,11 +117,14 @@ const mockTriggers: TriggerRow[] = [
   { id: 't20', user: mockUsers[2], automationId: '2', triggeredAt: '2026-02-25' },
 ]
 
-function formatTriggerDate(iso: string): string {
+function formatTriggerDate(iso: string): { day: string; year: string } {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   const d = new Date(iso)
   const day = String(d.getUTCDate()).padStart(2, '0')
-  return `${day} ${months[d.getUTCMonth()]} ${d.getUTCFullYear()}`
+  return {
+    day: `${months[d.getUTCMonth()]} ${day},`,
+    year: String(d.getUTCFullYear()),
+  }
 }
 
 function Automations() {
@@ -132,6 +138,14 @@ function Automations() {
   const [page, setPage] = useState(1)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Manage tab row action menu
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  // Delete confirmation modal
+  const [pendingDelete, setPendingDelete] = useState<AutomationRow | null>(null)
+  const [confirmInput, setConfirmInput] = useState('')
 
   const activeAutomationsCount = automations.filter((a) => a.active).length
 
@@ -186,6 +200,42 @@ function Automations() {
     return () => document.removeEventListener('mousedown', onMouseDown)
   }, [dropdownOpen])
 
+  // Click-outside for row action menu
+  useEffect(() => {
+    if (openMenuId === null) return
+    function onMouseDown(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null)
+      }
+    }
+    document.addEventListener('mousedown', onMouseDown)
+    return () => document.removeEventListener('mousedown', onMouseDown)
+  }, [openMenuId])
+
+  function requestDeleteAutomation(id: string) {
+    const automation = automations.find((a) => a.id === id)
+    if (!automation) return
+    setPendingDelete(automation)
+    setConfirmInput('')
+  }
+
+  function closeDeleteModal() {
+    setPendingDelete(null)
+    setConfirmInput('')
+  }
+
+  function confirmDeleteAutomation() {
+    if (!pendingDelete) return
+    setAutomations((rows) => rows.filter((r) => r.id !== pendingDelete.id))
+    closeDeleteModal()
+  }
+
+  function editAutomation(id: string) {
+    // TODO: open edit modal once the design exists
+    const automation = automations.find((a) => a.id === id)
+    window.alert(`Edit "${automation?.name ?? 'automation'}" — not yet implemented`)
+  }
+
   function toggleActive(id: string) {
     setAutomations((rows) =>
       rows.map((r) => (r.id === id ? { ...r, active: !r.active } : r)),
@@ -195,6 +245,19 @@ function Automations() {
   function toggleSort() {
     setSortDirection((d) => (d === 'desc' ? 'asc' : 'desc'))
   }
+
+  function clearFilters() {
+    setSearchQuery('')
+    setAutomationFilterId('all')
+  }
+
+  const hasAnyTriggers = mockTriggers.length > 0
+  const hasActiveFilters =
+    searchQuery.trim() !== '' || automationFilterId !== 'all'
+  const currentMonthLabel = new Date().toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+  })
 
   const dropdownLabel =
     automationFilterId === 'all'
@@ -292,9 +355,52 @@ function Automations() {
                     <span className="automations-toggle-label">{row.active ? 'Active' : 'Inactive'}</span>
                   </div>
                   <div className="automations-table-cell automations-table-cell--actions">
-                    <button type="button" className="automations-row-action" aria-label="More actions">
-                      <More size={20} color="var(--text-secondary)" variant="Linear" />
-                    </button>
+                    <div
+                      className="automations-more-wrapper"
+                      ref={openMenuId === row.id ? menuRef : undefined}
+                    >
+                      <button
+                        type="button"
+                        className="automations-row-action"
+                        aria-label="More actions"
+                        aria-haspopup="menu"
+                        aria-expanded={openMenuId === row.id}
+                        onClick={() =>
+                          setOpenMenuId(openMenuId === row.id ? null : row.id)
+                        }
+                      >
+                        <More size={20} color="var(--text-secondary)" variant="Linear" />
+                      </button>
+                      {openMenuId === row.id && (
+                        <div className="automations-action-menu" role="menu">
+                          <div className="automations-action-menu-caret" />
+                          <button
+                            type="button"
+                            className="automations-action-menu-item"
+                            role="menuitem"
+                            onClick={() => {
+                              setOpenMenuId(null)
+                              editAutomation(row.id)
+                            }}
+                          >
+                            <Edit2 size={20} color="var(--text-secondary)" variant="Linear" />
+                            Edit automation
+                          </button>
+                          <button
+                            type="button"
+                            className="automations-action-menu-item automations-action-menu-item--danger"
+                            role="menuitem"
+                            onClick={() => {
+                              setOpenMenuId(null)
+                              requestDeleteAutomation(row.id)
+                            }}
+                          >
+                            <Trash size={20} color="var(--danger-500)" variant="Linear" />
+                            Delete automation
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -320,7 +426,9 @@ function Automations() {
                   <Calendar size={40} color="var(--lesson-quiz)" variant="Linear" />
                 </span>
                 <div className="automations-stat-info">
-                  <p className="automations-stat-label">This month</p>
+                  <p className="automations-stat-label">
+                    This month <span className="automations-stat-label-meta">({currentMonthLabel})</span>
+                  </p>
                   <p className="automations-stat-value">{THIS_MONTH_TRIGGERS}</p>
                 </div>
               </div>
@@ -331,12 +439,16 @@ function Automations() {
                 </span>
                 <div className="automations-stat-info">
                   <p className="automations-stat-label">Active automations</p>
-                  <p className="automations-stat-value">{activeAutomationsCount}</p>
+                  <p className="automations-stat-value">
+                    {activeAutomationsCount}
+                    <span className="automations-stat-value-suffix">/{automations.length}</span>
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Filter bar: search left, automation dropdown right */}
+            {hasAnyTriggers && (
             <div className="automations-filter-bar">
               <div className="automations-search">
                 <SearchNormal1 size={18} color="var(--text-tertiary)" variant="Linear" />
@@ -354,7 +466,22 @@ function Automations() {
                     aria-label="Clear search"
                     onClick={() => setSearchQuery('')}
                   >
-                    <CloseCircle size={20} color="var(--text-tertiary)" variant="Linear" />
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M14.375 14.375L5.625 5.625M14.375 5.625L5.625 14.375"
+                        stroke="currentColor"
+                        strokeWidth="1.25"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   </button>
                 )}
               </div>
@@ -411,29 +538,57 @@ function Automations() {
                 )}
               </div>
             </div>
+            )}
 
             {/* Activity table */}
             <div className="automations-table">
-              <div className="automations-table-header">
-                <div className="automations-table-cell automations-table-cell--user">User</div>
-                <div className="automations-table-cell automations-table-cell--automation">Automation</div>
-                <button
-                  type="button"
-                  className="automations-table-cell automations-table-cell--triggered automations-table-cell--sortable"
-                  onClick={toggleSort}
-                  aria-label={`Sort by triggered date, currently ${sortDirection === 'desc' ? 'descending' : 'ascending'}`}
-                >
-                  Triggered
-                  {sortDirection === 'desc' ? (
-                    <ArrowDown size={16} color="var(--text-secondary)" variant="Linear" />
-                  ) : (
-                    <ArrowUp size={16} color="var(--text-secondary)" variant="Linear" />
-                  )}
-                </button>
-              </div>
+              {pageRows.length > 0 && (
+                <div className="automations-table-header">
+                  <div className="automations-table-cell automations-table-cell--user">User</div>
+                  <div className="automations-table-cell automations-table-cell--automation">Automation</div>
+                  <button
+                    type="button"
+                    className="automations-table-cell automations-table-cell--triggered automations-table-cell--sortable"
+                    onClick={toggleSort}
+                    aria-label={`Sort by triggered date, currently ${sortDirection === 'desc' ? 'descending' : 'ascending'}`}
+                  >
+                    Triggered
+                    {sortDirection === 'desc' ? (
+                      <ArrowDown size={16} color="var(--text-secondary)" variant="Linear" />
+                    ) : (
+                      <ArrowUp size={16} color="var(--text-secondary)" variant="Linear" />
+                    )}
+                  </button>
+                </div>
+              )}
 
               {pageRows.length === 0 ? (
-                <div className="automations-table-empty">No results found.</div>
+                !hasAnyTriggers ? (
+                  <div className="automations-empty-state">
+                    <Activity size={40} color="var(--text-tertiary)" variant="Linear" />
+                    <p className="automations-empty-state-title">No activity yet</p>
+                    <p className="automations-empty-state-body">
+                      Triggers will appear here when your automations enrol users in courses.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="automations-empty-state">
+                    <SearchNormal1 size={40} color="var(--text-tertiary)" variant="Linear" />
+                    <p className="automations-empty-state-title">No results match your filters</p>
+                    <p className="automations-empty-state-body">
+                      Try a different search or adjust your filters.
+                    </p>
+                    {hasActiveFilters && (
+                      <button
+                        type="button"
+                        className="automations-empty-state-action"
+                        onClick={clearFilters}
+                      >
+                        Clear filters
+                      </button>
+                    )}
+                  </div>
+                )
               ) : (
                 pageRows.map((row) => {
                   const automation = automationsById.get(row.automationId)
@@ -468,7 +623,15 @@ function Automations() {
                         )}
                       </div>
                       <div className="automations-table-cell automations-table-cell--triggered">
-                        {formatTriggerDate(row.triggeredAt)}
+                        {(() => {
+                          const date = formatTriggerDate(row.triggeredAt)
+                          return (
+                            <div className="automations-trigger-date">
+                              <span className="automations-trigger-date-day">{date.day}</span>
+                              <span className="automations-trigger-date-year">{date.year}</span>
+                            </div>
+                          )
+                        })()}
                       </div>
                     </div>
                   )
@@ -505,6 +668,49 @@ function Automations() {
           </div>
         )}
       </main>
+
+      {/* Delete automation confirmation */}
+      <ConfirmModal open={!!pendingDelete} onClose={closeDeleteModal}>
+        {pendingDelete && (
+          <>
+            <div className="confirm-modal-header confirm-modal-header--center">
+              <Danger size={72} color="var(--danger-500)" variant="Linear" />
+              <h3 className="confirm-modal-title">Delete automation</h3>
+              <p className="confirm-modal-body">
+                You're about to delete <strong>{pendingDelete.name}</strong>. Past
+                trigger activity will be retained, but the automation will stop
+                running. This cannot be undone.
+              </p>
+            </div>
+            <div className="confirm-modal-input-group">
+              <label className="confirm-modal-label">
+                Type <span className="confirm-modal-label-danger">'Delete'</span> below, to confirm
+              </label>
+              <input
+                className="confirm-modal-input"
+                type="text"
+                value={confirmInput}
+                onChange={(e) => setConfirmInput(e.target.value)}
+              />
+            </div>
+            <div className="confirm-modal-actions confirm-modal-actions--center">
+              <button
+                className="confirm-modal-btn confirm-modal-btn--outlined-neutral"
+                onClick={closeDeleteModal}
+              >
+                Cancel
+              </button>
+              <button
+                className="confirm-modal-btn confirm-modal-btn--danger"
+                disabled={confirmInput !== 'Delete'}
+                onClick={confirmDeleteAutomation}
+              >
+                Delete Automation
+              </button>
+            </div>
+          </>
+        )}
+      </ConfirmModal>
     </div>
   )
 }

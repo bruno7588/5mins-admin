@@ -65,19 +65,43 @@ Border with transparent background. Use for secondary actions.
 ```
 
 ### Outlined-2
-Secondary outline style with neutral colors. Use for tertiary actions.
+Neutral outline at rest, cyan tint on interaction. Use for tertiary actions where you want a quieter default than the primary Outlined button but still want the brand color to surface on hover/press.
+
+Source: Figma Library node `11609:8315` (Enabled / Hover / Pressed).
 
 ```css
+/* Enabled */
 .btn-outlined-2 {
   background: transparent;
-  color: var(--neutral-800);          /* #20222A */
-  border: 1px solid var(--neutral-100);
+  color: var(--text-primary);              /* --neutral-800 */
+  border: 1px solid var(--text-primary);
 }
+
+/* Hover */
 .btn-outlined-2:hover {
-  background: var(--neutral-50);
-  border-color: var(--neutral-200);
+  background: rgba(0, 206, 230, 0.16);     /* primary-500 @ 16% */
+  color: var(--primary-600);               /* #00AFC4 */
+  border-color: var(--primary-600);
+}
+
+/* Pressed */
+.btn-outlined-2:active {
+  background: rgba(0, 206, 230, 0.16);
+  color: var(--primary-700);               /* #008393 */
+  border-color: var(--primary-700);
+}
+
+.btn-outlined-2:disabled {
+  color: var(--neutral-300);
+  border-color: var(--neutral-100);
+  background: transparent;
 }
 ```
+
+**Notes**
+- The default border uses `--text-primary` (dark neutral), **not** `--neutral-100`. Earlier versions of this doc were wrong on this — verify against the Figma library if in doubt.
+- Hover background `rgba(0, 206, 230, 0.16)` is `--primary-500` at 16% opacity. There's no semantic token for it yet — inline the rgba.
+- Padding for the **Medium** size is `10px 20px` (not `12px 20px` like other variants), to land on the 41px height shown in the Figma library. 10px is off the 4px scale, but matches the design intentionally.
 
 ### Text
 No background or border, just text. Use for inline or subtle actions.
