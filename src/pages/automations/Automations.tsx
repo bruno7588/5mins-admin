@@ -198,8 +198,8 @@ function Automations() {
 
   const dropdownLabel =
     automationFilterId === 'all'
-      ? 'All automations'
-      : automationsById.get(automationFilterId)?.name ?? 'All automations'
+      ? 'All Automations'
+      : automationsById.get(automationFilterId)?.name ?? 'All Automations'
 
   return (
     <div className="automations-layout">
@@ -390,7 +390,7 @@ function Automations() {
                         setDropdownOpen(false)
                       }}
                     >
-                      All automations
+                      All Automations
                     </button>
                     {automations.map((a) => (
                       <button
