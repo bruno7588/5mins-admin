@@ -456,6 +456,7 @@
   flex-wrap: wrap;
 }
 
+
 .automations-search {
   display: flex;
   align-items: center;
@@ -511,6 +512,10 @@
   position: relative;
   width: 230px;
   flex-shrink: 0;
+}
+
+.automations-dropdown--state {
+  width: auto;
 }
 
 .automations-dropdown-trigger {
@@ -598,6 +603,19 @@
 
 .automations-listbox-item--selected:hover {
   background: var(--secondary-600);
+}
+
+.automations-filter-dropdowns {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+}
+
+.automations-filter-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-right: var(--space-xs);
 }
 
 /* ── Activity table cells ── */

@@ -16,7 +16,6 @@ import {
   ArrowUp2,
   ArrowLeft2,
   ArrowRight2,
-  Sort,
 } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
@@ -24,6 +23,7 @@ import './Automations.css'
 
 type Tab = 'manage' | 'activity'
 type SortDirection = 'asc' | 'desc'
+type StateFilter = 'all' | 'active' | 'inactive' | 'deleted'
 
 interface AutomationRow {
   id: string
@@ -133,11 +133,13 @@ function Automations() {
 
   // Activity tab state
   const [searchQuery, setSearchQuery] = useState('')
+  const [stateFilter, setStateFilter] = useState<StateFilter>('all')
   const [automationFilterId, setAutomationFilterId] = useState<string>('all')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
   const [page, setPage] = useState(1)
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const [openDropdown, setOpenDropdown] = useState<'state' | 'automation' | null>(null)
+  const stateDropdownRef = useRef<HTMLDivElement>(null)
+  const automationDropdownRef = useRef<HTMLDivElement>(null)
 
   // Manage tab row action menu
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
@@ -169,12 +171,21 @@ function Automations() {
     if (automationFilterId !== 'all') {
       rows = rows.filter((t) => t.automationId === automationFilterId)
     }
+    if (stateFilter !== 'all') {
+      rows = rows.filter((t) => {
+        const automation = automationsById.get(t.automationId)
+        if (stateFilter === 'deleted') return !automation
+        if (stateFilter === 'active') return !!automation && automation.active
+        if (stateFilter === 'inactive') return !!automation && !automation.active
+        return true
+      })
+    }
     rows = [...rows].sort((a, b) => {
       const cmp = a.triggeredAt.localeCompare(b.triggeredAt)
       return sortDirection === 'asc' ? cmp : -cmp
     })
     return rows
-  }, [searchQuery, automationFilterId, sortDirection])
+  }, [searchQuery, stateFilter, automationFilterId, sortDirection, automationsById])
 
   const totalRows = filteredTriggers.length
   const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE))
@@ -186,19 +197,20 @@ function Automations() {
   // Reset page when filters change
   useEffect(() => {
     setPage(1)
-  }, [searchQuery, automationFilterId, sortDirection])
+  }, [searchQuery, stateFilter, automationFilterId, sortDirection])
 
-  // Click-outside for dropdown
+  // Click-outside for filter dropdowns
   useEffect(() => {
-    if (!dropdownOpen) return
+    if (openDropdown === null) return
     function onMouseDown(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setDropdownOpen(false)
+      const ref = openDropdown === 'state' ? stateDropdownRef : automationDropdownRef
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpenDropdown(null)
       }
     }
     document.addEventListener('mousedown', onMouseDown)
     return () => document.removeEventListener('mousedown', onMouseDown)
-  }, [dropdownOpen])
+  }, [openDropdown])
 
   // Click-outside for row action menu
   useEffect(() => {
@@ -248,21 +260,38 @@ function Automations() {
 
   function clearFilters() {
     setSearchQuery('')
+    setStateFilter('all')
     setAutomationFilterId('all')
   }
 
   const hasAnyTriggers = mockTriggers.length > 0
   const hasActiveFilters =
-    searchQuery.trim() !== '' || automationFilterId !== 'all'
+    searchQuery.trim() !== '' || stateFilter !== 'all' || automationFilterId !== 'all'
   const currentMonthLabel = new Date().toLocaleDateString('en-US', {
     month: 'long',
     year: 'numeric',
   })
 
-  const dropdownLabel =
+  const stateDropdownLabel =
+    stateFilter === 'all'
+      ? 'All states'
+      : stateFilter === 'active'
+      ? 'Active'
+      : stateFilter === 'inactive'
+      ? 'Inactive'
+      : 'Deleted'
+
+  const automationDropdownLabel =
     automationFilterId === 'all'
       ? 'All Automations'
       : automationsById.get(automationFilterId)?.name ?? 'All Automations'
+
+  const stateOptions: { value: StateFilter; label: string }[] = [
+    { value: 'all', label: 'All states' },
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' },
+    { value: 'deleted', label: 'Deleted' },
+  ]
 
   return (
     <div className="automations-layout">
@@ -486,56 +515,99 @@ function Automations() {
                 )}
               </div>
 
-              <div
-                className={`automations-dropdown${dropdownOpen ? ' automations-dropdown--open' : ''}`}
-                ref={dropdownRef}
-              >
-                <button
-                  type="button"
-                  className="automations-dropdown-trigger"
-                  onClick={() => setDropdownOpen((o) => !o)}
-                  aria-haspopup="listbox"
-                  aria-expanded={dropdownOpen}
+              <div className="automations-filter-dropdowns">
+                <span className="automations-filter-label">Filter by</span>
+                {/* State filter */}
+                <div
+                  className={`automations-dropdown automations-dropdown--state${openDropdown === 'state' ? ' automations-dropdown--open' : ''}`}
+                  ref={stateDropdownRef}
                 >
-                  <Sort size={20} color="var(--text-secondary)" variant="Linear" />
-                  <span className="automations-dropdown-value">{dropdownLabel}</span>
-                  {dropdownOpen ? (
-                    <ArrowUp2 size={20} color="var(--text-secondary)" variant="Linear" />
-                  ) : (
-                    <ArrowDown2 size={20} color="var(--text-secondary)" variant="Linear" />
+                  <button
+                    type="button"
+                    className="automations-dropdown-trigger"
+                    onClick={() => setOpenDropdown((o) => (o === 'state' ? null : 'state'))}
+                    aria-haspopup="listbox"
+                    aria-expanded={openDropdown === 'state'}
+                  >
+                    <span className="automations-dropdown-value">{stateDropdownLabel}</span>
+                    {openDropdown === 'state' ? (
+                      <ArrowUp2 size={20} color="var(--text-secondary)" variant="Linear" />
+                    ) : (
+                      <ArrowDown2 size={20} color="var(--text-secondary)" variant="Linear" />
+                    )}
+                  </button>
+                  {openDropdown === 'state' && (
+                    <div className="automations-listbox" role="listbox">
+                      {stateOptions.map((opt) => (
+                        <button
+                          type="button"
+                          role="option"
+                          key={opt.value}
+                          aria-selected={stateFilter === opt.value}
+                          className={`automations-listbox-item${stateFilter === opt.value ? ' automations-listbox-item--selected' : ''}`}
+                          onClick={() => {
+                            setStateFilter(opt.value)
+                            setOpenDropdown(null)
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
                   )}
-                </button>
-                {dropdownOpen && (
-                  <div className="automations-listbox" role="listbox">
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={automationFilterId === 'all'}
-                      className={`automations-listbox-item${automationFilterId === 'all' ? ' automations-listbox-item--selected' : ''}`}
-                      onClick={() => {
-                        setAutomationFilterId('all')
-                        setDropdownOpen(false)
-                      }}
-                    >
-                      All Automations
-                    </button>
-                    {automations.map((a) => (
+                </div>
+
+                {/* Automation filter */}
+                <div
+                  className={`automations-dropdown${openDropdown === 'automation' ? ' automations-dropdown--open' : ''}`}
+                  ref={automationDropdownRef}
+                >
+                  <button
+                    type="button"
+                    className="automations-dropdown-trigger"
+                    onClick={() => setOpenDropdown((o) => (o === 'automation' ? null : 'automation'))}
+                    aria-haspopup="listbox"
+                    aria-expanded={openDropdown === 'automation'}
+                  >
+                    <span className="automations-dropdown-value">{automationDropdownLabel}</span>
+                    {openDropdown === 'automation' ? (
+                      <ArrowUp2 size={20} color="var(--text-secondary)" variant="Linear" />
+                    ) : (
+                      <ArrowDown2 size={20} color="var(--text-secondary)" variant="Linear" />
+                    )}
+                  </button>
+                  {openDropdown === 'automation' && (
+                    <div className="automations-listbox" role="listbox">
                       <button
                         type="button"
                         role="option"
-                        key={a.id}
-                        aria-selected={automationFilterId === a.id}
-                        className={`automations-listbox-item${automationFilterId === a.id ? ' automations-listbox-item--selected' : ''}`}
+                        aria-selected={automationFilterId === 'all'}
+                        className={`automations-listbox-item${automationFilterId === 'all' ? ' automations-listbox-item--selected' : ''}`}
                         onClick={() => {
-                          setAutomationFilterId(a.id)
-                          setDropdownOpen(false)
+                          setAutomationFilterId('all')
+                          setOpenDropdown(null)
                         }}
                       >
-                        {a.name}
+                        All Automations
                       </button>
-                    ))}
-                  </div>
-                )}
+                      {automations.map((a) => (
+                        <button
+                          type="button"
+                          role="option"
+                          key={a.id}
+                          aria-selected={automationFilterId === a.id}
+                          className={`automations-listbox-item${automationFilterId === a.id ? ' automations-listbox-item--selected' : ''}`}
+                          onClick={() => {
+                            setAutomationFilterId(a.id)
+                            setOpenDropdown(null)
+                          }}
+                        >
+                          {a.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             )}
@@ -619,6 +691,9 @@ function Automations() {
                               }`}
                             />
                             <span>{automation!.name}</span>
+                            {isInactive && (
+                              <span className="badge badge--informative" role="status">Inactive</span>
+                            )}
                           </>
                         )}
                       </div>
