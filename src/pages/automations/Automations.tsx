@@ -3,7 +3,7 @@ import {
   UserCirlceAdd,
   Medal,
   More,
-  UserTick,
+  Activity,
   Calendar,
   Flash,
   SearchNormal1,
@@ -307,7 +307,7 @@ function Automations() {
             <div className="automations-stat-cards">
               <div className="automations-stat-card">
                 <span className="automations-stat-icon">
-                  <UserTick size={40} color="var(--button-background)" variant="Linear" />
+                  <Activity size={40} color="var(--button-background)" variant="Linear" />
                 </span>
                 <div className="automations-stat-info">
                   <p className="automations-stat-label">Total triggers</p>
