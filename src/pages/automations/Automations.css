@@ -663,6 +663,10 @@
   color: var(--text-disabled);
 }
 
+.automations-automation-name--deleted {
+  text-decoration: line-through;
+}
+
 /* ===== Badge component (per docs/design-system/badges.md) ===== */
 .badge {
   display: inline-flex;

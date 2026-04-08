@@ -327,7 +327,7 @@ function Automations() {
           <div className="automations-title-group">
             <h2 className="automations-title">Automations</h2>
             <p className="automations-description">
-              Create and manage automation rules for course enrolments.{' '}
+              Manage enrollment automations and review trigger history.{' '}
               <a className="automations-description-link" href="#">
                 Here is how it works
               </a>
@@ -716,7 +716,9 @@ function Automations() {
                       <div className={automationCellClass}>
                         {isDeleted ? (
                           <>
-                            <span>{row.automationNameSnapshot ?? 'Deleted automation'}</span>
+                            <span className="automations-automation-name--deleted">
+                              {row.automationNameSnapshot ?? 'Deleted automation'}
+                            </span>
                             <span className="badge badge--informative" role="status">Deleted</span>
                           </>
                         ) : (
