@@ -9,6 +9,7 @@ This directory contains the complete 5Mins.ai design system documentation.
 | `design-system-guidelines.md` | **Consolidated reference** — all tokens, quick decisions | Always read this first for any UI work |
 | `buttons.md` | Button variants, semantic types, sizes, states, React implementation | Building any button or CTA |
 | `badges.md` | Badge types, colors, icons, usage patterns | Adding status indicators, tags, or pills |
+| `chips.md` | Chip / filter-tag component — all variants (default, hover, selected, disabled), optional left icon (user) and right icon (close/X), dark-theme design tokens, React implementation | Adding filter chips, selection pills, dismissible tags, or any small pill-shaped interactive label |
 | `headers.md` | Page Header and Section Header with all sub-elements | Building page layouts, navigation, tabs, chips |
 | `overlays.md` | Dialog, Modal, Side Drawer — specs, animations, accessibility | Building any overlay, popup, or panel |
 | `lesson-cards.md` | Lesson card views, states, quiz badges, progress bars | Building lesson lists, course catalogs |

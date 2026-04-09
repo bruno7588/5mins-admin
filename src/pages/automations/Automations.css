@@ -370,6 +370,49 @@
   background: var(--neutral-50);
 }
 
+.automations-action-menu-item:disabled {
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  position: relative;
+}
+
+.automations-action-menu-item:disabled:hover {
+  background: transparent;
+}
+
+/* CSS tooltip for disabled menu items — appears to the left of the row.
+   Uses data-tooltip attribute so the message is content-driven from JSX. */
+.automations-action-menu-item[disabled][data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 10px;
+  background: var(--neutral-800, #20222a);
+  color: var(--neutral-0, #ffffff);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  border-radius: var(--radius-xs);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(32, 34, 42, 0.15);
+}
+
+.automations-action-menu-item[disabled][data-tooltip]:hover::before {
+  content: '';
+  position: absolute;
+  right: calc(100% + 2px);
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-left-color: var(--neutral-800, #20222a);
+  pointer-events: none;
+  z-index: 10;
+}
+
 .automations-action-menu-item--danger {
   color: var(--danger-500);
 }

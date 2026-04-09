@@ -1,0 +1,89 @@
+/* Search component — per docs/design-system/search.md */
+
+.search {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  background: var(--input-background);
+  cursor: text;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+/* ── Size M ── */
+.search--m {
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+}
+
+/* ── Size L ── */
+.search--l {
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 16px;
+}
+
+/* ── Hover ── */
+.search:hover {
+  background: var(--input-background-hover);
+  border-color: var(--border-hover);
+}
+
+/* ── Active / Focused ── */
+.search:focus-within {
+  background: var(--input-background);
+  border-color: var(--secondary-500);
+}
+
+/* ── Search icon ── */
+.search__icon {
+  flex-shrink: 0;
+}
+
+/* ── Input ── */
+.search__input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.search--m .search__input {
+  font-size: 14px;
+}
+
+.search--l .search__input {
+  font-size: 16px;
+}
+
+.search__input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* ── Clear button ── */
+.search__clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.search__clear:hover {
+  opacity: 0.7;
+}
+
+.search__clear:focus-visible {
+  outline: 2px solid var(--secondary-500);
+  border-radius: 4px;
+}

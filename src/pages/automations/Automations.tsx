@@ -19,20 +19,30 @@ import {
 } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
+import ForceTriggerModal from './ForceTriggerModal'
+import ToastContainer, { useToast } from '../../components/Toast/Toast'
 import './Automations.css'
 
 type Tab = 'manage' | 'activity'
 type SortDirection = 'asc' | 'desc'
 type StateFilter = 'all' | 'active' | 'inactive' | 'deleted'
 
-interface AutomationRow {
+export interface AutomationCourse {
+  id: string
+  name: string
+  delay: string // free-text e.g. "0 days after registration", "1 day after previous course"
+  dueDate?: string
+}
+
+export interface AutomationRow {
   id: string
   name: string
   lastUpdated: string
   active: boolean
+  courses: AutomationCourse[]
 }
 
-interface User {
+export interface User {
   id: string
   name: string
   email: string
@@ -50,21 +60,191 @@ interface TriggerRow {
   triggeredAt: string // ISO date
 }
 
+function mkCourses(
+  prefix: string,
+  rows: Array<[name: string, delay: string]>,
+): AutomationCourse[] {
+  return rows.map(([name, delay], i) => ({ id: `${prefix}-c${i + 1}`, name, delay }))
+}
+
 const mockAutomations: AutomationRow[] = [
-  { id: '1', name: 'New Hire Compliance Onboarding', lastUpdated: 'Sep 30, 2024', active: true },
-  { id: '2', name: 'Quarterly Refresher — Food Safety', lastUpdated: 'Sep 28, 2024', active: true },
-  { id: '3', name: 'Annual Anti-Harassment Training', lastUpdated: 'Sep 24, 2024', active: true },
-  { id: '4', name: 'GDPR Privacy Awareness', lastUpdated: 'Sep 22, 2024', active: true },
-  { id: '5', name: 'Cybersecurity Essentials Q3', lastUpdated: 'Sep 18, 2024', active: true },
-  { id: '6', name: 'Manager 30-Day Check-in', lastUpdated: 'Sep 12, 2024', active: true },
-  { id: '7', name: 'Health & Safety Briefing', lastUpdated: 'Sep 5, 2024', active: true },
-  { id: '8', name: 'Diversity & Inclusion 2024', lastUpdated: 'Aug 30, 2024', active: false },
-  { id: '9', name: 'Remote Work Best Practices', lastUpdated: 'Aug 22, 2024', active: false },
-  { id: '10', name: 'Code of Conduct Refresher', lastUpdated: 'Aug 14, 2024', active: false },
-  { id: '11', name: 'Sales Onboarding Sprint', lastUpdated: 'Aug 8, 2024', active: false },
-  { id: '12', name: 'Customer Service Standards', lastUpdated: 'Jul 30, 2024', active: false },
-  { id: '13', name: 'Fire Safety Drill Series', lastUpdated: 'Jul 21, 2024', active: false },
-  { id: '14', name: 'Product Knowledge Bootcamp', lastUpdated: 'Jul 12, 2024', active: false },
+  {
+    id: '1',
+    name: 'New Hire Compliance Onboarding',
+    lastUpdated: 'Sep 30, 2024',
+    active: true,
+    courses: mkCourses('1', [
+      ['Welcome to the Company', '0 days after registration'],
+      ['Code of Conduct Essentials', '1 day after previous course'],
+      ['Workplace Health & Safety', '1 day after previous course'],
+      ['Information Security 101', '2 days after previous course'],
+      ['Anti-Harassment Foundations', '2 days after previous course'],
+      ['Data Privacy & GDPR Basics', '3 days after previous course'],
+      ['Diversity, Equity & Inclusion', '3 days after previous course'],
+      ['Anti-Bribery & Corruption', '4 days after previous course'],
+      ['Whistleblower Policy Overview', '4 days after previous course'],
+      ['Conflict of Interest', '5 days after previous course'],
+      ['IT Acceptable Use Policy', '5 days after previous course'],
+      ['Email & Communication Standards', '6 days after previous course'],
+      ['Remote Work Guidelines', '6 days after previous course'],
+      ['Expense Policy Walkthrough', '7 days after previous course'],
+      ['Travel Policy Essentials', '7 days after previous course'],
+      ['Workplace Accessibility', '8 days after previous course'],
+      ['Mental Health Awareness', '8 days after previous course'],
+      ['Your First 30 Days', '14 days after previous course'],
+    ]),
+  },
+  {
+    id: '2',
+    name: 'Quarterly Refresher — Food Safety',
+    lastUpdated: 'Sep 28, 2024',
+    active: true,
+    courses: mkCourses('2', [
+      ['HACCP Refresher', '0 days after registration'],
+      ['Allergen Awareness', '2 days after previous course'],
+      ['Cross-Contamination Prevention', '2 days after previous course'],
+      ['Personal Hygiene Standards', '3 days after previous course'],
+    ]),
+  },
+  {
+    id: '3',
+    name: 'Annual Anti-Harassment Training',
+    lastUpdated: 'Sep 24, 2024',
+    active: true,
+    courses: mkCourses('3', [
+      ['Recognising Harassment', '0 days after registration'],
+      ['Bystander Intervention', '3 days after previous course'],
+      ['Reporting Procedures', '3 days after previous course'],
+    ]),
+  },
+  {
+    id: '4',
+    name: 'GDPR Privacy Awareness',
+    lastUpdated: 'Sep 22, 2024',
+    active: true,
+    courses: mkCourses('4', [
+      ['GDPR Fundamentals', '0 days after registration'],
+      ['Handling Personal Data', '2 days after previous course'],
+      ['Data Subject Rights', '2 days after previous course'],
+      ['Incident Response Basics', '3 days after previous course'],
+      ['Cross-Border Data Transfers', '3 days after previous course'],
+    ]),
+  },
+  {
+    id: '5',
+    name: 'Cybersecurity Essentials Q3',
+    lastUpdated: 'Sep 18, 2024',
+    active: true,
+    courses: mkCourses('5', [
+      ['Phishing & Social Engineering', '0 days after registration'],
+      ['Password & MFA Best Practices', '2 days after previous course'],
+      ['Device Security', '2 days after previous course'],
+      ['Secure Remote Work', '3 days after previous course'],
+      ['Reporting Incidents', '3 days after previous course'],
+      ['Cloud Storage Hygiene', '4 days after previous course'],
+    ]),
+  },
+  {
+    id: '6',
+    name: 'Manager 30-Day Check-in',
+    lastUpdated: 'Sep 12, 2024',
+    active: true,
+    courses: mkCourses('6', [
+      ['Coaching Fundamentals', '0 days after registration'],
+      ['Giving Effective Feedback', '3 days after previous course'],
+      ['Setting 30/60/90 Goals', '3 days after previous course'],
+    ]),
+  },
+  {
+    id: '7',
+    name: 'Health & Safety Briefing',
+    lastUpdated: 'Sep 5, 2024',
+    active: true,
+    courses: mkCourses('7', [
+      ['Health & Safety: The Workplace (UK)', '0 days after registration'],
+      ['Health & Safety: Working From Home (UK)', '1 day after previous course'],
+      ['First Aid Essentials', '2 days after previous course'],
+      ['Emergency Evacuation Procedures', '3 days after previous course'],
+    ]),
+  },
+  {
+    id: '8',
+    name: 'Diversity & Inclusion 2024',
+    lastUpdated: 'Aug 30, 2024',
+    active: false,
+    courses: mkCourses('8', [
+      ['Inclusive Language', '0 days after registration'],
+      ['Unconscious Bias', '2 days after previous course'],
+      ['Allyship in Practice', '2 days after previous course'],
+    ]),
+  },
+  {
+    id: '9',
+    name: 'Remote Work Best Practices',
+    lastUpdated: 'Aug 22, 2024',
+    active: false,
+    courses: mkCourses('9', [
+      ['Asynchronous Communication', '0 days after registration'],
+      ['Home Office Ergonomics', '2 days after previous course'],
+      ['Time Management at Home', '2 days after previous course'],
+    ]),
+  },
+  {
+    id: '10',
+    name: 'Code of Conduct Refresher',
+    lastUpdated: 'Aug 14, 2024',
+    active: false,
+    courses: mkCourses('10', [['Code of Conduct 2024 Update', '0 days after registration']]),
+  },
+  {
+    id: '11',
+    name: 'Sales Onboarding Sprint',
+    lastUpdated: 'Aug 8, 2024',
+    active: false,
+    courses: mkCourses('11', [
+      ['Product Overview', '0 days after registration'],
+      ['Discovery Calls', '1 day after previous course'],
+      ['Objection Handling', '2 days after previous course'],
+      ['Closing Techniques', '2 days after previous course'],
+      ['CRM Hygiene', '3 days after previous course'],
+    ]),
+  },
+  {
+    id: '12',
+    name: 'Customer Service Standards',
+    lastUpdated: 'Jul 30, 2024',
+    active: false,
+    courses: mkCourses('12', [
+      ['Service Mindset', '0 days after registration'],
+      ['Handling Difficult Customers', '2 days after previous course'],
+      ['Tone & Empathy', '2 days after previous course'],
+      ['Escalation Procedures', '3 days after previous course'],
+    ]),
+  },
+  {
+    id: '13',
+    name: 'Fire Safety Drill Series',
+    lastUpdated: 'Jul 21, 2024',
+    active: false,
+    courses: mkCourses('13', [
+      ['Fire Drill Procedures', '0 days after registration'],
+      ['Extinguisher Use', '2 days after previous course'],
+    ]),
+  },
+  {
+    id: '14',
+    name: 'Product Knowledge Bootcamp',
+    lastUpdated: 'Jul 12, 2024',
+    active: false,
+    courses: mkCourses('14', [
+      ['Product Lineup', '0 days after registration'],
+      ['Pricing & Plans', '1 day after previous course'],
+      ['Competitive Landscape', '2 days after previous course'],
+      ['Customer Personas', '2 days after previous course'],
+      ['Feature Deep Dives', '3 days after previous course'],
+      ['Roadmap Highlights', '3 days after previous course'],
+    ]),
+  },
 ]
 
 const PAGE_SIZE = 10
@@ -144,9 +324,8 @@ function Automations() {
   const [automations, setAutomations] = useState<AutomationRow[]>(
     demoMode === 'no-automations' ? [] : mockAutomations,
   )
-  const effectiveTriggers = useMemo(
-    () => (demoMode === 'no-automations' || demoMode === 'no-triggers' ? [] : mockTriggers),
-    [demoMode],
+  const [effectiveTriggers, setEffectiveTriggers] = useState<TriggerRow[]>(
+    demoMode === 'no-automations' || demoMode === 'no-triggers' ? [] : mockTriggers,
   )
   // Derived stats — kept in sync with effectiveTriggers so demo modes
   // and real-world empty accounts both show 0 instead of stale constants.
@@ -174,6 +353,37 @@ function Automations() {
   // Delete confirmation modal
   const [pendingDelete, setPendingDelete] = useState<AutomationRow | null>(null)
   const [confirmInput, setConfirmInput] = useState('')
+
+  // Force trigger modal
+  const [forceTriggerAutomation, setForceTriggerAutomation] = useState<AutomationRow | null>(null)
+
+  // Toasts
+  const { toasts, show: showToast } = useToast()
+
+  function handleForceTrigger(automationId: string, userIds: string[]) {
+    const automation = automations.find((a) => a.id === automationId)
+    if (!automation || userIds.length === 0) return
+
+    // TODO: Replace with actual API call — handle partial failure (some users
+    // succeed, some fail). For the prototype we simulate full success.
+    const now = new Date().toISOString().slice(0, 10) // YYYY-MM-DD to match existing rows
+    const newRows: TriggerRow[] = userIds
+      .map((id) => mockUsers.find((u) => u.id === id))
+      .filter((u): u is User => !!u)
+      .map((user, i) => ({
+        id: `t-ft-${Date.now()}-${i}`,
+        user,
+        automationId,
+        triggeredAt: now,
+      }))
+
+    setEffectiveTriggers((rows) => [...newRows, ...rows])
+    setForceTriggerAutomation(null)
+    showToast(
+      'success',
+      `Automation triggered for ${userIds.length} ${userIds.length === 1 ? 'user' : 'users'}`,
+    )
+  }
 
   const activeAutomationsCount = automations.filter((a) => a.active).length
 
@@ -441,6 +651,25 @@ function Automations() {
                           >
                             <Edit2 size={20} color="var(--text-secondary)" variant="Linear" />
                             Edit automation
+                          </button>
+                          <button
+                            type="button"
+                            className="automations-action-menu-item"
+                            role="menuitem"
+                            disabled={!row.active}
+                            data-tooltip={row.active ? undefined : 'Automation must be active'}
+                            onClick={() => {
+                              if (!row.active) return
+                              setOpenMenuId(null)
+                              setForceTriggerAutomation(row)
+                            }}
+                          >
+                            <Flash
+                              size={20}
+                              color={row.active ? 'var(--text-secondary)' : 'var(--text-disabled)'}
+                              variant="Linear"
+                            />
+                            Force trigger
                           </button>
                           <button
                             type="button"
@@ -826,6 +1055,24 @@ function Automations() {
           </>
         )}
       </ConfirmModal>
+
+      <ForceTriggerModal
+        automation={forceTriggerAutomation}
+        users={mockUsers}
+        previouslyTriggeredUserIds={
+          forceTriggerAutomation
+            ? new Set(
+                effectiveTriggers
+                  .filter((t) => t.automationId === forceTriggerAutomation.id)
+                  .map((t) => t.user.id),
+              )
+            : new Set()
+        }
+        onClose={() => setForceTriggerAutomation(null)}
+        onTrigger={handleForceTrigger}
+      />
+
+      <ToastContainer toasts={toasts} />
     </div>
   )
 }
