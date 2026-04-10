@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Refresh } from 'iconsax-react'
+import { ArrowUp2, Refresh } from 'iconsax-react'
 import CloseButton from '../../components/CloseButton/CloseButton'
 import Search from '../../components/Search/Search'
 import Alert from '../../components/Alert/Alert'
@@ -99,17 +99,14 @@ function ForceTriggerModal({
   if (!automation) return null
 
   const showResults = searchFocused && searchQuery.trim().length > 0
-  const triggerLabel = `Trigger for ${selectedUsers.length} ${
+  const triggerLabel = `Run for ${selectedUsers.length} ${
     selectedUsers.length === 1 ? 'user' : 'users'
   }`
   const COURSE_PREVIEW_COUNT = 3
-  const allCourseBullets = automation.courses.map(
-    (c) => `${c.name} — ${c.delay}`,
-  )
-  const courseBullets =
-    coursesExpanded || allCourseBullets.length <= COURSE_PREVIEW_COUNT
-      ? allCourseBullets
-      : allCourseBullets.slice(0, COURSE_PREVIEW_COUNT)
+  const visibleCourses =
+    coursesExpanded || automation.courses.length <= COURSE_PREVIEW_COUNT
+      ? automation.courses
+      : automation.courses.slice(0, COURSE_PREVIEW_COUNT)
   const retriggerCount = selectedUsers.filter((u) =>
     previouslyTriggeredUserIds.has(u.id),
   ).length
@@ -148,31 +145,39 @@ function ForceTriggerModal({
 
         {/* Body */}
         <div className="force-trigger-body">
-          {/* Course summary as Callout */}
+          {/* Course list */}
           <div className="force-trigger-courses">
-            <Alert
-              type="Callout"
-              title={`This will enrol users in ${automation.courses.length} ${
-                automation.courses.length === 1 ? 'course' : 'courses'
-              }`}
-              bullets={courseBullets}
-            />
-            {allCourseBullets.length > COURSE_PREVIEW_COUNT && (
-              <button
-                type="button"
-                className="force-trigger-toggle-courses"
-                onClick={() => setCoursesExpanded((v) => !v)}
-              >
-                {coursesExpanded
-                  ? 'Show less'
-                  : `Show all ${allCourseBullets.length} courses`}
-              </button>
-            )}
+            <p className="force-trigger-courses-label">
+              Users will be enrolled in these courses
+            </p>
+            <div className="force-trigger-courses-card">
+              {visibleCourses.map((c, i) => (
+                <div key={i} className="force-trigger-course-row">
+                  <span className="force-trigger-course-badge">{i + 1}</span>
+                  <span className="force-trigger-course-name">{c.name}</span>
+                </div>
+              ))}
+              {automation.courses.length > COURSE_PREVIEW_COUNT && (
+                <button
+                  type="button"
+                  className="force-trigger-toggle-courses"
+                  onClick={() => setCoursesExpanded((v) => !v)}
+                >
+                  {coursesExpanded ? 'View less' : `View all ${automation.courses.length} courses`}
+                  <ArrowUp2
+                    size={16}
+                    color="currentColor"
+                    variant="Linear"
+                    className={`force-trigger-toggle-chevron${coursesExpanded ? '' : ' force-trigger-toggle-chevron--down'}`}
+                  />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* User picker */}
           <div className="force-trigger-section">
-            <p className="force-trigger-section-label">Select users to trigger</p>
+            <p className="force-trigger-section-label">Select users</p>
             <div className="force-trigger-search-wrapper" ref={searchWrapperRef}>
               <Search
                 size="M"
@@ -206,7 +211,7 @@ function ForceTriggerModal({
                           {wasTriggered && (
                             <span
                               className="force-trigger-result-marker"
-                              title="Already triggered by this automation"
+                              title="Already enrolled by this automation"
                             >
                               <Refresh
                                 size={16}
@@ -245,7 +250,7 @@ function ForceTriggerModal({
               icon
               message={`${retriggerCount} of the selected ${
                 retriggerCount === 1 ? 'user has' : 'users have'
-              } already been triggered by this automation. Their enrolments will be reset and the trigger time will be updated to now.`}
+              } already been enrolled by this automation. Their progress will be reset and enrolment will restart from the beginning.`}
             />
           )}
 
