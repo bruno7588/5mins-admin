@@ -163,7 +163,7 @@ function ForceTriggerModal({
                   className="force-trigger-toggle-courses"
                   onClick={() => setCoursesExpanded((v) => !v)}
                 >
-                  {coursesExpanded ? 'View less' : `View all ${automation.courses.length} courses`}
+                  {coursesExpanded ? 'View less' : 'View all'}
                   <ArrowUp2
                     size={16}
                     color="currentColor"
