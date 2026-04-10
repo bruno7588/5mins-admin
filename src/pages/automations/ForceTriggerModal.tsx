@@ -26,6 +26,7 @@ function ForceTriggerModal({
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
   const [searchFocused, setSearchFocused] = useState(false)
+  const [coursesExpanded, setCoursesExpanded] = useState(false)
   const searchWrapperRef = useRef<HTMLDivElement>(null)
 
   // Reset state every time the drawer opens for a (new) automation.
@@ -35,6 +36,7 @@ function ForceTriggerModal({
       setSearchQuery('')
       setSelectedUserIds([])
       setSearchFocused(false)
+      setCoursesExpanded(false)
     }
   }, [automation])
 
@@ -100,9 +102,14 @@ function ForceTriggerModal({
   const triggerLabel = `Trigger for ${selectedUsers.length} ${
     selectedUsers.length === 1 ? 'user' : 'users'
   }`
-  const courseBullets = automation.courses.map(
+  const COURSE_PREVIEW_COUNT = 3
+  const allCourseBullets = automation.courses.map(
     (c) => `${c.name} — ${c.delay}`,
   )
+  const courseBullets =
+    coursesExpanded || allCourseBullets.length <= COURSE_PREVIEW_COUNT
+      ? allCourseBullets
+      : allCourseBullets.slice(0, COURSE_PREVIEW_COUNT)
   const retriggerCount = selectedUsers.filter((u) =>
     previouslyTriggeredUserIds.has(u.id),
   ).length
@@ -125,17 +132,15 @@ function ForceTriggerModal({
         aria-modal="true"
         aria-labelledby="force-trigger-title"
       >
-        {/* Header */}
+        {/* Header — Section Header pattern per spec */}
         <div className="force-trigger-header">
-          <div className="force-trigger-header-row">
-            <div className="force-trigger-header-text">
-              <h3 id="force-trigger-title" className="force-trigger-title">
-                Force trigger: {automation.name}
-              </h3>
-              <p className="force-trigger-subtitle">
-                Manually enrol selected users. Automation rules will be skipped.
-              </p>
-            </div>
+          <div className="force-trigger-headline">
+            <h2 id="force-trigger-title" className="force-trigger-title">
+              Trigger automation
+            </h2>
+            <p className="force-trigger-subtitle">
+              {automation.name}
+            </p>
             <CloseButton onClick={handleClose} className="force-trigger-close" />
           </div>
           <div className="force-trigger-divider" />
@@ -144,13 +149,26 @@ function ForceTriggerModal({
         {/* Body */}
         <div className="force-trigger-body">
           {/* Course summary as Callout */}
-          <Alert
-            type="Callout"
-            title={`This will enrol users in ${automation.courses.length} ${
-              automation.courses.length === 1 ? 'course' : 'courses'
-            }`}
-            bullets={courseBullets}
-          />
+          <div className="force-trigger-courses">
+            <Alert
+              type="Callout"
+              title={`This will enrol users in ${automation.courses.length} ${
+                automation.courses.length === 1 ? 'course' : 'courses'
+              }`}
+              bullets={courseBullets}
+            />
+            {allCourseBullets.length > COURSE_PREVIEW_COUNT && (
+              <button
+                type="button"
+                className="force-trigger-toggle-courses"
+                onClick={() => setCoursesExpanded((v) => !v)}
+              >
+                {coursesExpanded
+                  ? 'Show less'
+                  : `Show all ${allCourseBullets.length} courses`}
+              </button>
+            )}
+          </div>
 
           {/* User picker */}
           <div className="force-trigger-section">
@@ -238,23 +256,19 @@ function ForceTriggerModal({
               keep the modal open so the admin can investigate. */}
         </div>
 
-        {/* Footer */}
+        {/* Footer — sticky per spec */}
         <div className="force-trigger-footer">
-          <button
-            type="button"
-            className="confirm-modal-btn confirm-modal-btn--primary"
-            disabled={selectedUsers.length === 0}
-            onClick={handleTrigger}
-          >
-            {triggerLabel}
-          </button>
-          <button
-            type="button"
-            className="confirm-modal-btn confirm-modal-btn--outlined-neutral"
-            onClick={handleClose}
-          >
-            Cancel
-          </button>
+          <div className="force-trigger-footer-divider" />
+          <div className="force-trigger-footer-buttons">
+            <button
+              type="button"
+              className="force-trigger-btn-primary"
+              disabled={selectedUsers.length === 0}
+              onClick={handleTrigger}
+            >
+              {triggerLabel}
+            </button>
+          </div>
         </div>
       </aside>
     </>

@@ -28,6 +28,7 @@ When building any UI component, feature, or screen, you MUST read the relevant d
    - `docs/design-system/file-uploader.md` - File upload component — two sizes (L/S), all five states (Enabled, Hover, Error, Uploading, Filled), circular progress, filename display, Preview + Change File CTAs | Any file input, drag-and-drop zone, CSV import, document or media upload
    - `docs/design-system/alerts.md` — Alert and Callout banner — both types, all prop combos, CSS, React implementation | Building any inline notification, warning banner, callout, or info strip
    - `docs/design-system/search.md` — Search input — two sizes (M/L), three states (Enabled, Hover, Active), filled/empty modes, clear button | Building any search field, filter input, or keyword search bar
+   - `docs/design-system/tooltip.md` — Tooltip component — 4 positions (Top/Bottom/Left/Right), 3 alignments (Center/Start/End), optional info icon anchor, caret, dark background, max-width 288px, React implementation | Any tooltip, contextual hint, helper text on hover/focus, or info icon with floating label
 
 ### Strict rules
 
