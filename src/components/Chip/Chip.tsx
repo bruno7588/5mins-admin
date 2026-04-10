@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import { User } from 'iconsax-react'
 import './Chip.css'
 
@@ -6,7 +7,9 @@ interface ChipProps {
   selected?: boolean
   disabled?: boolean
   iconLeft?: boolean
+  customIconLeft?: ReactNode
   iconRight?: boolean
+  variant?: 'default' | 'warning'
   onClick?: () => void
   onDismiss?: () => void
   className?: string
@@ -17,7 +20,9 @@ function Chip({
   selected = false,
   disabled = false,
   iconLeft = false,
+  customIconLeft,
   iconRight = false,
+  variant = 'default',
   onClick,
   onDismiss,
   className = '',
@@ -32,10 +37,11 @@ function Chip({
     'chip',
     selected && 'chip--selected',
     disabled && 'chip--disabled',
-    iconLeft && iconRight && 'chip--icon-both',
-    iconLeft && !iconRight && 'chip--icon-left',
-    iconRight && !iconLeft && 'chip--icon-right',
-    !iconLeft && !iconRight && 'chip--no-icons',
+    (iconLeft || customIconLeft) && iconRight && 'chip--icon-both',
+    (iconLeft || customIconLeft) && !iconRight && 'chip--icon-left',
+    iconRight && !iconLeft && !customIconLeft && 'chip--icon-right',
+    !iconLeft && !customIconLeft && !iconRight && 'chip--no-icons',
+    variant === 'warning' && 'chip--warning',
     className,
   ]
     .filter(Boolean)
@@ -50,7 +56,7 @@ function Chip({
       aria-pressed={onClick ? selected : undefined}
       onClick={disabled ? undefined : onClick}
     >
-      {iconLeft && <User size={16} color={iconColor} variant="Linear" />}
+      {customIconLeft ? customIconLeft : iconLeft && <User size={16} color={iconColor} variant="Linear" />}
       <span className="chip__label">{label}</span>
       {iconRight && (
         <button
@@ -72,11 +78,10 @@ function Chip({
             aria-hidden="true"
           >
             <path
-              d="M12 4L4 12M4 4L12 12"
+              d="M11 5L5 11M5 5L11 11"
               stroke={iconColor}
               strokeWidth="1.5"
               strokeLinecap="round"
-              strokeLinejoin="round"
             />
           </svg>
         </button>

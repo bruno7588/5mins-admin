@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { SearchNormal1, CloseCircle } from 'iconsax-react'
+import { SearchNormal1, Add } from 'iconsax-react'
 import './Search.css'
 
 export type SearchSize = 'M' | 'L'
@@ -73,10 +73,11 @@ function Search({
           }}
           aria-label="Clear search"
         >
-          <CloseCircle
+          <Add
             size={clearSize}
-            variant="Outline"
             color="var(--text-tertiary)"
+            variant="Linear"
+            style={{ transform: 'rotate(45deg)' }}
           />
         </button>
       )}

@@ -109,7 +109,6 @@
   flex: 1 0 0;
   min-height: 0;
   width: 100%;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: var(--ml, 20px);
@@ -220,7 +219,9 @@
 .force-trigger-search-wrapper {
   position: relative;
   width: 100%;
+  z-index: 2;
 }
+
 
 /* ===== User picker — results dropdown ===== */
 .force-trigger-results {
@@ -229,13 +230,16 @@
   left: 0;
   right: 0;
   z-index: 10;
-  max-height: 280px;
-  overflow-y: auto;
   background: var(--neutral-0);
   border: 1px solid var(--neutral-100);
   border-radius: var(--radius-s, 8px);
   box-shadow: 0 8px 24px rgba(32, 34, 42, 0.12);
   padding: var(--xs, 4px);
+}
+
+.force-trigger-results-list {
+  max-height: 280px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -288,17 +292,12 @@
   line-height: 1.4;
 }
 
-.force-trigger-result-marker {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
 
-/* ===== Selected user chips ===== */
+/* ===== Selected user badges ===== */
 .force-trigger-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--xs, 4px);
+  gap: var(--sm, 12px);
   margin-top: var(--xs, 4px);
 }
 

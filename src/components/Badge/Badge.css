@@ -1,0 +1,52 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: var(--xxl, 40px);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.badge--icon {
+  gap: 4px;
+}
+
+.badge__icon {
+  display: flex;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.badge--success      { background: rgba(24, 169, 87, 0.16);  color: var(--text-success, #18A957); }
+.badge--warning      { background: rgba(255, 165, 56, 0.16); color: var(--text-warning, #664B16); }
+.badge--error        { background: rgba(223, 22, 66, 0.16);  color: var(--text-error, #E95C7B); }
+.badge--in-progress  { background: rgba(0, 206, 230, 0.16);  color: var(--text-progress, #00CEE6); }
+.badge--informative  { background: var(--input-background, rgba(69, 76, 94, 0.16)); color: var(--text-secondary, #BFC2CC); }
+.badge--quiz         { background: rgba(99, 104, 219, 0.16); color: var(--text-quiz, #FFDBAF); }
+.badge--new          { background: var(--danger-400, #E95C7B); color: var(--neutral-25, #F9F9FA); }
+
+/* Dismissible badge — has close button */
+.badge--dismissible {
+  gap: 4px;
+}
+
+.badge__dismiss {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.badge__dismiss:hover {
+  opacity: 0.7;
+}

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowUp2, Refresh } from 'iconsax-react'
+import { ArrowUp2, Flash, Repeat } from 'iconsax-react'
 import CloseButton from '../../components/CloseButton/CloseButton'
 import Search from '../../components/Search/Search'
-import Alert from '../../components/Alert/Alert'
-import Chip from '../../components/Chip/Chip'
+import Badge from '../../components/Badge/Badge'
+import Tooltip from '../../components/Tooltip/Tooltip'
 import type { AutomationRow, User } from './Automations'
 import './ForceTriggerModal.css'
 
@@ -78,13 +78,14 @@ function ForceTriggerModal({
 
   const filteredResults = useMemo(() => {
     const q = searchQuery.trim().toLowerCase()
-    if (!q) return []
     const selectedSet = new Set(selectedUserIds)
-    return users.filter(
-      (u) =>
-        !selectedSet.has(u.id) &&
-        (u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)),
-    )
+    return users
+      .filter(
+        (u) =>
+          !selectedSet.has(u.id) &&
+          (!q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)),
+      )
+      .sort((a, b) => a.name.localeCompare(b.name))
   }, [searchQuery, selectedUserIds, users])
 
   function selectUser(userId: string) {
@@ -98,7 +99,7 @@ function ForceTriggerModal({
 
   if (!automation) return null
 
-  const showResults = searchFocused && searchQuery.trim().length > 0
+  const showResults = searchFocused && filteredResults.length > 0
   const triggerLabel = `Run for ${selectedUsers.length} ${
     selectedUsers.length === 1 ? 'user' : 'users'
   }`
@@ -182,77 +183,70 @@ function ForceTriggerModal({
               <Search
                 size="M"
                 value={searchQuery}
-                placeholder="Search users by name or email"
+                placeholder="Search by name or email"
                 onChange={setSearchQuery}
                 onFocus={() => setSearchFocused(true)}
               />
               {showResults && (
                 <div className="force-trigger-results" role="listbox">
-                  {filteredResults.length === 0 ? (
-                    <div className="force-trigger-results-empty">
-                      No users match "{searchQuery}"
-                    </div>
-                  ) : (
-                    filteredResults.map((user) => {
-                      const wasTriggered = previouslyTriggeredUserIds.has(user.id)
-                      return (
-                        <button
-                          key={user.id}
-                          type="button"
-                          role="option"
-                          aria-selected={false}
-                          className="force-trigger-result"
-                          onClick={() => selectUser(user.id)}
-                        >
-                          <div className="force-trigger-result-info">
-                            <span className="force-trigger-result-name">{user.name}</span>
-                            <span className="force-trigger-result-email">{user.email}</span>
-                          </div>
-                          {wasTriggered && (
-                            <span
-                              className="force-trigger-result-marker"
-                              title="Already enrolled by this automation"
-                            >
-                              <Refresh
-                                size={16}
-                                color="var(--text-tertiary)"
-                                variant="Linear"
-                              />
-                            </span>
-                          )}
-                        </button>
-                      )
-                    })
-                  )}
+                  <div className="force-trigger-results-list">
+                    {filteredResults.length === 0 ? (
+                      <div className="force-trigger-results-empty">
+                        No users match "{searchQuery}"
+                      </div>
+                    ) : (
+                      filteredResults.map((user) => {
+                        const wasTriggered = previouslyTriggeredUserIds.has(user.id)
+                        return (
+                          <button
+                            key={user.id}
+                            type="button"
+                            role="option"
+                            aria-selected={false}
+                            className="force-trigger-result"
+                            onClick={() => selectUser(user.id)}
+                          >
+                            <div className="force-trigger-result-info">
+                              <span className="force-trigger-result-name">{user.name}</span>
+                              <span className="force-trigger-result-email">{user.email}</span>
+                            </div>
+                            {wasTriggered && (
+                              <Tooltip
+                                text="This user has already been enrolled. Selecting them will restart their enrolment."
+                                position="Top"
+                                alignment="End"
+                                icon={false}
+                              >
+                                <Badge type="informative" customIcon={<Flash size={16} color="currentColor" variant="Linear" />} label="Enrolled" />
+                              </Tooltip>
+                            )}
+                          </button>
+                        )
+                      })
+                    )}
+                  </div>
                 </div>
               )}
             </div>
 
             {selectedUsers.length > 0 && (
               <div className="force-trigger-chips">
-                {selectedUsers.map((user) => (
-                  <Chip
-                    key={user.id}
-                    label={user.name}
-                    iconLeft
-                    iconRight
-                    onDismiss={() => removeUser(user.id)}
-                  />
-                ))}
+                {selectedUsers.map((user) => {
+                  const wasEnrolled = previouslyTriggeredUserIds.has(user.id)
+                  return (
+                    <Badge
+                      key={user.id}
+                      type={wasEnrolled ? 'warning' : 'informative'}
+                      label={user.name}
+                      customIcon={wasEnrolled ? <Repeat size={16} color="currentColor" variant="Bold" /> : undefined}
+                      onDismiss={() => removeUser(user.id)}
+                    />
+                  )
+                })}
               </div>
             )}
           </div>
 
-          {/* Re-trigger warning — informational, non-blocking */}
-          {retriggerCount > 0 && (
-            <Alert
-              type="Alert"
-              icon
-              message={`${retriggerCount} of the selected ${
-                retriggerCount === 1 ? 'user has' : 'users have'
-              } already been enrolled by this automation. Their progress will be reset and enrolment will restart from the beginning.`}
-            />
-          )}
 
           {/* Failure alert slot — wired up but unused in prototype.
               TODO: Replace with actual API call — handle partial failure (some
