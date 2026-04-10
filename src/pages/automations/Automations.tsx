@@ -669,7 +669,7 @@ function Automations() {
                               color={row.active ? 'var(--text-secondary)' : 'var(--text-disabled)'}
                               variant="Linear"
                             />
-                            Trigger automation
+                            Run automation
                           </button>
                           <button
                             type="button"

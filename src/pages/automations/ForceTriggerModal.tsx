@@ -136,7 +136,7 @@ function ForceTriggerModal({
         <div className="force-trigger-header">
           <div className="force-trigger-headline">
             <h2 id="force-trigger-title" className="force-trigger-title">
-              Trigger automation
+              Run automation
             </h2>
             <p className="force-trigger-subtitle">
               {automation.name}
