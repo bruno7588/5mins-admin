@@ -108,9 +108,6 @@ function ForceTriggerModal({
     coursesExpanded || automation.courses.length <= COURSE_PREVIEW_COUNT
       ? automation.courses
       : automation.courses.slice(0, COURSE_PREVIEW_COUNT)
-  const retriggerCount = selectedUsers.filter((u) =>
-    previouslyTriggeredUserIds.has(u.id),
-  ).length
 
   function handleTrigger() {
     if (!automation || selectedUsers.length === 0) return
