@@ -4,8 +4,20 @@ import CloseButton from '../../components/CloseButton/CloseButton'
 import Search from '../../components/Search/Search'
 import Badge from '../../components/Badge/Badge'
 import Chip from '../../components/Chip/Chip'
-import type { AutomationRow, User } from './Automations'
+import type { AutomationRow, User, EnrollmentType, DueDateConfig } from './Automations'
 import './ForceTriggerModal.css'
+
+function formatEnrollment(e: EnrollmentType): string {
+  if (e.kind === 'immediate') return 'Immediate'
+  const unit = e.days === 1 ? 'day' : 'days'
+  return `After ${e.days} ${unit}`
+}
+
+function formatDueDate(d: DueDateConfig): string {
+  if (d.kind === 'none') return 'No due date'
+  const unit = d.daysAfterStart === 1 ? 'day' : 'days'
+  return `Due ${d.daysAfterStart} ${unit} after start`
+}
 
 interface ForceTriggerModalProps {
   automation: AutomationRow | null
@@ -151,7 +163,14 @@ function ForceTriggerModal({
               {visibleCourses.map((c, i) => (
                 <div key={i} className="force-trigger-course-row">
                   <span className="force-trigger-course-badge">{i + 1}</span>
-                  <span className="force-trigger-course-name">{c.name}</span>
+                  <div className="force-trigger-course-info">
+                    <span className="force-trigger-course-name">{c.name}</span>
+                    <span className="force-trigger-course-meta">
+                      {formatEnrollment(c.enrollmentType)}
+                      <span className="force-trigger-course-meta-dot">&middot;</span>
+                      {formatDueDate(c.dueDate)}
+                    </span>
+                  </div>
                 </div>
               ))}
               {automation.courses.length > COURSE_PREVIEW_COUNT && (
@@ -170,6 +189,11 @@ function ForceTriggerModal({
                 </button>
               )}
             </div>
+            <p className="force-trigger-recurrence-note">
+              {automation.recurrence.enabled
+                ? `Repeats every ${automation.recurrence.intervalMonths} ${automation.recurrence.intervalMonths === 1 ? 'month' : 'months'}`
+                : 'Never repeats'}
+            </p>
           </div>
 
           {/* User picker */}

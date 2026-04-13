@@ -106,8 +106,9 @@
 
 /* ===== Body (scrollable content) ===== */
 .force-trigger-body {
-  flex: 1 0 0;
+  flex: 1 1 0;
   min-height: 0;
+  overflow-y: auto;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -139,9 +140,18 @@
   border-radius: var(--sm, 12px);
 }
 
+.force-trigger-recurrence-note {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+}
+
 .force-trigger-course-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--s, 8px);
 }
 
@@ -152,6 +162,7 @@
   width: 16px;
   height: 16px;
   flex-shrink: 0;
+  margin-top: 3px;
   border-radius: var(--xxl, 40px);
   background: var(--input-background, #383D4C);
   font-family: 'Poppins', sans-serif;
@@ -162,9 +173,15 @@
   text-align: center;
 }
 
-.force-trigger-course-name {
+.force-trigger-course-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.force-trigger-course-name {
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
   font-weight: 400;
@@ -173,6 +190,22 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.force-trigger-course-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--xs, 4px);
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+}
+
+.force-trigger-course-meta-dot {
+  font-size: 12px;
+  line-height: 1;
 }
 
 .force-trigger-toggle-courses {
@@ -314,6 +347,7 @@
   gap: 16px;
   width: 100%;
   flex-shrink: 0;
+  background: var(--page-background);
 }
 
 .force-trigger-footer-divider {
