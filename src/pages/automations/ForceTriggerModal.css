@@ -104,6 +104,69 @@
   border-radius: var(--x, 4px);
 }
 
+/* ===== Success state ===== */
+.force-trigger-success {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sm, 12px);
+  padding: var(--xl, 32px);
+  text-align: center;
+}
+
+.force-trigger-success-icon {
+  margin-bottom: var(--s, 8px);
+}
+
+.force-trigger-success-title {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+
+.force-trigger-success-subtitle {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.force-trigger-success-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sm, 12px);
+  margin-top: var(--ml, 20px);
+  padding: var(--m, 16px) var(--ml, 20px);
+  width: 100%;
+  max-width: 420px;
+  background: var(--neutral-50);
+  border-radius: var(--sm, 12px);
+}
+
+.force-trigger-success-user {
+  display: flex;
+  align-items: center;
+  gap: var(--sm, 12px);
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.force-trigger-success .force-trigger-btn-primary {
+  margin-top: var(--ml, 20px);
+}
+
 /* ===== Body (scrollable content) ===== */
 .force-trigger-body {
   flex: 1 1 0;

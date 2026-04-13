@@ -397,11 +397,6 @@ function Automations() {
       }))
 
     setEffectiveTriggers((rows) => [...newRows, ...rows])
-    setForceTriggerAutomation(null)
-    showToast(
-      'success',
-      `Automation triggered for ${userIds.length} ${userIds.length === 1 ? 'user' : 'users'}`,
-    )
   }
 
   const activeAutomationsCount = automations.filter((a) => a.active).length

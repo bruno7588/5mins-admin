@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowUp2, Flash } from 'iconsax-react'
+import { ArrowUp2, Flash, TickCircle } from 'iconsax-react'
 import CloseButton from '../../components/CloseButton/CloseButton'
 import Search from '../../components/Search/Search'
 import Badge from '../../components/Badge/Badge'
@@ -58,6 +58,7 @@ function ForceTriggerModal({
   const [searchFocused, setSearchFocused] = useState(false)
   const [coursesExpanded, setCoursesExpanded] = useState(false)
   const [enrolledTooltip, setEnrolledTooltip] = useState<{ top: number; right: number } | null>(null)
+  const [triggered, setTriggered] = useState(false)
   const searchWrapperRef = useRef<HTMLDivElement>(null)
 
   // Reset state every time the drawer opens for a (new) automation.
@@ -68,6 +69,7 @@ function ForceTriggerModal({
       setSelectedUserIds([])
       setSearchFocused(false)
       setCoursesExpanded(false)
+      setTriggered(false)
     }
   }, [automation])
 
@@ -141,6 +143,7 @@ function ForceTriggerModal({
   function handleTrigger() {
     if (!automation || selectedUsers.length === 0) return
     onTrigger(automation.id, selectedUsers.map((u) => u.id))
+    setTriggered(true)
   }
 
   return (
@@ -156,162 +159,185 @@ function ForceTriggerModal({
         aria-modal="true"
         aria-labelledby="force-trigger-title"
       >
-        {/* Header — Section Header pattern per spec */}
-        <div className="force-trigger-header">
-          <div className="force-trigger-headline">
-            <h2 id="force-trigger-title" className="force-trigger-title">
-              Run automation
+        {triggered ? (
+          <div className="force-trigger-success">
+            <div className="force-trigger-success-icon">
+              <TickCircle size={80} color="var(--success-500)" variant="Bold" />
+            </div>
+            <h2 className="force-trigger-success-title">
+              Automation triggered for {selectedUsers.length}{' '}
+              {selectedUsers.length === 1 ? 'user' : 'users'}
             </h2>
-            <p className="force-trigger-subtitle">
-              {automation.name}
-            </p>
-            <CloseButton onClick={handleClose} className="force-trigger-close" />
-          </div>
-          <div className="force-trigger-divider" />
-        </div>
-
-        {/* Body */}
-        <div className="force-trigger-body">
-          {/* Course list */}
-          <div className="force-trigger-courses">
-            <p className="force-trigger-courses-label">
-              Users will be enrolled in these courses
-            </p>
-            <div className="force-trigger-courses-card">
-              {visibleCourses.map((c, i) => (
-                <div key={i} className="force-trigger-course-item">
-                  <span className="force-trigger-course-badge">{i + 1}</span>
-                  <div className="force-trigger-course-info">
-                    <span className="force-trigger-course-name">{c.name}</span>
-                    <span className="force-trigger-course-meta">{formatCourseMeta(c)}</span>
-                  </div>
+            <p className="force-trigger-success-subtitle">{automation.name}</p>
+            <div className="force-trigger-success-card">
+              {selectedUsers.map((user) => (
+                <div key={user.id} className="force-trigger-success-user">
+                  <TickCircle size={20} color="var(--success-500)" variant="Bold" />
+                  <span>{user.name}</span>
                 </div>
               ))}
-              {automation.courses.length > COURSE_PREVIEW_COUNT && (
-                <button
-                  type="button"
-                  className="force-trigger-toggle-courses"
-                  onClick={() => setCoursesExpanded((v) => !v)}
-                >
-                  {coursesExpanded ? 'View less' : 'View all'}
-                  <ArrowUp2
-                    size={16}
-                    color="currentColor"
-                    variant="Linear"
-                    className={`force-trigger-toggle-chevron${coursesExpanded ? '' : ' force-trigger-toggle-chevron--down'}`}
-                  />
-                </button>
-              )}
             </div>
-          </div>
-
-          {/* User picker */}
-          <div className="force-trigger-section">
-            <p className="force-trigger-section-label">Select users</p>
-            <div className="force-trigger-search-wrapper" ref={searchWrapperRef}>
-              <Search
-                size="M"
-                value={searchQuery}
-                placeholder="Search by name or email"
-                onChange={setSearchQuery}
-                onFocus={() => setSearchFocused(true)}
-              />
-              {showResults && (
-                <div className="force-trigger-results" role="listbox">
-                  <div className="force-trigger-results-list">
-                    {filteredResults.length === 0 ? (
-                      <div className="force-trigger-results-empty">
-                        No users match "{searchQuery}"
-                      </div>
-                    ) : (
-                      filteredResults.map((user) => {
-                        const wasTriggered = previouslyTriggeredUserIds.has(user.id)
-                        return (
-                          <button
-                            key={user.id}
-                            type="button"
-                            role="option"
-                            aria-selected={false}
-                            aria-disabled={wasTriggered || undefined}
-                            className={`force-trigger-result${wasTriggered ? ' force-trigger-result--disabled' : ''}`}
-                            onClick={wasTriggered ? undefined : () => selectUser(user.id)}
-                            onMouseEnter={wasTriggered ? (e) => {
-                              const rect = e.currentTarget.getBoundingClientRect()
-                              setEnrolledTooltip({ top: rect.top - 4, right: window.innerWidth - rect.right })
-                            } : undefined}
-                            onMouseLeave={wasTriggered ? () => setEnrolledTooltip(null) : undefined}
-                          >
-                            <div className="force-trigger-result-info">
-                              <span className="force-trigger-result-name">{user.name}</span>
-                              <span className="force-trigger-result-email">{user.email}</span>
-                            </div>
-                            {wasTriggered && (
-                              <Badge type="informative" customIcon={<Flash size={16} color="currentColor" variant="Linear" />} label="Enrolled" />
-                            )}
-                          </button>
-                        )
-                      })
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {selectedUsers.length > 0 && (
-              <div className="force-trigger-chips">
-                {selectedUsers.map((user) => (
-                  <Chip
-                    key={user.id}
-                    label={user.name}
-                    iconRight
-                    onDismiss={() => removeUser(user.id)}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-
-          {/* Failure alert slot — wired up but unused in prototype.
-              TODO: Replace with actual API call — handle partial failure (some
-              users succeed, some fail). When the backend returns a list of
-              failed user IDs, render an Alert here listing their names and
-              keep the modal open so the admin can investigate. */}
-        </div>
-
-        {enrolledTooltip && (
-          <div
-            className="force-trigger-tooltip"
-            style={{
-              position: 'fixed',
-              top: enrolledTooltip.top,
-              right: enrolledTooltip.right,
-              transform: 'translateY(-100%)',
-            }}
-          >
-            <span className="force-trigger-tooltip__content">
-              This user is already enrolled in this automation.
-            </span>
-            <svg className="force-trigger-tooltip__caret" width="12" height="6" viewBox="0 0 12 6" fill="none">
-              <path d="M6 6L0 0H12L6 6Z" fill="var(--tooltip-background, #0f1014)" />
-            </svg>
-          </div>
-        )}
-
-        {/* Footer — sticky per spec */}
-        <div className="force-trigger-footer">
-          <div className="force-trigger-footer-divider" />
-          <div className="force-trigger-footer-buttons">
             <button
               type="button"
               className="force-trigger-btn-primary"
-              disabled={selectedUsers.length === 0}
-              onClick={handleTrigger}
+              onClick={handleClose}
             >
-              {triggerLabel}
+              Done
             </button>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* Header */}
+            <div className="force-trigger-header">
+              <div className="force-trigger-headline">
+                <h2 id="force-trigger-title" className="force-trigger-title">
+                  Run automation
+                </h2>
+                <p className="force-trigger-subtitle">
+                  {automation.name}
+                </p>
+                <CloseButton onClick={handleClose} className="force-trigger-close" />
+              </div>
+              <div className="force-trigger-divider" />
+            </div>
+
+            {/* Body */}
+            <div className="force-trigger-body">
+              {/* Course list */}
+              <div className="force-trigger-courses">
+                <p className="force-trigger-courses-label">
+                  Users will be enrolled in these courses
+                </p>
+                <div className="force-trigger-courses-card">
+                  {visibleCourses.map((c, i) => (
+                    <div key={i} className="force-trigger-course-item">
+                      <span className="force-trigger-course-badge">{i + 1}</span>
+                      <div className="force-trigger-course-info">
+                        <span className="force-trigger-course-name">{c.name}</span>
+                        <span className="force-trigger-course-meta">{formatCourseMeta(c)}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {automation.courses.length > COURSE_PREVIEW_COUNT && (
+                    <button
+                      type="button"
+                      className="force-trigger-toggle-courses"
+                      onClick={() => setCoursesExpanded((v) => !v)}
+                    >
+                      {coursesExpanded ? 'View less' : 'View all'}
+                      <ArrowUp2
+                        size={16}
+                        color="currentColor"
+                        variant="Linear"
+                        className={`force-trigger-toggle-chevron${coursesExpanded ? '' : ' force-trigger-toggle-chevron--down'}`}
+                      />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* User picker */}
+              <div className="force-trigger-section">
+                <p className="force-trigger-section-label">Select users</p>
+                <div className="force-trigger-search-wrapper" ref={searchWrapperRef}>
+                  <Search
+                    size="M"
+                    value={searchQuery}
+                    placeholder="Search by name or email"
+                    onChange={setSearchQuery}
+                    onFocus={() => setSearchFocused(true)}
+                  />
+                  {showResults && (
+                    <div className="force-trigger-results" role="listbox">
+                      <div className="force-trigger-results-list">
+                        {filteredResults.length === 0 ? (
+                          <div className="force-trigger-results-empty">
+                            No users match "{searchQuery}"
+                          </div>
+                        ) : (
+                          filteredResults.map((user) => {
+                            const wasTriggered = previouslyTriggeredUserIds.has(user.id)
+                            return (
+                              <button
+                                key={user.id}
+                                type="button"
+                                role="option"
+                                aria-selected={false}
+                                aria-disabled={wasTriggered || undefined}
+                                className={`force-trigger-result${wasTriggered ? ' force-trigger-result--disabled' : ''}`}
+                                onClick={wasTriggered ? undefined : () => selectUser(user.id)}
+                                onMouseEnter={wasTriggered ? (e) => {
+                                  const rect = e.currentTarget.getBoundingClientRect()
+                                  setEnrolledTooltip({ top: rect.top - 4, right: window.innerWidth - rect.right })
+                                } : undefined}
+                                onMouseLeave={wasTriggered ? () => setEnrolledTooltip(null) : undefined}
+                              >
+                                <div className="force-trigger-result-info">
+                                  <span className="force-trigger-result-name">{user.name}</span>
+                                  <span className="force-trigger-result-email">{user.email}</span>
+                                </div>
+                                {wasTriggered && (
+                                  <Badge type="informative" customIcon={<Flash size={16} color="currentColor" variant="Linear" />} label="Enrolled" />
+                                )}
+                              </button>
+                            )
+                          })
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {selectedUsers.length > 0 && (
+                  <div className="force-trigger-chips">
+                    {selectedUsers.map((user) => (
+                      <Chip
+                        key={user.id}
+                        label={user.name}
+                        iconRight
+                        onDismiss={() => removeUser(user.id)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {enrolledTooltip && (
+              <div
+                className="force-trigger-tooltip"
+                style={{
+                  position: 'fixed',
+                  top: enrolledTooltip.top,
+                  right: enrolledTooltip.right,
+                  transform: 'translateY(-100%)',
+                }}
+              >
+                <span className="force-trigger-tooltip__content">
+                  This user is already enrolled in this automation.
+                </span>
+                <svg className="force-trigger-tooltip__caret" width="12" height="6" viewBox="0 0 12 6" fill="none">
+                  <path d="M6 6L0 0H12L6 6Z" fill="var(--tooltip-background, #0f1014)" />
+                </svg>
+              </div>
+            )}
+
+            {/* Footer */}
+            <div className="force-trigger-footer">
+              <div className="force-trigger-footer-divider" />
+              <div className="force-trigger-footer-buttons">
+                <button
+                  type="button"
+                  className="force-trigger-btn-primary"
+                  disabled={selectedUsers.length === 0}
+                  onClick={handleTrigger}
+                >
+                  {triggerLabel}
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </aside>
     </>
   )
