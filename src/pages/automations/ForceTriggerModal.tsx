@@ -4,19 +4,37 @@ import CloseButton from '../../components/CloseButton/CloseButton'
 import Search from '../../components/Search/Search'
 import Badge from '../../components/Badge/Badge'
 import Chip from '../../components/Chip/Chip'
-import type { AutomationRow, User, EnrollmentType, DueDateConfig } from './Automations'
+import type { AutomationRow, AutomationCourse, User } from './Automations'
 import './ForceTriggerModal.css'
 
-function formatEnrollment(e: EnrollmentType): string {
-  if (e.kind === 'immediate') return 'Immediate'
-  const unit = e.days === 1 ? 'day' : 'days'
-  return `After ${e.days} ${unit}`
-}
+function formatCourseMeta(c: AutomationCourse): string {
+  const parts: string[] = []
 
-function formatDueDate(d: DueDateConfig): string {
-  if (d.kind === 'none') return 'No due date'
-  const unit = d.daysAfterStart === 1 ? 'day' : 'days'
-  return `Due ${d.daysAfterStart} ${unit} after start`
+  // Enrollment
+  if (c.enrollmentType.kind === 'immediate') {
+    parts.push('Immediate')
+  } else {
+    const unit = c.enrollmentType.days === 1 ? 'day' : 'days'
+    parts.push(`${c.enrollmentType.days} ${unit} after previous course`)
+  }
+
+  // Due date
+  if (c.dueDate.kind === 'none') {
+    parts.push('No due date')
+  } else {
+    const unit = c.dueDate.daysAfterStart === 1 ? 'day' : 'days'
+    parts.push(`Due ${c.dueDate.daysAfterStart} ${unit} after start date`)
+  }
+
+  // Recurrence
+  if (c.recurrence.enabled) {
+    const unit = c.recurrence.intervalMonths === 1 ? 'month' : 'months'
+    parts.push(`Repeats every ${c.recurrence.intervalMonths} ${unit}`)
+  } else {
+    parts.push('Never repeats')
+  }
+
+  return parts.join(' \u00b7 ')
 }
 
 interface ForceTriggerModalProps {
@@ -161,15 +179,11 @@ function ForceTriggerModal({
             </p>
             <div className="force-trigger-courses-card">
               {visibleCourses.map((c, i) => (
-                <div key={i} className="force-trigger-course-row">
+                <div key={i} className="force-trigger-course-item">
                   <span className="force-trigger-course-badge">{i + 1}</span>
                   <div className="force-trigger-course-info">
                     <span className="force-trigger-course-name">{c.name}</span>
-                    <span className="force-trigger-course-meta">
-                      {formatEnrollment(c.enrollmentType)}
-                      <span className="force-trigger-course-meta-dot">&middot;</span>
-                      {formatDueDate(c.dueDate)}
-                    </span>
+                    <span className="force-trigger-course-meta">{formatCourseMeta(c)}</span>
                   </div>
                 </div>
               ))}
@@ -189,11 +203,6 @@ function ForceTriggerModal({
                 </button>
               )}
             </div>
-            <p className="force-trigger-recurrence-note">
-              {automation.recurrence.enabled
-                ? `Repeats every ${automation.recurrence.intervalMonths} ${automation.recurrence.intervalMonths === 1 ? 'month' : 'months'}`
-                : 'Never repeats'}
-            </p>
           </div>
 
           {/* User picker */}

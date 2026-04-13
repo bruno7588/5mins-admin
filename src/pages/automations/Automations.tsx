@@ -44,6 +44,7 @@ export interface AutomationCourse {
   name: string
   enrollmentType: EnrollmentType
   dueDate: DueDateConfig
+  recurrence: RecurrenceConfig
 }
 
 export interface AutomationRow {
@@ -52,7 +53,6 @@ export interface AutomationRow {
   lastUpdated: string
   active: boolean
   courses: AutomationCourse[]
-  recurrence: RecurrenceConfig
 }
 
 export interface User {
@@ -83,13 +83,14 @@ function parseDelay(delay: string): EnrollmentType {
 
 function mkCourses(
   prefix: string,
-  rows: Array<[name: string, delay: string, dueDays?: number]>,
+  rows: Array<[name: string, delay: string, dueDays?: number, repeatMonths?: number]>,
 ): AutomationCourse[] {
-  return rows.map(([name, delay, dueDays], i) => ({
+  return rows.map(([name, delay, dueDays, repeatMonths], i) => ({
     id: `${prefix}-c${i + 1}`,
     name,
     enrollmentType: parseDelay(delay),
     dueDate: dueDays != null ? { kind: 'relative', daysAfterStart: dueDays } : { kind: 'none' },
+    recurrence: repeatMonths != null ? { enabled: true, intervalMonths: repeatMonths } : { enabled: false },
   }))
 }
 
@@ -99,12 +100,11 @@ const mockAutomations: AutomationRow[] = [
     name: 'New Hire Compliance Onboarding',
     lastUpdated: 'Sep 30, 2024',
     active: true,
-    recurrence: { enabled: false },
     courses: mkCourses('1', [
       ['Welcome to the Company', '0 days after registration'],
-      ['Code of Conduct Essentials', '1 day after previous course', 7],
+      ['Code of Conduct Essentials', '1 day after previous course', 7, 12],
       ['Workplace Health & Safety', '1 day after previous course', 7],
-      ['Information Security 101', '2 days after previous course', 14],
+      ['Information Security 101', '2 days after previous course', 14, 12],
       ['Anti-Harassment Foundations', '2 days after previous course', 14],
       ['Data Privacy & GDPR Basics', '3 days after previous course'],
       ['Diversity, Equity & Inclusion', '3 days after previous course'],
@@ -115,12 +115,11 @@ const mockAutomations: AutomationRow[] = [
     name: 'Quarterly Refresher — Food Safety',
     lastUpdated: 'Sep 28, 2024',
     active: true,
-    recurrence: { enabled: true, intervalMonths: 3 },
     courses: mkCourses('2', [
-      ['HACCP Refresher', '0 days after registration', 7],
-      ['Allergen Awareness', '2 days after previous course', 7],
-      ['Cross-Contamination Prevention', '2 days after previous course', 7],
-      ['Personal Hygiene Standards', '3 days after previous course'],
+      ['HACCP Refresher', '0 days after registration', 7, 3],
+      ['Allergen Awareness', '2 days after previous course', 7, 3],
+      ['Cross-Contamination Prevention', '2 days after previous course', 7, 3],
+      ['Personal Hygiene Standards', '3 days after previous course', undefined, 3],
       ['Cold Chain Management', '3 days after previous course'],
       ['Cleaning & Sanitisation Protocols', '4 days after previous course'],
       ['Food Storage & Labelling', '4 days after previous course'],
@@ -131,11 +130,10 @@ const mockAutomations: AutomationRow[] = [
     name: 'Annual Anti-Harassment Training',
     lastUpdated: 'Sep 24, 2024',
     active: true,
-    recurrence: { enabled: true, intervalMonths: 12 },
     courses: mkCourses('3', [
-      ['Recognising Harassment', '0 days after registration', 14],
-      ['Bystander Intervention', '3 days after previous course', 14],
-      ['Reporting Procedures', '3 days after previous course', 14],
+      ['Recognising Harassment', '0 days after registration', 14, 12],
+      ['Bystander Intervention', '3 days after previous course', 14, 12],
+      ['Reporting Procedures', '3 days after previous course', 14, 12],
     ]),
   },
   {
@@ -143,9 +141,8 @@ const mockAutomations: AutomationRow[] = [
     name: 'GDPR Privacy Awareness',
     lastUpdated: 'Sep 22, 2024',
     active: true,
-    recurrence: { enabled: false },
     courses: mkCourses('4', [
-      ['GDPR Fundamentals', '0 days after registration'],
+      ['GDPR Fundamentals', '0 days after registration', undefined, 6],
       ['Handling Personal Data', '2 days after previous course', 7],
       ['Data Subject Rights', '2 days after previous course', 7],
       ['Incident Response Basics', '3 days after previous course'],
@@ -157,10 +154,9 @@ const mockAutomations: AutomationRow[] = [
     name: 'Cybersecurity Essentials Q3',
     lastUpdated: 'Sep 18, 2024',
     active: true,
-    recurrence: { enabled: true, intervalMonths: 3 },
     courses: mkCourses('5', [
-      ['Phishing & Social Engineering', '0 days after registration', 7],
-      ['Password & MFA Best Practices', '2 days after previous course', 7],
+      ['Phishing & Social Engineering', '0 days after registration', 7, 3],
+      ['Password & MFA Best Practices', '2 days after previous course', 7, 3],
       ['Device Security', '2 days after previous course'],
       ['Secure Remote Work', '3 days after previous course'],
       ['Reporting Incidents', '3 days after previous course'],
@@ -172,7 +168,6 @@ const mockAutomations: AutomationRow[] = [
     name: 'Manager 30-Day Check-in',
     lastUpdated: 'Sep 12, 2024',
     active: true,
-    recurrence: { enabled: false },
     courses: mkCourses('6', [
       ['Coaching Fundamentals', '0 days after registration'],
       ['Giving Effective Feedback', '3 days after previous course'],
@@ -184,10 +179,9 @@ const mockAutomations: AutomationRow[] = [
     name: 'Health & Safety Briefing',
     lastUpdated: 'Sep 5, 2024',
     active: true,
-    recurrence: { enabled: true, intervalMonths: 12 },
     courses: mkCourses('7', [
-      ['Health & Safety: The Workplace (UK)', '0 days after registration', 14],
-      ['Health & Safety: Working From Home (UK)', '1 day after previous course', 14],
+      ['Health & Safety: The Workplace (UK)', '0 days after registration', 14, 12],
+      ['Health & Safety: Working From Home (UK)', '1 day after previous course', 14, 12],
       ['First Aid Essentials', '2 days after previous course'],
       ['Emergency Evacuation Procedures', '3 days after previous course'],
     ]),
@@ -197,7 +191,6 @@ const mockAutomations: AutomationRow[] = [
     name: 'Diversity & Inclusion 2024',
     lastUpdated: 'Aug 30, 2024',
     active: false,
-    recurrence: { enabled: false },
     courses: mkCourses('8', [
       ['Inclusive Language', '0 days after registration'],
       ['Unconscious Bias', '2 days after previous course'],
@@ -209,7 +202,6 @@ const mockAutomations: AutomationRow[] = [
     name: 'Remote Work Best Practices',
     lastUpdated: 'Aug 22, 2024',
     active: false,
-    recurrence: { enabled: false },
     courses: mkCourses('9', [
       ['Asynchronous Communication', '0 days after registration'],
       ['Home Office Ergonomics', '2 days after previous course', 7],
@@ -221,15 +213,13 @@ const mockAutomations: AutomationRow[] = [
     name: 'Code of Conduct Refresher',
     lastUpdated: 'Aug 14, 2024',
     active: false,
-    recurrence: { enabled: true, intervalMonths: 6 },
-    courses: mkCourses('10', [['Code of Conduct 2024 Update', '0 days after registration', 14]]),
+    courses: mkCourses('10', [['Code of Conduct 2024 Update', '0 days after registration', 14, 6]]),
   },
   {
     id: '11',
     name: 'Sales Onboarding Sprint',
     lastUpdated: 'Aug 8, 2024',
     active: false,
-    recurrence: { enabled: false },
     courses: mkCourses('11', [
       ['Product Overview', '0 days after registration'],
       ['Discovery Calls', '1 day after previous course'],
@@ -243,7 +233,6 @@ const mockAutomations: AutomationRow[] = [
     name: 'Customer Service Standards',
     lastUpdated: 'Jul 30, 2024',
     active: false,
-    recurrence: { enabled: false },
     courses: mkCourses('12', [
       ['Service Mindset', '0 days after registration'],
       ['Handling Difficult Customers', '2 days after previous course', 7],
@@ -256,10 +245,9 @@ const mockAutomations: AutomationRow[] = [
     name: 'Fire Safety Drill Series',
     lastUpdated: 'Jul 21, 2024',
     active: false,
-    recurrence: { enabled: true, intervalMonths: 6 },
     courses: mkCourses('13', [
-      ['Fire Drill Procedures', '0 days after registration', 7],
-      ['Extinguisher Use', '2 days after previous course', 7],
+      ['Fire Drill Procedures', '0 days after registration', 7, 6],
+      ['Extinguisher Use', '2 days after previous course', 7, 6],
     ]),
   },
   {
@@ -267,7 +255,6 @@ const mockAutomations: AutomationRow[] = [
     name: 'Product Knowledge Bootcamp',
     lastUpdated: 'Jul 12, 2024',
     active: false,
-    recurrence: { enabled: false },
     courses: mkCourses('14', [
       ['Product Lineup', '0 days after registration'],
       ['Pricing & Plans', '1 day after previous course'],
