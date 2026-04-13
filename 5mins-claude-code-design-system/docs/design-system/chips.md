@@ -5,7 +5,7 @@ description: >
   filter pills, selection chips, dismissible tags, or any small pill-shaped
   interactive label in the admin or learner UI. Covers all variants (default,
   hover, selected, disabled), optional left icon (user) and right icon (close/X),
-  and dark-theme design tokens. Trigger this skill whenever someone needs a chip,
+  and design tokens. Trigger this skill whenever someone needs a chip,
   filter chip, tag pill, selection pill, or dismissible label in the 5Mins.ai
   platform — even if they just say "add a chip" or "filter tag".
 ---
@@ -13,7 +13,7 @@ description: >
 # 5Mins.ai — Chips Component
 
 Figma source: `Library` › node `11100-2179`
-Screenshot: pill-shaped labels, dark theme, yellow selected state.
+Screenshot: pill-shaped labels, yellow selected state.
 
 ---
 
@@ -32,7 +32,7 @@ Screenshot: pill-shaped labels, dark theme, yellow selected state.
 
 ## Design Tokens
 
-All values are **dark-theme** (5Mins.ai default).
+All values use 5Mins.ai design tokens.
 
 | CSS Variable               | Value      | Usage                                  |
 |----------------------------|------------|----------------------------------------|

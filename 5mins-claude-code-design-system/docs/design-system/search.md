@@ -208,7 +208,7 @@ export const Search: React.FC<SearchProps> = ({
   font-family: 'Poppins', sans-serif;
   font-weight: 400;
   line-height: 1.5;
-  color: var(--text-primary);              /* #F9F9FA dark theme */
+  color: var(--text-primary);              /* #F9F9FA */
 }
 
 .search--m .search__input { font-size: 14px; }
@@ -264,7 +264,7 @@ export const Search: React.FC<SearchProps> = ({
 
 ## Token Summary
 
-| Token | Value (dark theme) | Used for |
+| Token | Value | Used for |
 |---|---|---|
 | `--surface-input` | `rgba(191,194,204,0.16)` | Default background |
 | `--surface-input-hover` | `#2D313D` (Neutral-700) | Hover background |

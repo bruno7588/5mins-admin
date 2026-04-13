@@ -329,12 +329,12 @@
   align-items: flex-start;
 }
 
-/* Filled primary button (cyan) */
+/* Filled primary button (cyan) — matches Figma node 8086-15934 */
 .force-trigger-btn-primary {
-  background: var(--primary-button-background, #00CEE6);
-  color: var(--text-button-foreground, #20222A);
-  padding: 10px var(--ml, 20px);
-  border-radius: var(--s, 8px);
+  background: var(--primary-600);
+  color: var(--neutral-25);
+  padding: 10px var(--space-ml);
+  border-radius: var(--radius-s);
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
   font-size: 14px;
@@ -343,9 +343,13 @@
   cursor: pointer;
 }
 
+.force-trigger-btn-primary:hover:not(:disabled) {
+  background: var(--primary-700);
+}
+
 .force-trigger-btn-primary:disabled {
-  background: var(--neutral-100, #DFE1E6);
-  color: var(--neutral-300, #9EA4B3);
+  background: var(--button-background-disabled);
+  color: var(--text-button-disabled);
   cursor: not-allowed;
 }
 

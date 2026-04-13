@@ -24,7 +24,7 @@
 
 ## 1. Brand Identity
 
-5Mins.ai is a B2B micro-learning platform for enterprise customers in compliance-heavy industries (hospitality, finance, healthcare). The visual language is clean, modern, and professional with a dark-themed interface and a distinctive cyan brand color. The UI prioritises clarity, readability, and a consistent learning experience across web and mobile.
+5Mins.ai is a B2B micro-learning platform for enterprise customers in compliance-heavy industries (hospitality, finance, healthcare). The visual language is clean, modern, and professional with a distinctive cyan brand color. The UI prioritises clarity, readability, and a consistent learning experience across web and mobile.
 
 **Tech stack context:** React TypeScript, CSS with design tokens (CSS custom properties). Icon library: Iconsax React. Font: Poppins via Google Fonts.
 
@@ -98,9 +98,9 @@ Quiz type and interactive learning element colors:
 | `--neutral-25` | #F9F9FA | Page background |
 | `--neutral-0` | #FFFFFF | Card backgrounds |
 
-### 2.6 Dark Theme Tokens
+### 2.6 Overlay Tokens
 
-Used in overlays, modals, and the dark-themed portions of the UI:
+Used in overlays, modals, and similar UI surfaces:
 
 | Token | Hex | Usage |
 |-------|-----|-------|

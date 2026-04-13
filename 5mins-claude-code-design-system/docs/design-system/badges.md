@@ -143,7 +143,7 @@ A solid, high-contrast badge that draws attention to freshly added content. Unli
 | **Quiz** | `rgba(99, 104, 219, 0.16)` | `#FFDBAF` |
 | **New** | `#E95C7B` (solid) | `#F9F9FA` |
 
-The translucent background pattern (16% opacity) is a core design principle — it ensures badges feel lightweight on 5Mins.ai's dark-themed surfaces while maintaining readable contrast.
+The translucent background pattern (16% opacity) is a core design principle — it ensures badges feel lightweight while maintaining readable contrast.
 
 ## React TypeScript Implementation
 

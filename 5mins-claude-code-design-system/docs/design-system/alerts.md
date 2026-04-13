@@ -32,7 +32,7 @@ Two distinct banner types for surfacing messages inline with content.
 Background:    var(--surface-input)  →  rgba(191, 194, 204, 0.16)
 Border-radius: 12px  (--spacing-sm)
 Padding:       12px 16px  (--spacing-sm --spacing-m)  →  16px all sides when supportingText
-Text color:    var(--text-secondary)  →  #BFC2CC  (Neutral-200 in dark theme)
+Text color:    var(--text-secondary)  →  #BFC2CC  (Neutral-200)
 Font:          Poppins 14px / 1.5 line-height
 ```
 
@@ -54,7 +54,7 @@ Font:          Poppins 14px / 1.5 line-height
 Outlined style, appears at the **end** of the row (simple) or **below** the description (supporting text):
 
 ```css
-border: 1px solid var(--text-primary);   /* #F9F9FA in dark theme */
+border: 1px solid var(--text-primary);   /* #F9F9FA */
 border-radius: 8px;                      /* --spacing-s */
 padding: 8px 16px;                       /* --spacing-s --spacing-m */
 color: var(--text-primary);
@@ -211,7 +211,7 @@ export const Alert: React.FC<AlertProps> = ({
 /* ── Callout ── */
 .alert--callout {
   background: var(--surface-input);    /* rgba(191,194,204,0.16) */
-  color: var(--text-secondary);        /* #BFC2CC in dark theme */
+  color: var(--text-secondary);        /* #BFC2CC */
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
   font-weight: 400;
@@ -299,7 +299,7 @@ export const Alert: React.FC<AlertProps> = ({
 /* Outlined — Callout */
 .alert__btn--outlined {
   font-size: 14px;
-  color: var(--text-primary);              /* #F9F9FA dark theme */
+  color: var(--text-primary);              /* #F9F9FA */
   border: 1px solid var(--text-primary);
   border-radius: 8px;                      /* --spacing-s */
   padding: 8px 16px;                       /* --spacing-s --spacing-m */
@@ -359,9 +359,9 @@ export const Alert: React.FC<AlertProps> = ({
 |---|---|---|
 | `--surface-input` | `rgba(191,194,204,0.16)` | Callout background |
 | `rgba(255,187,56,0.12)` | hardcoded | Alert background (Warning-500 @ 12%) |
-| `--text-secondary` | `#BFC2CC` dark theme | Callout text |
+| `--text-secondary` | `#BFC2CC` | Callout text |
 | `--text-warning` | `#996322` | Alert text (Warning-700, accessible) |
-| `--text-primary` | `#F9F9FA` dark theme | Callout button border + label |
+| `--text-primary` | `#F9F9FA` | Callout button border + label |
 | `--spacing-sm` | `12px` | Border-radius, vertical padding |
 | `--spacing-m` | `16px` | Horizontal padding |
 | `--spacing-s` | `8px` | Gap, button padding vertical |

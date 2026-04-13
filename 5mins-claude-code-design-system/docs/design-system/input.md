@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `InputField` component is the standard text entry control across the 5Mins.ai platform. It is an **outlined, dark-theme input** built on the 5Mins design system. Always use this component — never build raw `<input>` elements.
+The `InputField` component is the standard text entry control across the 5Mins.ai platform. It is an **outlined input** built on the 5Mins design system. Always use this component — never build raw `<input>` elements.
 
 **Figma source:** `Library → Input Field (Outlined)` — node `8974-24610`
 

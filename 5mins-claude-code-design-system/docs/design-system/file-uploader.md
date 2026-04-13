@@ -1,7 +1,7 @@
 # FileUploader Component
 
 > **Figma source:** Library node `11362-1265`  
-> **Dark theme** · **React + TypeScript** · **Iconsax icons**
+> **React + TypeScript** · **Iconsax icons**
 
 ---
 

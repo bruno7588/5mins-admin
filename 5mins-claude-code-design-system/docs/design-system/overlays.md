@@ -1,7 +1,7 @@
 
 # 5Mins.ai Overlay Component System
 
-Complete implementation guide for the three overlay components in the 5Mins.ai design system: **Dialog**, **Modal**, and **Side Drawer**. All three share a common overlay backdrop and dark-theme styling but serve distinct interaction purposes.
+Complete implementation guide for the three overlay components in the 5Mins.ai design system: **Dialog**, **Modal**, and **Side Drawer**. All three share a common overlay backdrop but serve distinct interaction purposes.
 
 ## When to Use What
 
