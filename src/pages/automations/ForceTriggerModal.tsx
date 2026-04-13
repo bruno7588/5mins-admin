@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowUp2, Flash, Repeat } from 'iconsax-react'
+import { ArrowUp2, Flash } from 'iconsax-react'
 import CloseButton from '../../components/CloseButton/CloseButton'
 import Search from '../../components/Search/Search'
 import Badge from '../../components/Badge/Badge'
-import Tooltip from '../../components/Tooltip/Tooltip'
+import Chip from '../../components/Chip/Chip'
 import type { AutomationRow, User } from './Automations'
 import './ForceTriggerModal.css'
 
@@ -27,6 +27,7 @@ function ForceTriggerModal({
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
   const [searchFocused, setSearchFocused] = useState(false)
   const [coursesExpanded, setCoursesExpanded] = useState(false)
+  const [enrolledTooltip, setEnrolledTooltip] = useState<{ top: number; right: number } | null>(null)
   const searchWrapperRef = useRef<HTMLDivElement>(null)
 
   // Reset state every time the drawer opens for a (new) automation.
@@ -100,9 +101,7 @@ function ForceTriggerModal({
   if (!automation) return null
 
   const showResults = searchFocused && filteredResults.length > 0
-  const triggerLabel = `Run for ${selectedUsers.length} ${
-    selectedUsers.length === 1 ? 'user' : 'users'
-  }`
+  const triggerLabel = 'Run Automation'
   const COURSE_PREVIEW_COUNT = 3
   const visibleCourses =
     coursesExpanded || automation.courses.length <= COURSE_PREVIEW_COUNT
@@ -200,22 +199,21 @@ function ForceTriggerModal({
                             type="button"
                             role="option"
                             aria-selected={false}
-                            className="force-trigger-result"
-                            onClick={() => selectUser(user.id)}
+                            aria-disabled={wasTriggered || undefined}
+                            className={`force-trigger-result${wasTriggered ? ' force-trigger-result--disabled' : ''}`}
+                            onClick={wasTriggered ? undefined : () => selectUser(user.id)}
+                            onMouseEnter={wasTriggered ? (e) => {
+                              const rect = e.currentTarget.getBoundingClientRect()
+                              setEnrolledTooltip({ top: rect.top - 4, right: window.innerWidth - rect.right })
+                            } : undefined}
+                            onMouseLeave={wasTriggered ? () => setEnrolledTooltip(null) : undefined}
                           >
                             <div className="force-trigger-result-info">
                               <span className="force-trigger-result-name">{user.name}</span>
                               <span className="force-trigger-result-email">{user.email}</span>
                             </div>
                             {wasTriggered && (
-                              <Tooltip
-                                text="This user has already been enrolled. Selecting them will restart their enrolment."
-                                position="Top"
-                                alignment="End"
-                                icon={false}
-                              >
-                                <Badge type="informative" customIcon={<Flash size={16} color="currentColor" variant="Linear" />} label="Enrolled" />
-                              </Tooltip>
+                              <Badge type="informative" customIcon={<Flash size={16} color="currentColor" variant="Linear" />} label="Enrolled" />
                             )}
                           </button>
                         )
@@ -228,18 +226,14 @@ function ForceTriggerModal({
 
             {selectedUsers.length > 0 && (
               <div className="force-trigger-chips">
-                {selectedUsers.map((user) => {
-                  const wasEnrolled = previouslyTriggeredUserIds.has(user.id)
-                  return (
-                    <Badge
-                      key={user.id}
-                      type={wasEnrolled ? 'warning' : 'informative'}
-                      label={user.name}
-                      customIcon={wasEnrolled ? <Repeat size={16} color="currentColor" variant="Bold" /> : undefined}
-                      onDismiss={() => removeUser(user.id)}
-                    />
-                  )
-                })}
+                {selectedUsers.map((user) => (
+                  <Chip
+                    key={user.id}
+                    label={user.name}
+                    iconRight
+                    onDismiss={() => removeUser(user.id)}
+                  />
+                ))}
               </div>
             )}
           </div>
@@ -251,6 +245,25 @@ function ForceTriggerModal({
               failed user IDs, render an Alert here listing their names and
               keep the modal open so the admin can investigate. */}
         </div>
+
+        {enrolledTooltip && (
+          <div
+            className="force-trigger-tooltip"
+            style={{
+              position: 'fixed',
+              top: enrolledTooltip.top,
+              right: enrolledTooltip.right,
+              transform: 'translateY(-100%)',
+            }}
+          >
+            <span className="force-trigger-tooltip__content">
+              This user is already enrolled in this automation.
+            </span>
+            <svg className="force-trigger-tooltip__caret" width="12" height="6" viewBox="0 0 12 6" fill="none">
+              <path d="M6 6L0 0H12L6 6Z" fill="var(--tooltip-background, #0f1014)" />
+            </svg>
+          </div>
+        )}
 
         {/* Footer — sticky per spec */}
         <div className="force-trigger-footer">
