@@ -377,7 +377,7 @@ function Automations() {
   const [forceTriggerAutomation, setForceTriggerAutomation] = useState<AutomationRow | null>(null)
 
   // Toasts
-  const { toasts, show: showToast } = useToast()
+  const { toasts } = useToast()
 
   function handleForceTrigger(automationId: string, userIds: string[]) {
     const automation = automations.find((a) => a.id === automationId)
