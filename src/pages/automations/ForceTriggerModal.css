@@ -379,6 +379,18 @@
 }
 
 
+/* ===== Hover add icon ===== */
+.force-trigger-result__add {
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.force-trigger-result:hover .force-trigger-result__add {
+  opacity: 1;
+}
+
 /* ===== Selected user badges ===== */
 .force-trigger-chips {
   display: flex;

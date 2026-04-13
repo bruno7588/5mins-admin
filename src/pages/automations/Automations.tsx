@@ -1083,6 +1083,10 @@ function Automations() {
             : new Set()
         }
         onClose={() => setForceTriggerAutomation(null)}
+        onDone={() => {
+          setForceTriggerAutomation(null)
+          setActiveTab('activity')
+        }}
         onTrigger={handleForceTrigger}
       />
 

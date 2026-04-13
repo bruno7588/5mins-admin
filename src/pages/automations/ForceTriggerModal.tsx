@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowUp2, Flash, TickCircle } from 'iconsax-react'
+import { ArrowUp2, TickCircle, UserTick } from 'iconsax-react'
 import CloseButton from '../../components/CloseButton/CloseButton'
 import Search from '../../components/Search/Search'
 import Badge from '../../components/Badge/Badge'
@@ -42,6 +42,7 @@ interface ForceTriggerModalProps {
   users: User[]
   previouslyTriggeredUserIds: Set<string>
   onClose: () => void
+  onDone: () => void
   onTrigger: (automationId: string, userIds: string[]) => void
 }
 
@@ -50,6 +51,7 @@ function ForceTriggerModal({
   users,
   previouslyTriggeredUserIds,
   onClose,
+  onDone,
   onTrigger,
 }: ForceTriggerModalProps) {
   const [closing, setClosing] = useState(false)
@@ -180,7 +182,10 @@ function ForceTriggerModal({
             <button
               type="button"
               className="force-trigger-btn-primary"
-              onClick={handleClose}
+              onClick={() => {
+                setClosing(true)
+                setTimeout(onDone, 300)
+              }}
             >
               Done
             </button>
@@ -276,8 +281,10 @@ function ForceTriggerModal({
                                   <span className="force-trigger-result-name">{user.name}</span>
                                   <span className="force-trigger-result-email">{user.email}</span>
                                 </div>
-                                {wasTriggered && (
-                                  <Badge type="informative" customIcon={<Flash size={16} color="currentColor" variant="Linear" />} label="Enrolled" />
+                                {wasTriggered ? (
+                                  <Badge type="informative" customIcon={<UserTick size={16} color="currentColor" variant="Linear" />} label="Enrolled" />
+                                ) : (
+                                  <svg className="force-trigger-result__add" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                                 )}
                               </button>
                             )
