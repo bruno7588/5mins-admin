@@ -1,0 +1,277 @@
+/* DS Side Drawer — follows docs/design-system/overlays.md, content per Figma 10613:658 */
+
+/* Backdrop */
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--neutral-900, #0F1014);
+  opacity: 0.64;
+  z-index: 1000;
+  animation: overlay-fade-in 200ms ease-out;
+}
+.overlay-backdrop--closing { animation: overlay-fade-out 300ms ease-out forwards; }
+@keyframes overlay-fade-in  { from { opacity: 0; } to { opacity: 0.64; } }
+@keyframes overlay-fade-out { from { opacity: 0.64; } to { opacity: 0; } }
+
+/* Drawer panel */
+.side-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 720px;
+  max-width: 100%;
+  height: 100vh;
+  padding: var(--space-ml) var(--space-l);
+  background: var(--page-background);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-ml);
+  z-index: 1001;
+  animation: side-drawer-in 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.side-drawer--closing { animation: side-drawer-out 300ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+@keyframes side-drawer-in  { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes side-drawer-out { from { transform: translateX(0);    } to { transform: translateX(100%); } }
+
+/* Header (member chip + close, divider below) */
+.side-drawer__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.side-drawer__headline {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-m);
+  width: 100%;
+}
+
+.cd-drawer__member {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-m);
+  min-width: 0;
+}
+
+.cd-drawer__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--input-background);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+.cd-drawer__avatar--img { object-fit: cover; }
+
+.cd-drawer__member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  line-height: 1.5;
+  min-width: 0;
+}
+
+.cd-drawer__member-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cd-drawer__member-role {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.cd-drawer__close {
+  flex-shrink: 0;
+  padding: 4px;
+}
+
+.modal__divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  border-radius: var(--radius-xs);
+}
+
+/* Content */
+.side-drawer__content {
+  flex: 1 0 0;
+  min-height: 0;
+  width: 100%;
+  overflow-y: auto;
+}
+
+/* Footer */
+.side-drawer__footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+  width: 100%;
+  background: var(--page-background);
+}
+.side-drawer__footer-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  border-radius: var(--radius-xs);
+}
+.side-drawer__buttons {
+  display: flex;
+  gap: var(--space-m);
+  align-items: flex-start;
+}
+.side-drawer__btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s);
+  background: var(--primary-button-background, var(--primary-500, #00CEE6));
+  color: var(--text-button-foreground, var(--neutral-800));
+  padding: 10px var(--space-ml);
+  border-radius: var(--radius-s);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.5;
+  border: none;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+.side-drawer__btn-primary:hover { background: var(--primary-600); }
+.side-drawer__btn-secondary {
+  background: transparent;
+  color: var(--primary-button-background, var(--primary-600));
+  border: 1px solid var(--primary-button-background, var(--primary-600));
+  padding: 10px var(--space-ml);
+  border-radius: var(--radius-s);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+.side-drawer__btn-secondary:hover { background: rgba(0, 206, 230, 0.16); }
+
+/* Courses table */
+.cd-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.cd-table__header {
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.cd-table__header .cd-table__cell {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  padding: 0 var(--space-m);
+}
+
+.cd-table__row {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+}
+
+.cd-table__cell {
+  display: flex;
+  align-items: center;
+  padding: var(--space-sm) var(--space-m);
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.cd-table__cell--course {
+  flex: 1 0 0;
+  min-width: 0;
+  gap: var(--space-sm);
+}
+
+.cd-table__cell--date {
+  width: 102px;
+  flex-shrink: 0;
+}
+
+.cd-table__cell--progress {
+  gap: 8px;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  padding: var(--space-sm) var(--space-m);
+}
+
+.cd-table__thumb {
+  width: 90px;
+  height: 44px;
+  border-radius: var(--radius-s);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.cd-table__course-title {
+  font-size: 14px;
+  color: var(--text-primary);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.cd-table__date-stack {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.cd-table__date-top {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+.cd-table__date-year {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.cd-table__progress {
+  display: flex;
+  width: 72px;
+  height: 8px;
+  border-radius: var(--radius-ml);
+  overflow: hidden;
+  background: var(--border);
+  flex-shrink: 0;
+}
+.cd-table__progress-seg {
+  flex: 1 0 0;
+  height: 100%;
+  background: var(--border);
+}
+.cd-table__progress-seg--filled {
+  background: var(--primary-600);
+}
+.cd-table__progress-pct {
+  font-size: 14px;
+  color: var(--text-secondary);
+  min-width: 33px;
+  text-align: left;
+}

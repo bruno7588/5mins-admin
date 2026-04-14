@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Home2,
@@ -14,7 +16,28 @@ import {
   Calendar,
   Add,
   Mobile,
+  Danger,
+  InfoCircle,
+  TickCircle,
+  TaskSquare,
+  SmsNotification,
+  ArrowDown,
+  ArrowUp,
+  ArrowLeft2,
+  ArrowRight2,
 } from 'iconsax-react'
+import Badge from '../../components/Badge/Badge'
+import Tooltip from '../../components/Tooltip/Tooltip'
+import Search from '../../components/Search/Search'
+import Checkbox from '../../components/Checkbox/Checkbox'
+import CoursesDrawer, { type CourseBucket, type DrawerCourse } from './CoursesDrawer'
+import avatar1 from './assets/m1.jpg'
+import thumb1 from './assets/t1.png'
+import thumb2 from './assets/t2.png'
+import thumb3 from './assets/t3.jpg'
+import avatar2 from './assets/m2.jpg'
+import avatar3 from './assets/m3.jpg'
+import avatar4 from './assets/m4.jpg'
 import './MyTeam.css'
 
 function Logo({ size = 22 }: { size?: number }) {
@@ -39,6 +62,101 @@ function Logo({ size = 22 }: { size?: number }) {
   )
 }
 
+function ProgressBar({ value, muted }: { value: number; muted?: boolean }) {
+  const segments = 8
+  const filled = Math.round((value / 100) * segments)
+  return (
+    <div className={`mt-cp__progress${muted ? ' mt-cp__progress--muted' : ''}`} role="progressbar" aria-valuenow={value} aria-valuemin={0} aria-valuemax={100}>
+      {Array.from({ length: segments }).map((_, i) => (
+        <span key={i} className={`mt-cp__progress-seg${i < filled ? ' mt-cp__progress-seg--filled' : ''}`} />
+      ))}
+    </div>
+  )
+}
+
+function StatCard({ icon, label, value }: { icon: ReactNode; label: string; value: number }) {
+  return (
+    <div className="mt-stat-card">
+      <span className="mt-stat-icon">{icon}</span>
+      <div className="mt-stat-info">
+        <p className="mt-stat-label">{label}</p>
+        <p className="mt-stat-value">{value.toLocaleString()}</p>
+      </div>
+    </div>
+  )
+}
+
+type TeamMember = {
+  id: string
+  name: string
+  role: string
+  initials: string
+  avatarSrc?: string
+  overdue: number              // past due
+  atRisk: number               // due within next 30 days
+  inProgress: number           // started, not yet complete
+  completed: number            // completed all-time
+  overallProgress: number      // 0–100 — completion across all assigned courses
+}
+
+const COURSE_POOL = [
+  'Compliance & Ethics 101',
+  'Food Safety Essentials',
+  'Customer Service Fundamentals',
+  'Data Protection (GDPR)',
+  'Harassment Prevention',
+  'Conflict Resolution',
+  'POS System Training',
+  'Fire Safety',
+  'Cash Handling',
+  'Allergen Awareness',
+  'Sustainable Service',
+  'Brand Standards',
+]
+
+function addDays(days: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() + days)
+  return d.toISOString().slice(0, 10)
+}
+
+const THUMB_POOL = [thumb1, thumb2, thumb3]
+
+function coursesFor(memberId: string, bucket: CourseBucket, count: number): DrawerCourse[] {
+  if (count === 0) return []
+  const seed = [...memberId].reduce((a, c) => a + c.charCodeAt(0), 0)
+  return Array.from({ length: count }).map((_, i) => {
+    const titleIdx = (seed + i * 7 + (bucket === 'overdue' ? 0 : 3)) % COURSE_POOL.length
+    const title = COURSE_POOL[titleIdx]
+    const thumbnailSrc = THUMB_POOL[(seed + i) % THUMB_POOL.length]
+    const dueOffset = bucket === 'overdue'
+      ? -(((seed + i) % 14) + 1)     // 1–14 days ago
+      : ((seed + i * 3) % 28) + 2    // 2–29 days ahead
+    // start date: typically 30–60 days before due date
+    const startOffset = dueOffset - (30 + ((seed + i * 5) % 30))
+    const progress = bucket === 'overdue' ? (i * 11) % 40 : 0
+    return {
+      id: `${memberId}-${bucket}-${i}`,
+      title,
+      thumbnailSrc,
+      startDate: addDays(startOffset),
+      dueDate: addDays(dueOffset),
+      progress,
+    }
+  })
+}
+
+const team: TeamMember[] = [
+  { id: 'm1', name: 'Michael Thompson', role: 'Risk Management Specialist', initials: 'MT', avatarSrc: avatar1, overdue: 2, atRisk: 1, inProgress: 1, completed: 3,  overallProgress: 0  },
+  { id: 'm2', name: 'Jessica Hart',     role: 'Compliance Officer',         initials: 'JH', avatarSrc: avatar2, overdue: 0, atRisk: 3, inProgress: 2, completed: 5,  overallProgress: 0  },
+  { id: 'm3', name: 'David Johnson',    role: 'Investment Strategist',      initials: 'DJ', avatarSrc: avatar3, overdue: 1, atRisk: 0, inProgress: 0, completed: 4,  overallProgress: 12 },
+  { id: 'm4', name: 'Noah Williams',    role: 'Concierge',                  initials: 'NW',                     overdue: 0, atRisk: 0, inProgress: 3, completed: 6,  overallProgress: 68 },
+  { id: 'm5', name: 'Mei Tanaka',       role: 'Housekeeping',               initials: 'MT',                     overdue: 3, atRisk: 2, inProgress: 0, completed: 2,  overallProgress: 22 },
+  { id: 'm6', name: 'Ethan Brooks',     role: 'Barista',                    initials: 'EB',                     overdue: 0, atRisk: 1, inProgress: 1, completed: 4,  overallProgress: 45 },
+  { id: 'm7', name: 'Priya Shah',       role: 'Shift Lead',                 initials: 'PS',                     overdue: 0, atRisk: 0, inProgress: 2, completed: 7,  overallProgress: 91 },
+  { id: 'm8', name: 'Samantha Rivers',  role: 'Financial Analyst',          initials: 'SR', avatarSrc: avatar4, overdue: 1, atRisk: 0, inProgress: 1, completed: 3,  overallProgress: 0  },
+]
+
 const sideItems = [
   { label: 'For You', icon: Home2 },
   { label: 'Your Workspace', icon: Profile2User },
@@ -52,6 +170,72 @@ const sideItems = [
 
 function MyTeam() {
   const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [drawerState, setDrawerState] = useState<{ memberId: string; bucket: CourseBucket } | null>(null)
+  const [sortKey, setSortKey] = useState<'overdue' | 'atRisk' | 'progress'>('overdue')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+
+  const toggleSort = (key: 'overdue' | 'atRisk' | 'progress') => {
+    if (sortKey === key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+    else {
+      setSortKey(key)
+      setSortDir('desc')
+    }
+  }
+
+  const rows = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase()
+    const filtered = q
+      ? team.filter((r) => r.name.toLowerCase().includes(q) || r.role.toLowerCase().includes(q))
+      : team
+    const sorted = [...filtered].sort((a, b) => {
+      let diff = 0
+      if (sortKey === 'overdue') diff = a.overdue - b.overdue
+      else if (sortKey === 'atRisk') diff = a.atRisk - b.atRisk
+      else diff = a.overallProgress - b.overallProgress
+      return sortDir === 'asc' ? diff : -diff
+    })
+    return sorted
+  }, [searchQuery, sortKey, sortDir])
+
+  const totals = useMemo(() => {
+    return rows.reduce(
+      (acc, r) => ({
+        overdue: acc.overdue + r.overdue,
+        atRisk: acc.atRisk + r.atRisk,
+        inProgress: acc.inProgress + r.inProgress,
+        completed: acc.completed + r.completed,
+      }),
+      { overdue: 0, atRisk: 0, inProgress: 0, completed: 0 },
+    )
+  }, [rows])
+
+  const visibleIds = rows.map((r) => r.id)
+  const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id))
+
+  const toggleRow = (id: string) =>
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+
+  const toggleAll = () =>
+    setSelectedIds((prev) => {
+      if (allVisibleSelected) {
+        const next = new Set(prev)
+        visibleIds.forEach((id) => next.delete(id))
+        return next
+      }
+      const next = new Set(prev)
+      visibleIds.forEach((id) => next.add(id))
+      return next
+    })
+
+  const selectedCount = selectedIds.size
+  const canSendReminders = selectedCount > 0
 
   return (
     <div className="mt-app">
@@ -138,8 +322,236 @@ function MyTeam() {
               </button>
             </nav>
           </header>
+
+          <section className="mt-course-progress" aria-label="Course Progress">
+            <div className="mt-cp__stats">
+              <StatCard
+                icon={<Danger size={40} color="var(--danger-500)" variant="Linear" />}
+                label="Overdue"
+                value={totals.overdue}
+              />
+              <StatCard
+                icon={<InfoCircle size={40} color="var(--warning-500)" variant="Linear" />}
+                label="At Risk"
+                value={totals.atRisk}
+              />
+              <StatCard
+                icon={<TaskSquare size={40} color="var(--primary-600)" variant="Linear" />}
+                label="In Progress"
+                value={totals.inProgress}
+              />
+              <StatCard
+                icon={<TickCircle size={40} color="var(--success-500)" variant="Linear" />}
+                label="Completed"
+                value={totals.completed}
+              />
+            </div>
+
+            <div className="mt-cp__toolbar">
+              <div className="mt-cp__toolbar-search">
+                <Search
+                  size="M"
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                  placeholder="Search for learners"
+                  ariaLabel="Search for learners"
+                />
+              </div>
+              <div className="mt-cp__toolbar-actions">
+                {canSendReminders ? (
+                  <button type="button" className="mt-cp__reminders-btn mt-cp__reminders-btn--active">
+                    <span>Send Reminders ({selectedCount})</span>
+                    <SmsNotification size={20} color="currentColor" variant="Linear" />
+                  </button>
+                ) : (
+                  <Tooltip
+                    text="Select learners to remind"
+                    position="Top"
+                    alignment="End"
+                    icon={false}
+                  >
+                    <button
+                      type="button"
+                      className="mt-cp__reminders-btn"
+                      disabled
+                      aria-disabled="true"
+                    >
+                      <span>Send Reminders</span>
+                      <SmsNotification size={20} color="currentColor" variant="Linear" />
+                    </button>
+                  </Tooltip>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-cp__tablescroll">
+              <div className="mt-cp__table">
+                <div className="mt-cp__table-header">
+                  <div className="mt-cp__table-cell mt-cp__table-cell--name">
+                    <Checkbox checked={allVisibleSelected} onChange={toggleAll} />
+                    <span className="mt-cp__th-label">Name</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="mt-cp__table-cell mt-cp__table-cell--metric mt-cp__th-btn"
+                    onClick={() => toggleSort('overdue')}
+                    aria-label={`Sort by Overdue, currently ${sortKey === 'overdue' ? sortDir : 'unsorted'}`}
+                  >
+                    <Tooltip text="Courses past their due date" position="Top" alignment="Center" icon={false}>
+                      <span className="mt-cp__th-label">Overdue</span>
+                    </Tooltip>
+                    {sortKey === 'overdue' ? (
+                      sortDir === 'asc' ? (
+                        <ArrowUp size={16} color="var(--text-secondary)" variant="Linear" />
+                      ) : (
+                        <ArrowDown size={16} color="var(--text-secondary)" variant="Linear" />
+                      )
+                    ) : (
+                      <ArrowDown size={16} color="var(--text-tertiary)" variant="Linear" />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="mt-cp__table-cell mt-cp__table-cell--metric mt-cp__th-btn"
+                    onClick={() => toggleSort('atRisk')}
+                    aria-label={`Sort by At Risk, currently ${sortKey === 'atRisk' ? sortDir : 'unsorted'}`}
+                  >
+                    <Tooltip text="Courses due within the next 30 days" position="Top" alignment="Center" icon={false}>
+                      <span className="mt-cp__th-label">At Risk</span>
+                    </Tooltip>
+                    {sortKey === 'atRisk' ? (
+                      sortDir === 'asc' ? (
+                        <ArrowUp size={16} color="var(--text-secondary)" variant="Linear" />
+                      ) : (
+                        <ArrowDown size={16} color="var(--text-secondary)" variant="Linear" />
+                      )
+                    ) : (
+                      <ArrowDown size={16} color="var(--text-tertiary)" variant="Linear" />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="mt-cp__table-cell mt-cp__table-cell--metric mt-cp__th-btn"
+                    onClick={() => toggleSort('progress')}
+                    aria-label={`Sort by Overall progress, currently ${sortKey === 'progress' ? sortDir : 'unsorted'}`}
+                  >
+                    <span className="mt-cp__th-label">Overall progress</span>
+                    {sortKey === 'progress' ? (
+                      sortDir === 'asc' ? (
+                        <ArrowUp size={16} color="var(--text-secondary)" variant="Linear" />
+                      ) : (
+                        <ArrowDown size={16} color="var(--text-secondary)" variant="Linear" />
+                      )
+                    ) : (
+                      <ArrowDown size={16} color="var(--text-tertiary)" variant="Linear" />
+                    )}
+                  </button>
+                  <div className="mt-cp__table-cell mt-cp__table-cell--action" aria-hidden="true" />
+                </div>
+
+                {rows.map((r) => {
+                  const needsAttention = r.overdue > 0 || r.atRisk > 0
+                  const progressMuted = !needsAttention && r.overallProgress === 0
+                  return (
+                    <div
+                      className={`mt-cp__table-row${selectedIds.has(r.id) ? ' mt-cp__table-row--selected' : ''}`}
+                      key={r.id}
+                    >
+                      <div className="mt-cp__table-cell mt-cp__table-cell--name">
+                        <Checkbox checked={selectedIds.has(r.id)} onChange={() => toggleRow(r.id)} />
+                        {r.avatarSrc ? (
+                          <img className="mt-cp__avatar mt-cp__avatar--img" src={r.avatarSrc} alt="" />
+                        ) : (
+                          <div className="mt-cp__avatar" aria-hidden="true">{r.initials}</div>
+                        )}
+                        <div className="mt-cp__member-info">
+                          <span className="mt-cp__member-name">{r.name}</span>
+                          <span className="mt-cp__member-role">{r.role}</span>
+                        </div>
+                      </div>
+                      <div className="mt-cp__table-cell mt-cp__table-cell--metric">
+                        {r.overdue > 0 ? (
+                          <button
+                            type="button"
+                            className="mt-cp__metric-btn"
+                            onClick={() => setDrawerState({ memberId: r.id, bucket: 'overdue' })}
+                            aria-label={`View ${r.overdue} overdue course${r.overdue === 1 ? '' : 's'} for ${r.name}`}
+                          >
+                            <Badge type="error" icon label={String(r.overdue)} />
+                          </button>
+                        ) : (
+                          <span className="mt-cp__status-dash">–</span>
+                        )}
+                      </div>
+                      <div className="mt-cp__table-cell mt-cp__table-cell--metric">
+                        {r.atRisk > 0 ? (
+                          <button
+                            type="button"
+                            className="mt-cp__metric-btn"
+                            onClick={() => setDrawerState({ memberId: r.id, bucket: 'at-risk' })}
+                            aria-label={`View ${r.atRisk} at-risk course${r.atRisk === 1 ? '' : 's'} for ${r.name}`}
+                          >
+                            <Badge type="warning" icon label={String(r.atRisk)} />
+                          </button>
+                        ) : (
+                          <span className="mt-cp__status-dash">–</span>
+                        )}
+                      </div>
+                      <div className={`mt-cp__table-cell mt-cp__table-cell--metric${progressMuted ? ' mt-cp__table-cell--muted' : ''}`}>
+                        <ProgressBar value={r.overallProgress} muted={progressMuted} />
+                        <span className="mt-cp__progress-pct">{r.overallProgress}%</span>
+                      </div>
+                      <div className="mt-cp__table-cell mt-cp__table-cell--action">
+                        {needsAttention && (
+                          <Tooltip text="Send reminder" position="Top" alignment="End" icon={false}>
+                            <button
+                              type="button"
+                              className="mt-cp__row-action"
+                              aria-label={`Send reminder to ${r.name}`}
+                            >
+                              <SmsNotification size={20} color="var(--text-secondary)" variant="Linear" />
+                            </button>
+                          </Tooltip>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+
+                <div className="mt-cp__pagination">
+                  <span className="mt-cp__pagination-label">1–{rows.length} of {rows.length}</span>
+                  <button type="button" className="mt-cp__pagination-btn" aria-label="Previous page" disabled>
+                    <ArrowLeft2 size={16} color="var(--text-secondary)" variant="Linear" />
+                  </button>
+                  <button type="button" className="mt-cp__pagination-btn" aria-label="Next page" disabled>
+                    <ArrowRight2 size={16} color="var(--text-secondary)" variant="Linear" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
         </section>
       </div>
+
+      {drawerState && (() => {
+        const member = team.find((m) => m.id === drawerState.memberId)
+        if (!member) return null
+        const count = drawerState.bucket === 'overdue' ? member.overdue : member.atRisk
+        const courses = coursesFor(member.id, drawerState.bucket, count)
+        return (
+          <CoursesDrawer
+            open
+            bucket={drawerState.bucket}
+            memberName={member.name}
+            memberRole={member.role}
+            memberAvatarSrc={member.avatarSrc}
+            memberInitials={member.initials}
+            courses={courses}
+            onClose={() => setDrawerState(null)}
+            onSendReminder={() => setDrawerState(null)}
+          />
+        )
+      })()}
     </div>
   )
 }
