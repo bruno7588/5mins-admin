@@ -16,6 +16,8 @@ import QBYourContent from './pages/questions-bank/YourContent'
 import ScormYourContent from './pages/scorm-content/YourContent'
 import ScormCreateCourse from './pages/scorm-content/CreateCourse'
 
+import MyTeam from './pages/my-team/MyTeam'
+
 function App() {
   return (
     <Routes>
@@ -40,6 +42,7 @@ function App() {
           </div>
         }
       />
+      <Route path="/my-team" element={<MyTeam />} />
 
       {/* All other pages — with TopNav */}
       <Route

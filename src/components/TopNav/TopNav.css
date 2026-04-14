@@ -22,6 +22,10 @@
 .topnav-logo {
   display: flex;
   align-items: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .topnav-right {
@@ -31,21 +35,29 @@
 }
 
 .topnav-btn-outline {
-  padding: var(--space-s) var(--space-m);
+  height: 41px;
+  padding: 8px 16px;
   font-size: 14px;
-  font-weight: 500;
+  line-height: 1.5;
+  font-weight: 700;
   color: var(--text-primary);
-  border: 1px solid var(--border);
+  border: 1px solid var(--text-primary);
   border-radius: var(--radius-s);
-  background: unset;
-  background-color: unset;
+  background: transparent;
   cursor: pointer;
-  transition: background 150ms ease, border-color 150ms ease;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
 .topnav-btn-outline:hover {
-  background: var(--neutral-50);
-  border-color: var(--neutral-300);
+  background: rgba(0, 206, 230, 0.16);
+  color: var(--primary-600);
+  border-color: var(--primary-600);
+}
+
+.topnav-btn-outline:active {
+  background: rgba(0, 206, 230, 0.16);
+  color: var(--primary-700);
+  border-color: var(--primary-700);
 }
 
 .topnav-icon-btn {

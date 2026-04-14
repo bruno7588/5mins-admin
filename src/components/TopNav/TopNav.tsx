@@ -1,11 +1,20 @@
-import { Moon, Cpu } from 'iconsax-react'
+import { Moon, Logout } from 'iconsax-react'
+import { useNavigate } from 'react-router-dom'
+import Tooltip from '../Tooltip/Tooltip'
 import './TopNav.css'
 
 function TopNav() {
+  const navigate = useNavigate()
+  const goToApp = () => navigate('/my-team')
   return (
     <nav className="topnav">
       <div className="topnav-left">
-        <div className="topnav-logo">
+        <button
+          type="button"
+          className="topnav-logo"
+          onClick={goToApp}
+          aria-label="Go to My Team"
+        >
           <svg width="103" height="22" viewBox="0 0 103 22" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g clipPath="url(#clip0_5982_2850)">
               <path d="M0 15.5275H4.14665C4.18738 16.5133 4.51324 17.275 5.12424 17.8045C5.65378 18.2974 6.40327 18.5418 7.38087 18.5418C8.55806 18.5418 9.45419 18.2159 10.0652 17.5561C10.6762 16.8188 10.9817 15.8127 10.9817 14.5377C10.9817 13.2628 10.6558 12.3626 10.0082 11.7068C9.39716 11.0102 8.5214 10.6599 7.38494 10.6599C6.77394 10.6599 6.22404 10.7821 5.73932 11.0306C5.20978 11.3198 4.82282 11.6864 4.58249 12.1385L0.680245 11.9552L2.07332 0.439941H12.3177C12.888 0.480675 13.3849 0.708781 13.8126 1.11611C14.2403 1.52752 14.4522 2.04076 14.4522 2.65583V4.13445H5.12424L4.57434 8.26073C4.94094 7.93079 5.4664 7.66602 6.15887 7.45828C6.8106 7.25462 7.49899 7.14871 8.23219 7.14871C10.387 7.14871 12.1141 7.80451 13.4175 9.1202C14.7577 10.4766 15.4298 12.22 15.4298 14.3544C15.4298 16.6966 14.6966 18.5622 13.2342 19.9593C11.8126 21.3157 9.85745 21.9919 7.38087 21.9919C5.06314 21.9919 3.27495 21.4379 2.01222 20.33C0.749492 19.1813 0.0814665 17.5805 0 15.5275Z" fill="#00CEE6"/>
@@ -25,16 +34,20 @@ function TopNav() {
               </clipPath>
             </defs>
           </svg>
-        </div>
+        </button>
       </div>
       <div className="topnav-right">
-        <button className="topnav-btn-outline">Exit Admin</button>
-        <button className="topnav-icon-btn" aria-label="Dark mode">
-          <Moon size={24} color="var(--neutral-500)" variant="Linear" />
-        </button>
-        <button className="topnav-icon-btn" aria-label="AI Assistant">
-          <Cpu size={24} color="var(--neutral-500)" variant="Linear" />
-        </button>
+        <button className="topnav-btn-outline" onClick={goToApp}>Exit Admin</button>
+        <Tooltip text="Dark mode" position="Bottom" alignment="Center" icon={false}>
+          <button className="topnav-icon-btn" aria-label="Dark mode">
+            <Moon size={24} color="var(--neutral-500)" variant="Linear" />
+          </button>
+        </Tooltip>
+        <Tooltip text="Log out" position="Bottom" alignment="End" icon={false}>
+          <button className="topnav-icon-btn" aria-label="Log out">
+            <Logout size={24} color="var(--neutral-500)" variant="Linear" />
+          </button>
+        </Tooltip>
       </div>
     </nav>
   )
