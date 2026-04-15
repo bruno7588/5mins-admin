@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Home2,
@@ -195,7 +195,7 @@ function MyTeam() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [drawerState, setDrawerState] = useState<{ memberId: string; bucket: CourseBucket } | null>(null)
-  const [sortKey, setSortKey] = useState<'overdue' | 'atRisk' | 'progress'>('overdue')
+  const [sortKey, setSortKey] = useState<'overdue' | 'atRisk' | 'inProgress' | 'completed' | 'progress'>('overdue')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [courseFilter, setCourseFilter] = useState<'all' | 'compliance'>('all')
   const [scopeFilter, setScopeFilter] = useState<string>('direct')
@@ -226,7 +226,7 @@ function MyTeam() {
     [subManagers],
   )
 
-  const toggleSort = (key: 'overdue' | 'atRisk' | 'progress') => {
+  const toggleSort = (key: 'overdue' | 'atRisk' | 'inProgress' | 'completed' | 'progress') => {
     if (sortKey === key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
     else {
       setSortKey(key)
@@ -258,6 +258,8 @@ function MyTeam() {
       let diff = 0
       if (sortKey === 'overdue') diff = a.overdue - b.overdue
       else if (sortKey === 'atRisk') diff = a.atRisk - b.atRisk
+      else if (sortKey === 'inProgress') diff = a.inProgress - b.inProgress
+      else if (sortKey === 'completed') diff = a.completed - b.completed
       else diff = a.overallProgress - b.overallProgress
       return sortDir === 'asc' ? diff : -diff
     })
@@ -286,6 +288,25 @@ function MyTeam() {
   useEffect(() => {
     setPage(1)
   }, [searchQuery, courseFilter, scopeFilter, sortKey, sortDir])
+
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [hasScroll, setHasScroll] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const onScroll = () => setIsScrolled(el.scrollLeft > 0)
+    const checkOverflow = () => setHasScroll(el.scrollWidth > el.clientWidth)
+    el.addEventListener('scroll', onScroll)
+    const ro = new ResizeObserver(checkOverflow)
+    ro.observe(el)
+    checkOverflow()
+    return () => {
+      el.removeEventListener('scroll', onScroll)
+      ro.disconnect()
+    }
+  }, [showReportsTo])
 
   const visibleIds = paginatedRows.map((r) => r.id)
   const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id))
@@ -490,7 +511,10 @@ function MyTeam() {
               </div>
             </div>
 
-            <div className="mt-cp__tablescroll">
+            <div
+              className={`mt-cp__tablescroll${hasScroll ? ' mt-cp__tablescroll--has-scroll' : ''}${isScrolled ? ' mt-cp__tablescroll--scrolled' : ''}`}
+              ref={scrollRef}
+            >
               <div className="mt-cp__table">
                 <div className="mt-cp__table-header">
                   <div className="mt-cp__table-cell mt-cp__table-cell--name">
@@ -518,7 +542,7 @@ function MyTeam() {
                         <ArrowDown size={16} color="var(--text-secondary)" variant="Linear" />
                       )
                     ) : (
-                      <ArrowDown size={16} color="var(--text-tertiary)" variant="Linear" />
+                      <span className="mt-cp__th-sort-hint"><ArrowDown size={16} color="var(--text-tertiary)" variant="Linear" /></span>
                     )}
                   </button>
                   <button
@@ -537,7 +561,45 @@ function MyTeam() {
                         <ArrowDown size={16} color="var(--text-secondary)" variant="Linear" />
                       )
                     ) : (
-                      <ArrowDown size={16} color="var(--text-tertiary)" variant="Linear" />
+                      <span className="mt-cp__th-sort-hint"><ArrowDown size={16} color="var(--text-tertiary)" variant="Linear" /></span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="mt-cp__table-cell mt-cp__table-cell--metric mt-cp__th-btn"
+                    onClick={() => toggleSort('inProgress')}
+                    aria-label={`Sort by In Progress, currently ${sortKey === 'inProgress' ? sortDir : 'unsorted'}`}
+                  >
+                    <Tooltip text="Courses started but not yet complete" position="Top" alignment="Center" icon={false}>
+                      <span className="mt-cp__th-label">In Progress</span>
+                    </Tooltip>
+                    {sortKey === 'inProgress' ? (
+                      sortDir === 'asc' ? (
+                        <ArrowUp size={16} color="var(--text-secondary)" variant="Linear" />
+                      ) : (
+                        <ArrowDown size={16} color="var(--text-secondary)" variant="Linear" />
+                      )
+                    ) : (
+                      <span className="mt-cp__th-sort-hint"><ArrowDown size={16} color="var(--text-tertiary)" variant="Linear" /></span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="mt-cp__table-cell mt-cp__table-cell--metric mt-cp__th-btn"
+                    onClick={() => toggleSort('completed')}
+                    aria-label={`Sort by Completed, currently ${sortKey === 'completed' ? sortDir : 'unsorted'}`}
+                  >
+                    <Tooltip text="Courses completed all-time" position="Top" alignment="Center" icon={false}>
+                      <span className="mt-cp__th-label">Completed</span>
+                    </Tooltip>
+                    {sortKey === 'completed' ? (
+                      sortDir === 'asc' ? (
+                        <ArrowUp size={16} color="var(--text-secondary)" variant="Linear" />
+                      ) : (
+                        <ArrowDown size={16} color="var(--text-secondary)" variant="Linear" />
+                      )
+                    ) : (
+                      <span className="mt-cp__th-sort-hint"><ArrowDown size={16} color="var(--text-tertiary)" variant="Linear" /></span>
                     )}
                   </button>
                   <button
@@ -554,7 +616,7 @@ function MyTeam() {
                         <ArrowDown size={16} color="var(--text-secondary)" variant="Linear" />
                       )
                     ) : (
-                      <ArrowDown size={16} color="var(--text-tertiary)" variant="Linear" />
+                      <span className="mt-cp__th-sort-hint"><ArrowDown size={16} color="var(--text-tertiary)" variant="Linear" /></span>
                     )}
                   </button>
                   <div className="mt-cp__table-cell mt-cp__table-cell--action" aria-hidden="true" />
@@ -611,31 +673,55 @@ function MyTeam() {
                       })()}
                       <div className="mt-cp__table-cell mt-cp__table-cell--metric">
                         {r.overdue > 0 ? (
-                          <button
-                            type="button"
-                            className="mt-cp__metric-btn"
-                            onClick={() => setDrawerState({ memberId: r.id, bucket: 'overdue' })}
-                            aria-label={`View ${r.overdue} overdue course${r.overdue === 1 ? '' : 's'} for ${r.name}`}
+                          <Tooltip
+                            text={`View ${r.overdue} overdue course${r.overdue === 1 ? '' : 's'}`}
+                            position="Top"
+                            alignment="Center"
+                            icon={false}
                           >
-                            <Badge type="error" icon label={String(r.overdue)} />
-                          </button>
+                            <button
+                              type="button"
+                              className="mt-cp__metric-link mt-cp__metric-link--danger"
+                              onClick={() => setDrawerState({ memberId: r.id, bucket: 'overdue' })}
+                              aria-label={`View ${r.overdue} overdue course${r.overdue === 1 ? '' : 's'} for ${r.name}`}
+                            >
+                              {r.overdue}
+                            </button>
+                          </Tooltip>
                         ) : (
                           <span className="mt-cp__status-dash">–</span>
                         )}
                       </div>
                       <div className="mt-cp__table-cell mt-cp__table-cell--metric">
                         {r.atRisk > 0 ? (
-                          <button
-                            type="button"
-                            className="mt-cp__metric-btn"
-                            onClick={() => setDrawerState({ memberId: r.id, bucket: 'at-risk' })}
-                            aria-label={`View ${r.atRisk} at-risk course${r.atRisk === 1 ? '' : 's'} for ${r.name}`}
+                          <Tooltip
+                            text={`View ${r.atRisk} at-risk course${r.atRisk === 1 ? '' : 's'}`}
+                            position="Top"
+                            alignment="Center"
+                            icon={false}
                           >
-                            <Badge type="warning" icon label={String(r.atRisk)} />
-                          </button>
+                            <button
+                              type="button"
+                              className="mt-cp__metric-link mt-cp__metric-link--warning"
+                              onClick={() => setDrawerState({ memberId: r.id, bucket: 'at-risk' })}
+                              aria-label={`View ${r.atRisk} at-risk course${r.atRisk === 1 ? '' : 's'} for ${r.name}`}
+                            >
+                              {r.atRisk}
+                            </button>
+                          </Tooltip>
                         ) : (
                           <span className="mt-cp__status-dash">–</span>
                         )}
+                      </div>
+                      <div className="mt-cp__table-cell mt-cp__table-cell--metric">
+                        <span className={`mt-cp__metric-plain${r.inProgress === 0 ? ' mt-cp__metric-plain--zero' : ''}`}>
+                          {r.inProgress}
+                        </span>
+                      </div>
+                      <div className="mt-cp__table-cell mt-cp__table-cell--metric">
+                        <span className={`mt-cp__metric-plain${r.completed === 0 ? ' mt-cp__metric-plain--zero' : ''}`}>
+                          {r.completed}
+                        </span>
                       </div>
                       <div className={`mt-cp__table-cell mt-cp__table-cell--metric${progressMuted ? ' mt-cp__table-cell--muted' : ''}`}>
                         <ProgressBar value={r.overallProgress} muted={progressMuted} />

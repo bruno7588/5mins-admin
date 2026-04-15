@@ -547,6 +547,46 @@
   gap: var(--space-sm);
 }
 
+/* Sticky first column — matches People page pattern */
+.mt-cp__tablescroll--has-scroll .mt-cp__table-cell--name {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  flex: none;
+  width: 300px;
+  background: var(--page-background);
+}
+
+.mt-cp__tablescroll--has-scroll .mt-cp__table-row:hover .mt-cp__table-cell--name {
+  background: var(--cards-background-hover, var(--neutral-25));
+}
+
+.mt-cp__tablescroll--has-scroll .mt-cp__table-row--selected .mt-cp__table-cell--name {
+  background: #FEF1D6;
+}
+
+.mt-cp__tablescroll--has-scroll .mt-cp__table-row--selected:hover .mt-cp__table-cell--name {
+  background: #FDECC5;
+}
+
+/* Shadow on right edge when user has scrolled horizontally */
+.mt-cp__tablescroll--has-scroll .mt-cp__table-cell--name::after {
+  content: '';
+  position: absolute;
+  right: -12px;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.08), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.mt-cp__tablescroll--scrolled .mt-cp__table-cell--name::after {
+  opacity: 1;
+}
+
 .mt-cp__table-cell--reports-to {
   width: 180px;
   flex-shrink: 0;
@@ -618,6 +658,29 @@
   cursor: pointer;
   gap: 4px;
 }
+
+.mt-cp__th-btn:hover,
+.mt-cp__th-btn:focus-visible {
+  background: transparent;
+  outline: none;
+}
+
+/* Kill any background on the header and all descendants in every state */
+.mt-cp__table-header,
+.mt-cp__table-header *,
+.mt-cp__table-header *:hover,
+.mt-cp__table-header *:focus,
+.mt-cp__table-header *:focus-visible,
+.mt-cp__table-header *:active {
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.mt-cp__th-btn > .tooltip-wrapper {
+  display: inline-flex;
+  margin: 0;
+}
 .mt-cp__th-label {
   font-size: 14px;
   font-weight: 400;
@@ -625,6 +688,17 @@
 }
 .mt-cp__th-btn:hover .mt-cp__th-label {
   color: var(--text-primary);
+}
+
+/* Sort-direction hint: hidden until header is hovered/focused */
+.mt-cp__th-sort-hint {
+  display: inline-flex;
+  align-items: center;
+  visibility: hidden;
+}
+.mt-cp__th-btn:hover .mt-cp__th-sort-hint,
+.mt-cp__th-btn:focus-visible .mt-cp__th-sort-hint {
+  visibility: visible;
 }
 
 /* Action column */
@@ -704,16 +778,10 @@
 }
 
 .mt-cp__status-dash {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 12px;
-  border-radius: 40px;
-  background: var(--input-background);
   color: var(--text-disabled);
-  font-weight: 500;
+  font-weight: 400;
   font-size: 14px;
-  line-height: 1.2;
+  line-height: 1.5;
 }
 
 /* Pagination */
@@ -751,7 +819,77 @@
 .mt-cp__table-cell--metric {
   width: 140px;
   flex-shrink: 0;
-  justify-content: flex-start;
+  justify-content: center;
+}
+
+.mt-cp__metric-plain {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+/* Clickable metric number — underline + color shift on hover.
+   The Tooltip wrapper + button stretch to fill the cell so the full area
+   is the click/hover target, not just the small number. */
+.mt-cp__table-cell--metric:not(.mt-cp__th-btn) > .tooltip-wrapper,
+.mt-cp__table-cell--metric:not(.mt-cp__th-btn) > .tooltip-wrapper > .tooltip__trigger {
+  align-self: stretch;
+  width: 100%;
+  display: flex;
+}
+
+.mt-cp__table-cell--metric .tooltip__body--top-center,
+.mt-cp__table-cell--metric .tooltip__body--top-start,
+.mt-cp__table-cell--metric .tooltip__body--top-end {
+  bottom: calc(100% + 8px);
+}
+
+.mt-cp__metric-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  margin: calc(var(--space-sm) * -1) calc(var(--space-m) * -1);
+  padding: var(--space-sm) var(--space-m);
+  background: transparent;
+  border: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.mt-cp__metric-link:hover,
+.mt-cp__metric-link:focus-visible {
+  background: var(--input-background);
+  border-radius: var(--radius-s);
+}
+
+.mt-cp__metric-link--danger {
+  color: var(--danger-500);
+}
+.mt-cp__metric-link--danger:hover,
+.mt-cp__metric-link--danger:focus-visible {
+  color: var(--danger-600);
+  text-decoration: underline;
+  outline: none;
+}
+
+.mt-cp__metric-link--warning {
+  color: var(--text-warning);
+}
+.mt-cp__metric-link--warning:hover,
+.mt-cp__metric-link--warning:focus-visible {
+  color: #996322; /* Warning-700 */
+  text-decoration: underline;
+  outline: none;
+}
+
+.mt-cp__metric-plain--zero {
+  color: var(--text-disabled);
 }
 
 .mt-cp__avatar {
