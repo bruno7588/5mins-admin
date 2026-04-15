@@ -442,6 +442,7 @@
 }
 
 .mt-cp__switcher-item:hover:not(.mt-cp__switcher-item--active) {
+  background: var(--input-background);
   color: var(--text-primary);
 }
 
