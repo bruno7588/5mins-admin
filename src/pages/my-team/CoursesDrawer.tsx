@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { SmsNotification } from 'iconsax-react'
 import CloseButton from '../../components/CloseButton/CloseButton'
 import './CoursesDrawer.css'
 
