@@ -27,7 +27,6 @@ import {
   ArrowRight2,
   Sort,
 } from 'iconsax-react'
-import Badge from '../../components/Badge/Badge'
 import Tooltip from '../../components/Tooltip/Tooltip'
 import Search from '../../components/Search/Search'
 import Checkbox from '../../components/Checkbox/Checkbox'
