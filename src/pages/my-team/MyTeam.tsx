@@ -673,7 +673,7 @@ function MyTeam() {
                       <div className="mt-cp__table-cell mt-cp__table-cell--metric">
                         {r.overdue > 0 ? (
                           <Tooltip
-                            text={`View ${r.overdue} overdue course${r.overdue === 1 ? '' : 's'}`}
+                            text="View courses"
                             position="Top"
                             alignment="Center"
                             icon={false}
@@ -694,7 +694,7 @@ function MyTeam() {
                       <div className="mt-cp__table-cell mt-cp__table-cell--metric">
                         {r.atRisk > 0 ? (
                           <Tooltip
-                            text={`View ${r.atRisk} at-risk course${r.atRisk === 1 ? '' : 's'}`}
+                            text="View courses"
                             position="Top"
                             alignment="Center"
                             icon={false}
