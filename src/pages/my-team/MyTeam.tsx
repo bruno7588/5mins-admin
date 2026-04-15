@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Home2,
@@ -25,11 +25,13 @@ import {
   ArrowUp,
   ArrowLeft2,
   ArrowRight2,
+  Sort,
 } from 'iconsax-react'
 import Badge from '../../components/Badge/Badge'
 import Tooltip from '../../components/Tooltip/Tooltip'
 import Search from '../../components/Search/Search'
 import Checkbox from '../../components/Checkbox/Checkbox'
+import Dropdown, { type DropdownOption } from '../../components/Dropdown/Dropdown'
 import CoursesDrawer, { type CourseBucket, type DrawerCourse } from './CoursesDrawer'
 import avatar1 from './assets/m1.jpg'
 import thumb1 from './assets/t1.png'
@@ -92,12 +94,18 @@ type TeamMember = {
   role: string
   initials: string
   avatarSrc?: string
+  managerIds: string[]         // one or more managers — 'me' for direct reports, sub-manager ids for indirects
+  teamName?: string            // set on sub-managers — displayed in scope dropdown
   overdue: number              // past due
   atRisk: number               // due within next 30 days
   inProgress: number           // started, not yet complete
   completed: number            // completed all-time
   overallProgress: number      // 0–100 — completion across all assigned courses
 }
+
+const CURRENT_USER_ID = 'me'
+const CURRENT_USER_NAME = 'Alex Morgan'
+const PAGE_SIZE = 10
 
 const COURSE_POOL = [
   'Compliance & Ethics 101',
@@ -147,14 +155,28 @@ function coursesFor(memberId: string, bucket: CourseBucket, count: number): Draw
 }
 
 const team: TeamMember[] = [
-  { id: 'm1', name: 'Michael Thompson', role: 'Risk Management Specialist', initials: 'MT', avatarSrc: avatar1, overdue: 2, atRisk: 1, inProgress: 1, completed: 3,  overallProgress: 0  },
-  { id: 'm2', name: 'Jessica Hart',     role: 'Compliance Officer',         initials: 'JH', avatarSrc: avatar2, overdue: 0, atRisk: 3, inProgress: 2, completed: 5,  overallProgress: 0  },
-  { id: 'm3', name: 'David Johnson',    role: 'Investment Strategist',      initials: 'DJ', avatarSrc: avatar3, overdue: 1, atRisk: 0, inProgress: 0, completed: 4,  overallProgress: 12 },
-  { id: 'm4', name: 'Noah Williams',    role: 'Concierge',                  initials: 'NW',                     overdue: 0, atRisk: 0, inProgress: 3, completed: 6,  overallProgress: 68 },
-  { id: 'm5', name: 'Mei Tanaka',       role: 'Housekeeping',               initials: 'MT',                     overdue: 3, atRisk: 2, inProgress: 0, completed: 2,  overallProgress: 22 },
-  { id: 'm6', name: 'Ethan Brooks',     role: 'Barista',                    initials: 'EB',                     overdue: 0, atRisk: 1, inProgress: 1, completed: 4,  overallProgress: 45 },
-  { id: 'm7', name: 'Priya Shah',       role: 'Shift Lead',                 initials: 'PS',                     overdue: 0, atRisk: 0, inProgress: 2, completed: 7,  overallProgress: 91 },
-  { id: 'm8', name: 'Samantha Rivers',  role: 'Financial Analyst',          initials: 'SR', avatarSrc: avatar4, overdue: 1, atRisk: 0, inProgress: 1, completed: 3,  overallProgress: 0  },
+  // Direct reports of the current user
+  { id: 'm1', name: 'Michael Thompson', role: 'Risk Management Specialist', initials: 'MT', avatarSrc: avatar1, managerIds: [CURRENT_USER_ID], overdue: 2, atRisk: 1, inProgress: 1, completed: 3,  overallProgress: 0  },
+  { id: 'm2', name: 'Jessica Hart',     role: 'Compliance Officer',         initials: 'JH', avatarSrc: avatar2, managerIds: [CURRENT_USER_ID], teamName: 'Compliance Team',    overdue: 0, atRisk: 3, inProgress: 2, completed: 5,  overallProgress: 0  },
+  { id: 'm3', name: 'David Johnson',    role: 'Investment Strategist',      initials: 'DJ', avatarSrc: avatar3, managerIds: [CURRENT_USER_ID], overdue: 1, atRisk: 0, inProgress: 0, completed: 4,  overallProgress: 12 },
+  { id: 'm4', name: 'Noah Williams',    role: 'Concierge',                  initials: 'NW',                     managerIds: [CURRENT_USER_ID], overdue: 0, atRisk: 0, inProgress: 3, completed: 6,  overallProgress: 68 },
+  { id: 'm5', name: 'Mei Tanaka',       role: 'Housekeeping',               initials: 'MT',                     managerIds: [CURRENT_USER_ID], overdue: 3, atRisk: 2, inProgress: 0, completed: 2,  overallProgress: 22 },
+  { id: 'm6', name: 'Ethan Brooks',     role: 'Barista',                    initials: 'EB',                     managerIds: [CURRENT_USER_ID], overdue: 0, atRisk: 1, inProgress: 1, completed: 4,  overallProgress: 45 },
+  { id: 'm7', name: 'Priya Shah',       role: 'Shift Lead',                 initials: 'PS',                     managerIds: [CURRENT_USER_ID], teamName: 'Shift Operations',   overdue: 0, atRisk: 0, inProgress: 2, completed: 7,  overallProgress: 91 },
+  { id: 'm8', name: 'Samantha Rivers',  role: 'Financial Analyst',          initials: 'SR', avatarSrc: avatar4, managerIds: [CURRENT_USER_ID], overdue: 1, atRisk: 0, inProgress: 1, completed: 3,  overallProgress: 0  },
+
+  // Indirect reports — Jessica Hart's (m2) compliance team
+  { id: 'm9',  name: 'Laura Chen',      role: 'Compliance Analyst',         initials: 'LC', managerIds: ['m2', 'm7'], overdue: 1, atRisk: 2, inProgress: 1, completed: 4, overallProgress: 55 },
+  { id: 'm10', name: 'Marcus Reid',     role: 'Internal Auditor',           initials: 'MR', managerIds: ['m2'], overdue: 0, atRisk: 1, inProgress: 2, completed: 3, overallProgress: 72 },
+  { id: 'm11', name: 'Sofia Alvarez',   role: 'Compliance Analyst',         initials: 'SA', managerIds: ['m2'], overdue: 2, atRisk: 0, inProgress: 1, completed: 2, overallProgress: 30 },
+  { id: 'm12', name: 'Oliver Tran',     role: 'Risk Analyst',               initials: 'OT', managerIds: ['m2'], overdue: 0, atRisk: 0, inProgress: 1, completed: 6, overallProgress: 88 },
+
+  // Indirect reports — Priya Shah's (m7) shift team
+  { id: 'm13', name: 'Jamal Carter',    role: 'Barista',                    initials: 'JC', managerIds: ['m7'], overdue: 0, atRisk: 1, inProgress: 2, completed: 3, overallProgress: 60 },
+  { id: 'm14', name: 'Hana Ito',        role: 'Server',                     initials: 'HI', managerIds: ['m7'], overdue: 1, atRisk: 1, inProgress: 0, completed: 4, overallProgress: 48 },
+  { id: 'm15', name: 'Diego Ramirez',   role: 'Server',                     initials: 'DR', managerIds: ['m7'], overdue: 0, atRisk: 0, inProgress: 3, completed: 2, overallProgress: 40 },
+  { id: 'm16', name: 'Aisha Bello',     role: 'Barista',                    initials: 'AB', managerIds: ['m7'], overdue: 2, atRisk: 0, inProgress: 1, completed: 1, overallProgress: 18 },
+  { id: 'm17', name: 'Luke Patterson',  role: 'Host',                       initials: 'LP', managerIds: ['m7'], overdue: 0, atRisk: 2, inProgress: 1, completed: 5, overallProgress: 76 },
 ]
 
 const sideItems = [
@@ -175,6 +197,34 @@ function MyTeam() {
   const [drawerState, setDrawerState] = useState<{ memberId: string; bucket: CourseBucket } | null>(null)
   const [sortKey, setSortKey] = useState<'overdue' | 'atRisk' | 'progress'>('overdue')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+  const [courseFilter, setCourseFilter] = useState<'all' | 'compliance'>('all')
+  const [scopeFilter, setScopeFilter] = useState<string>('direct')
+  const [page, setPage] = useState(1)
+
+  const subManagers = useMemo(
+    () => team.filter((m) => team.some((x) => x.managerIds.includes(m.id))),
+    [],
+  )
+  const managerNameById = (id: string) =>
+    id === CURRENT_USER_ID ? CURRENT_USER_NAME : team.find((m) => m.id === id)?.name ?? '—'
+
+  const sortedManagerIds = (ids: string[]) => {
+    const hasMe = ids.includes(CURRENT_USER_ID)
+    const rest = ids.filter((id) => id !== CURRENT_USER_ID)
+    return hasMe ? [CURRENT_USER_ID, ...rest] : ids
+  }
+  const showReportsTo = scopeFilter !== 'direct'
+  const scopeOptions: DropdownOption[] = useMemo(
+    () => [
+      { value: 'direct', label: 'Direct reports' },
+      { value: 'all', label: 'All reports' },
+      ...subManagers.map((m) => ({
+        value: `mgr:${m.id}`,
+        label: m.teamName ?? m.name,
+      })),
+    ],
+    [subManagers],
+  )
 
   const toggleSort = (key: 'overdue' | 'atRisk' | 'progress') => {
     if (sortKey === key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
@@ -185,11 +235,26 @@ function MyTeam() {
   }
 
   const rows = useMemo(() => {
+    const scoped = team.filter((r) => {
+      if (scopeFilter === 'direct') return r.managerIds.includes(CURRENT_USER_ID)
+      if (scopeFilter === 'all') return true
+      if (scopeFilter.startsWith('mgr:')) return r.managerIds.includes(scopeFilter.slice(4))
+      return true
+    })
     const q = searchQuery.trim().toLowerCase()
-    const filtered = q
-      ? team.filter((r) => r.name.toLowerCase().includes(q) || r.role.toLowerCase().includes(q))
-      : team
-    const sorted = [...filtered].sort((a, b) => {
+    const base = q
+      ? scoped.filter((r) => r.name.toLowerCase().includes(q) || r.role.toLowerCase().includes(q))
+      : scoped
+    const scaled = courseFilter === 'compliance'
+      ? base.map((r) => ({
+          ...r,
+          overdue: Math.ceil(r.overdue / 2),
+          atRisk: Math.ceil(r.atRisk / 2),
+          inProgress: Math.floor(r.inProgress / 2),
+          completed: Math.floor(r.completed / 2),
+        }))
+      : base
+    const sorted = [...scaled].sort((a, b) => {
       let diff = 0
       if (sortKey === 'overdue') diff = a.overdue - b.overdue
       else if (sortKey === 'atRisk') diff = a.atRisk - b.atRisk
@@ -197,7 +262,7 @@ function MyTeam() {
       return sortDir === 'asc' ? diff : -diff
     })
     return sorted
-  }, [searchQuery, sortKey, sortDir])
+  }, [searchQuery, sortKey, sortDir, courseFilter, scopeFilter])
 
   const totals = useMemo(() => {
     return rows.reduce(
@@ -211,7 +276,18 @@ function MyTeam() {
     )
   }, [rows])
 
-  const visibleIds = rows.map((r) => r.id)
+  const totalRows = rows.length
+  const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE))
+  const safePage = Math.min(page, totalPages)
+  const pageStart = (safePage - 1) * PAGE_SIZE
+  const pageEnd = Math.min(pageStart + PAGE_SIZE, totalRows)
+  const paginatedRows = rows.slice(pageStart, pageEnd)
+
+  useEffect(() => {
+    setPage(1)
+  }, [searchQuery, courseFilter, scopeFilter, sortKey, sortDir])
+
+  const visibleIds = paginatedRows.map((r) => r.id)
   const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id))
 
   const toggleRow = (id: string) =>
@@ -301,7 +377,7 @@ function MyTeam() {
           <header className="mt-pageheader">
             <div className="mt-pageheader__row">
               <div className="mt-pageheader__headline">
-                <h1 className="mt-pageheader__title">Demo Team</h1>
+                <h1 className="mt-pageheader__title">My Team</h1>
                 <p className="mt-pageheader__subtitle">18 Active users · 3 Pending users</p>
               </div>
               <button type="button" className="mt-pageheader__cta">Manage Team</button>
@@ -311,7 +387,7 @@ function MyTeam() {
 
             <nav className="mt-tabs">
               <button type="button" className="mt-tab mt-tab--active">
-                <span>Course Progress</span>
+                <span>Course Tracker</span>
                 <span className="mt-tab__indicator" aria-hidden="true" />
               </button>
               <button type="button" className="mt-tab">
@@ -324,6 +400,27 @@ function MyTeam() {
           </header>
 
           <section className="mt-course-progress" aria-label="Course Progress">
+            <div className="mt-cp__switcher" role="tablist" aria-label="Course filter">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={courseFilter === 'all'}
+                className={`mt-cp__switcher-item${courseFilter === 'all' ? ' mt-cp__switcher-item--active' : ''}`}
+                onClick={() => setCourseFilter('all')}
+              >
+                All Courses
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={courseFilter === 'compliance'}
+                className={`mt-cp__switcher-item${courseFilter === 'compliance' ? ' mt-cp__switcher-item--active' : ''}`}
+                onClick={() => setCourseFilter('compliance')}
+              >
+                Compliance Only (12)
+              </button>
+            </div>
+
             <div className="mt-cp__stats">
               <StatCard
                 icon={<Danger size={40} color="var(--danger-500)" variant="Linear" />}
@@ -358,6 +455,15 @@ function MyTeam() {
                 />
               </div>
               <div className="mt-cp__toolbar-actions">
+                <div className="mt-cp__scope">
+                  <Dropdown
+                    size="md"
+                    iconLeft={<Sort size={20} color="var(--text-primary)" variant="Linear" />}
+                    options={scopeOptions}
+                    value={scopeFilter}
+                    onChange={setScopeFilter}
+                  />
+                </div>
                 {canSendReminders ? (
                   <button type="button" className="mt-cp__reminders-btn mt-cp__reminders-btn--active">
                     <span>Send Reminders ({selectedCount})</span>
@@ -391,6 +497,11 @@ function MyTeam() {
                     <Checkbox checked={allVisibleSelected} onChange={toggleAll} />
                     <span className="mt-cp__th-label">Name</span>
                   </div>
+                  {showReportsTo && (
+                    <div className="mt-cp__table-cell mt-cp__table-cell--reports-to">
+                      <span className="mt-cp__th-label">Reports to</span>
+                    </div>
+                  )}
                   <button
                     type="button"
                     className="mt-cp__table-cell mt-cp__table-cell--metric mt-cp__th-btn"
@@ -449,7 +560,7 @@ function MyTeam() {
                   <div className="mt-cp__table-cell mt-cp__table-cell--action" aria-hidden="true" />
                 </div>
 
-                {rows.map((r) => {
+                {paginatedRows.map((r) => {
                   const needsAttention = r.overdue > 0 || r.atRisk > 0
                   const progressMuted = !needsAttention && r.overallProgress === 0
                   return (
@@ -469,6 +580,35 @@ function MyTeam() {
                           <span className="mt-cp__member-role">{r.role}</span>
                         </div>
                       </div>
+                      {showReportsTo && (() => {
+                        const sortedIds = sortedManagerIds(r.managerIds)
+                        const primary = sortedIds[0]
+                        const extras = sortedIds.slice(1)
+                        return (
+                          <div className="mt-cp__table-cell mt-cp__table-cell--reports-to">
+                            <span className="mt-cp__reports-to-name">{managerNameById(primary)}</span>
+                            {extras.length > 0 && (
+                              <div className="mt-cp__reports-to-popover-wrap" tabIndex={0}>
+                                <span
+                                  className="mt-cp__reports-to-more"
+                                  aria-haspopup="listbox"
+                                >
+                                  +{extras.length}
+                                </span>
+                                <ul className="dropdown-menu mt-cp__reports-to-listbox" role="listbox">
+                                  {sortedIds.map((id) => (
+                                    <li key={id}>
+                                      <div className="dropdown-option" role="option" aria-selected={false}>
+                                        <span>{managerNameById(id)}</span>
+                                      </div>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })()}
                       <div className="mt-cp__table-cell mt-cp__table-cell--metric">
                         {r.overdue > 0 ? (
                           <button
@@ -518,15 +658,29 @@ function MyTeam() {
                   )
                 })}
 
-                <div className="mt-cp__pagination">
-                  <span className="mt-cp__pagination-label">1–{rows.length} of {rows.length}</span>
-                  <button type="button" className="mt-cp__pagination-btn" aria-label="Previous page" disabled>
-                    <ArrowLeft2 size={16} color="var(--text-secondary)" variant="Linear" />
-                  </button>
-                  <button type="button" className="mt-cp__pagination-btn" aria-label="Next page" disabled>
-                    <ArrowRight2 size={16} color="var(--text-secondary)" variant="Linear" />
-                  </button>
-                </div>
+                {totalRows > 0 && (
+                  <div className="mt-cp__pagination">
+                    <span className="mt-cp__pagination-label">{pageStart + 1}–{pageEnd} of {totalRows}</span>
+                    <button
+                      type="button"
+                      className="mt-cp__pagination-btn"
+                      aria-label="Previous page"
+                      disabled={safePage === 1}
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    >
+                      <ArrowLeft2 size={16} color="var(--text-secondary)" variant="Linear" />
+                    </button>
+                    <button
+                      type="button"
+                      className="mt-cp__pagination-btn"
+                      aria-label="Next page"
+                      disabled={safePage === totalPages}
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    >
+                      <ArrowRight2 size={16} color="var(--text-secondary)" variant="Linear" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </section>

@@ -433,6 +433,18 @@ function People() {
       {!(isDeactivatedTab && deactivatedPeople.length === 0) && (
       <div className="people-actions">
         <div className="people-actions-left">
+          <div className="people-search">
+            <SearchNormal1 size={18} color="var(--text-tertiary)" variant="Linear" />
+            <input
+              className="people-search-input"
+              type="text"
+              placeholder="Search for people"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="people-actions-right">
           {isDeactivatedTab && (
             <div className="people-filter">
               <span className="people-filter-label">Deactivation status is</span>
@@ -463,18 +475,6 @@ function People() {
               </div>
             </div>
           )}
-          <div className="people-search">
-            <SearchNormal1 size={18} color="var(--text-tertiary)" variant="Linear" />
-            <input
-              className="people-search-input"
-              type="text"
-              placeholder="Search for people"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="people-actions-right">
           {!isDeactivatedTab && userFields.length > 0 && (
             <div className="people-edit-cols-wrapper">
               <button

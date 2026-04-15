@@ -406,6 +406,51 @@
   width: auto;
 }
 
+.mt-cp__scope .dropdown-field {
+  width: auto;
+  min-width: 180px;
+}
+
+/* Content switcher: All Courses / Compliance Only */
+.mt-cp__switcher {
+  align-self: flex-start;
+  margin-bottom: calc(20px - var(--space-l));
+  display: inline-flex;
+  align-items: stretch;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-sm, 12px);
+  background: var(--input-background);
+}
+
+.mt-cp__switcher-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-s, 8px);
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+  white-space: nowrap;
+}
+
+.mt-cp__switcher-item:hover:not(.mt-cp__switcher-item--active) {
+  color: var(--text-primary);
+}
+
+.mt-cp__switcher-item--active {
+  background: var(--selected, #FFBB38);
+  color: var(--neutral-800, #20222A);
+  font-weight: 700;
+}
+
 .mt-cp__reminders-btn {
   display: inline-flex;
   align-items: center;
@@ -463,7 +508,6 @@
 .mt-cp__table-header {
   display: flex;
   align-items: center;
-  padding: 0 var(--space-m);
 }
 
 .mt-cp__table-header .mt-cp__table-cell {
@@ -501,6 +545,61 @@
   flex: 1;
   min-width: 260px;
   gap: var(--space-sm);
+}
+
+.mt-cp__table-cell--reports-to {
+  width: 180px;
+  flex-shrink: 0;
+  justify-content: flex-start;
+  gap: var(--space-xs, 4px);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.mt-cp__reports-to-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.mt-cp__reports-to-popover-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.mt-cp__reports-to-more {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: var(--radius-s);
+  background: var(--input-background);
+  color: var(--text-secondary);
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  cursor: default;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.mt-cp__reports-to-popover-wrap:hover .mt-cp__reports-to-more,
+.mt-cp__reports-to-popover-wrap:focus-within .mt-cp__reports-to-more {
+  background: var(--page-background-hover, var(--neutral-50));
+  color: var(--text-primary);
+}
+
+.mt-cp__reports-to-listbox {
+  display: none;
+  top: calc(100% + 4px);
+  left: 0;
+  right: auto;
+  min-width: 180px;
+}
+
+.mt-cp__reports-to-popover-wrap:hover .mt-cp__reports-to-listbox,
+.mt-cp__reports-to-popover-wrap:focus-within .mt-cp__reports-to-listbox {
+  display: block;
 }
 
 .mt-cp__table-row--selected {
