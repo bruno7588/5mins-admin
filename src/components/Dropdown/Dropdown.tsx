@@ -5,6 +5,7 @@ import './Dropdown.css'
 export interface DropdownOption {
   value: string
   label: string
+  description?: string
   disabled?: boolean
 }
 
@@ -115,7 +116,10 @@ function Dropdown({
                     setIsActive(false)
                   }}
                 >
-                  <span>{opt.label}</span>
+                  <span className="dropdown-option__text">
+                    <span>{opt.label}</span>
+                    {opt.description && <span className="dropdown-option__desc">{opt.description}</span>}
+                  </span>
                   {isSelected && (
                     <TickCircle size={16} color="var(--secondary-500)" variant="Bold" />
                   )}

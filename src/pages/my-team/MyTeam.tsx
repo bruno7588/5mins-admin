@@ -25,13 +25,13 @@ import {
   ArrowUp,
   ArrowLeft2,
   ArrowRight2,
-  Sort,
 } from 'iconsax-react'
 import Tooltip from '../../components/Tooltip/Tooltip'
 import Search from '../../components/Search/Search'
 import Checkbox from '../../components/Checkbox/Checkbox'
 import Dropdown, { type DropdownOption } from '../../components/Dropdown/Dropdown'
 import CoursesDrawer, { type CourseBucket, type DrawerCourse } from './CoursesDrawer'
+import EngagementTab from './EngagementTab'
 import avatar1 from './assets/m1.jpg'
 import thumb1 from './assets/t1.png'
 import thumb2 from './assets/t2.png'
@@ -75,13 +75,13 @@ function ProgressBar({ value, muted }: { value: number; muted?: boolean }) {
   )
 }
 
-function StatCard({ icon, label, value }: { icon: ReactNode; label: string; value: number }) {
+function StatCard({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
     <div className="mt-stat-card">
       <span className="mt-stat-icon">{icon}</span>
       <div className="mt-stat-info">
         <p className="mt-stat-label">{label}</p>
-        <p className="mt-stat-value">{value.toLocaleString()}</p>
+        <p className="mt-stat-value">{value}</p>
       </div>
     </div>
   )
@@ -199,11 +199,8 @@ function MyTeam() {
   const [courseFilter, setCourseFilter] = useState<'all' | 'compliance'>('all')
   const [scopeFilter, setScopeFilter] = useState<string>('direct')
   const [page, setPage] = useState(1)
+  const [currentTab, setCurrentTab] = useState<'course-tracker' | 'engagement' | 'learning-records'>('course-tracker')
 
-  const subManagers = useMemo(
-    () => team.filter((m) => team.some((x) => x.managerIds.includes(m.id))),
-    [],
-  )
   const managerNameById = (id: string) =>
     id === CURRENT_USER_ID ? CURRENT_USER_NAME : team.find((m) => m.id === id)?.name ?? '—'
 
@@ -213,17 +210,10 @@ function MyTeam() {
     return hasMe ? [CURRENT_USER_ID, ...rest] : ids
   }
   const showReportsTo = scopeFilter !== 'direct'
-  const scopeOptions: DropdownOption[] = useMemo(
-    () => [
-      { value: 'direct', label: 'Direct reports' },
-      { value: 'all', label: 'All reports' },
-      ...subManagers.map((m) => ({
-        value: `mgr:${m.id}`,
-        label: m.teamName ?? m.name,
-      })),
-    ],
-    [subManagers],
-  )
+  const scopeOptions: DropdownOption[] = [
+    { value: 'direct', label: 'Direct reports', description: 'Team members who report to you' },
+    { value: 'all', label: 'All reports', description: 'Includes indirect reports from each manager under you' },
+  ]
 
   const toggleSort = (key: 'overdue' | 'atRisk' | 'inProgress' | 'completed' | 'progress') => {
     if (sortKey === key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
@@ -234,12 +224,9 @@ function MyTeam() {
   }
 
   const rows = useMemo(() => {
-    const scoped = team.filter((r) => {
-      if (scopeFilter === 'direct') return r.managerIds.includes(CURRENT_USER_ID)
-      if (scopeFilter === 'all') return true
-      if (scopeFilter.startsWith('mgr:')) return r.managerIds.includes(scopeFilter.slice(4))
-      return true
-    })
+    const scoped = scopeFilter === 'direct'
+      ? team.filter((r) => r.managerIds.includes(CURRENT_USER_ID))
+      : team
     const q = searchQuery.trim().toLowerCase()
     const base = q
       ? scoped.filter((r) => r.name.toLowerCase().includes(q) || r.role.toLowerCase().includes(q))
@@ -276,6 +263,9 @@ function MyTeam() {
       { overdue: 0, atRisk: 0, inProgress: 0, completed: 0 },
     )
   }, [rows])
+
+  const totalCourses = totals.overdue + totals.atRisk + totals.inProgress + totals.completed
+  const pct = (n: number) => totalCourses === 0 ? '0%' : `${Math.round((n / totalCourses) * 100)}%`
 
   const totalRows = rows.length
   const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE))
@@ -406,20 +396,24 @@ function MyTeam() {
             <div className="mt-pageheader__divider" />
 
             <nav className="mt-tabs">
-              <button type="button" className="mt-tab mt-tab--active">
+              <button type="button" className={`mt-tab${currentTab === 'course-tracker' ? ' mt-tab--active' : ''}`} onClick={() => setCurrentTab('course-tracker')}>
                 <span>Course Tracker</span>
-                <span className="mt-tab__indicator" aria-hidden="true" />
+                {currentTab === 'course-tracker' && <span className="mt-tab__indicator" aria-hidden="true" />}
               </button>
-              <button type="button" className="mt-tab">
+              <button type="button" className={`mt-tab${currentTab === 'engagement' ? ' mt-tab--active' : ''}`} onClick={() => setCurrentTab('engagement')}>
                 <span>Engagement</span>
+                {currentTab === 'engagement' && <span className="mt-tab__indicator" aria-hidden="true" />}
               </button>
-              <button type="button" className="mt-tab">
+              <button type="button" className={`mt-tab${currentTab === 'learning-records' ? ' mt-tab--active' : ''}`} onClick={() => setCurrentTab('learning-records')}>
                 <span>Learning Records</span>
+                {currentTab === 'learning-records' && <span className="mt-tab__indicator" aria-hidden="true" />}
               </button>
             </nav>
           </header>
 
-          <section className="mt-course-progress" aria-label="Course Progress">
+          {currentTab === 'engagement' && <EngagementTab />}
+
+          {currentTab === 'course-tracker' && <section className="mt-course-progress" aria-label="Course Progress">
             <div className="mt-cp__switcher" role="tablist" aria-label="Course filter">
               <button
                 type="button"
@@ -445,22 +439,22 @@ function MyTeam() {
               <StatCard
                 icon={<Danger size={40} color="var(--danger-500)" variant="Linear" />}
                 label="Overdue"
-                value={totals.overdue}
+                value={pct(totals.overdue)}
               />
               <StatCard
                 icon={<InfoCircle size={40} color="var(--warning-500)" variant="Linear" />}
                 label="At Risk"
-                value={totals.atRisk}
+                value={pct(totals.atRisk)}
               />
               <StatCard
                 icon={<TaskSquare size={40} color="var(--primary-600)" variant="Linear" />}
                 label="In Progress"
-                value={totals.inProgress}
+                value={pct(totals.inProgress)}
               />
               <StatCard
                 icon={<TickCircle size={40} color="var(--success-500)" variant="Linear" />}
                 label="Completed"
-                value={totals.completed}
+                value={pct(totals.completed)}
               />
             </div>
 
@@ -478,7 +472,6 @@ function MyTeam() {
                 <div className="mt-cp__scope">
                   <Dropdown
                     size="md"
-                    iconLeft={<Sort size={20} color="var(--text-primary)" variant="Linear" />}
                     options={scopeOptions}
                     value={scopeFilter}
                     onChange={setScopeFilter}
@@ -768,7 +761,7 @@ function MyTeam() {
                 )}
               </div>
             </div>
-          </section>
+          </section>}
         </section>
       </div>
 
