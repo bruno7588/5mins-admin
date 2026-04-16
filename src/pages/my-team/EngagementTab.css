@@ -248,6 +248,12 @@
   margin: 0;
 }
 
+.eng-chart__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .eng-chart__legend {
   display: flex;
   align-items: center;

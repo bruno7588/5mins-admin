@@ -1,10 +1,21 @@
 import { useState } from 'react'
-import { ArrowDown2, InfoCircle, Diagram } from 'iconsax-react'
+import { ArrowDown2, Diagram } from 'iconsax-react'
 import avatar1 from './assets/m1.jpg'
 import avatar2 from './assets/m2.jpg'
 import avatar3 from './assets/m3.jpg'
 import avatar4 from './assets/m4.jpg'
 import './EngagementTab.css'
+
+function InfoIcon({ className }: { className?: string }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className={className}>
+      <path d="M9.6875 2.5C5.71836 2.5 2.5 5.71836 2.5 9.6875C2.5 13.6566 5.71836 16.875 9.6875 16.875C13.6566 16.875 16.875 13.6566 16.875 9.6875C16.875 5.71836 13.6566 2.5 9.6875 2.5Z" stroke="#454C5E" strokeWidth="0.833333" strokeMiterlimit="10"/>
+      <path d="M8.59375 8.59375H9.84375V13.125" stroke="#454C5E" strokeWidth="0.833333" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M8.125 13.2812H11.5625" stroke="#454C5E" strokeWidth="0.833333" strokeMiterlimit="10" strokeLinecap="round"/>
+      <path d="M9.6875 5.07812C9.48663 5.07812 9.29027 5.13769 9.12325 5.24929C8.95623 5.36089 8.82606 5.51951 8.74918 5.70509C8.67231 5.89067 8.6522 6.09488 8.69139 6.29189C8.73058 6.4889 8.82731 6.66987 8.96934 6.81191C9.11138 6.95394 9.29235 7.05067 9.48936 7.08986C9.68637 7.12905 9.89058 7.10894 10.0762 7.03207C10.2617 6.9552 10.4204 6.82502 10.532 6.658C10.6436 6.49098 10.7031 6.29462 10.7031 6.09375C10.7031 5.82439 10.5961 5.56606 10.4057 5.37559C10.2152 5.18513 9.95686 5.07812 9.6875 5.07812Z" fill="#454C5E"/>
+    </svg>
+  )
+}
 
 /* ── Mock data ── */
 
@@ -134,7 +145,7 @@ function SkillsCompetency() {
           <span className="eng-skills__header-name">Skill name</span>
           <div className="eng-skills__header-level">
             <span>Skill level</span>
-            <InfoCircle size={20} color="var(--text-tertiary)" variant="Linear" />
+            <InfoIcon />
           </div>
         </div>
 
@@ -147,7 +158,7 @@ function SkillsCompetency() {
               <div className="eng-skills__row-name">
                 <span className="eng-skills__icon">{skill.icon}</span>
                 <span>{skill.name}</span>
-                <InfoCircle size={20} color="var(--text-tertiary)" variant="Linear" className="eng-skills__info" />
+                <InfoIcon />
               </div>
               <div className="eng-skills__row-level">
                 <div className="eng-skills__bar">
@@ -186,7 +197,7 @@ function EngagementChart() {
         </button>
       </div>
 
-      <div>
+      <div className="eng-chart__body">
         <div className="eng-chart__legend">
           <div className="eng-chart__legend-left">
             <div className="eng-chart__legend-item">

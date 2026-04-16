@@ -32,6 +32,7 @@ import Checkbox from '../../components/Checkbox/Checkbox'
 import Dropdown, { type DropdownOption } from '../../components/Dropdown/Dropdown'
 import CoursesDrawer, { type CourseBucket, type DrawerCourse } from './CoursesDrawer'
 import EngagementTab from './EngagementTab'
+import LearningRecordsTab from './LearningRecordsTab'
 import avatar1 from './assets/m1.jpg'
 import thumb1 from './assets/t1.png'
 import thumb2 from './assets/t2.png'
@@ -412,6 +413,7 @@ function MyTeam() {
           </header>
 
           {currentTab === 'engagement' && <EngagementTab />}
+          {currentTab === 'learning-records' && <LearningRecordsTab />}
 
           {currentTab === 'course-tracker' && <section className="mt-course-progress" aria-label="Course Progress">
             <div className="mt-cp__switcher" role="tablist" aria-label="Course filter">

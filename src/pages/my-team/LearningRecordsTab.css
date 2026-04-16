@@ -1,0 +1,360 @@
+/* Learning Records tab */
+
+.lr {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+  width: 100%;
+  padding: var(--space-l) 0;
+}
+
+/* ── Actions bar (chips + download) ── */
+.lr__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.lr__chips {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.lr__chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 24px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  line-height: 1.5;
+  white-space: nowrap;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.lr__chip:hover:not(.lr__chip--active) {
+  background: var(--input-background);
+  color: var(--text-primary);
+}
+
+.lr__chip--active {
+  background: var(--secondary-500);
+  color: var(--neutral-800);
+  font-weight: 700;
+  border-color: var(--secondary-500);
+}
+
+.lr__download-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: 8px 16px;
+  border: 1px solid var(--text-primary);
+  border-radius: var(--radius-s);
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 150ms ease;
+}
+
+.lr__download-btn:hover {
+  background: var(--input-background);
+}
+
+/* ── Filters bar ── */
+.lr__filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-s);
+  background: var(--cards-background);
+  border-radius: var(--radius-sm);
+}
+
+.lr__filters-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-primary);
+}
+
+.lr__filters-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.lr__filters-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  background: var(--input-background);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.lr__filters-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary-600);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  line-height: 1.5;
+  padding: 0 var(--space-s);
+}
+
+.lr__filters-spacer {
+  flex: 1;
+}
+
+.lr__filters-chevron {
+  display: flex;
+  align-items: center;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 2px;
+}
+
+/* ── Table wrapper (horizontal scroll, sticky first col) ── */
+.lr__table-wrap {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.lr__table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-width: fit-content;
+}
+
+/* ── Header row ── */
+.lr__header {
+  display: flex;
+  align-items: center;
+}
+
+.lr__header .lr__cell {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  padding: 0 var(--space-sm);
+  white-space: nowrap;
+}
+
+/* ── Table row ── */
+.lr__row {
+  display: flex;
+  align-items: center;
+  min-width: fit-content;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: background 150ms ease;
+}
+
+.lr__row:hover {
+  background: var(--cards-background-hover, var(--neutral-25));
+}
+
+/* ── Cells ── */
+.lr__cell {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: var(--space-s) var(--space-sm);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.lr__cell--name {
+  width: 200px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.lr__cell--team      { width: 140px; }
+.lr__cell--region    { width: 140px; }
+.lr__cell--course    { width: 160px; }
+.lr__cell--category  { width: 140px; }
+.lr__cell--enrollment { width: 160px; }
+.lr__cell--start-date { width: 94px; }
+.lr__cell--due-date  { width: 94px; }
+.lr__cell--completion-date { width: 144px; }
+.lr__cell--duration  { width: 84px; }
+.lr__cell--progress  { width: 86px; }
+.lr__cell--status    { width: 128px; }
+
+/* Sticky first column */
+.lr__table-wrap .lr__cell--name {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: var(--page-background);
+}
+
+.lr__row:hover .lr__cell--name {
+  background: var(--cards-background-hover, var(--neutral-25));
+}
+
+.lr__cell--name::after {
+  content: '';
+  position: absolute;
+  right: -12px;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.08), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.lr__table-wrap--scrolled .lr__cell--name::after {
+  opacity: 1;
+}
+
+/* Name cell content */
+.lr__name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lr__email {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Date cell content */
+.lr__date-cell {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.lr__date-line1 {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.lr__date-line2 {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.lr__date-dash {
+  font-size: 14px;
+  color: var(--text-tertiary);
+}
+
+/* ── Badges (pill style, matching Figma) ── */
+.lr__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Enrollment badges */
+.lr__badge--current {
+  background: rgba(0, 206, 230, 0.16);
+  color: var(--primary-600);
+}
+
+.lr__badge--archived {
+  background: var(--input-background);
+  color: var(--text-secondary);
+}
+
+/* Status badges */
+.lr__badge--completed {
+  background: rgba(24, 169, 87, 0.16);
+  color: var(--success-500);
+}
+
+.lr__badge--failed {
+  background: rgba(223, 22, 66, 0.16);
+  color: var(--danger-400);
+}
+
+.lr__badge--in-progress {
+  background: rgba(0, 206, 230, 0.16);
+  color: var(--primary-600);
+}
+
+/* ── Pagination (matches mt-cp__pagination) ── */
+.lr__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-m);
+  padding: var(--space-s) var(--space-m);
+}
+
+.lr__pagination-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.lr__pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.lr__pagination-btn:hover:not(:disabled) {
+  background: var(--neutral-50);
+}
+
+.lr__pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
