@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react'
-import { SmsNotification } from 'iconsax-react'
-import CloseButton from '../../components/CloseButton/CloseButton'
 import './CoursesDrawer.css'
 
 export type CourseBucket = 'overdue' | 'at-risk'
@@ -23,7 +21,6 @@ interface Props {
   memberInitials: string
   courses: DrawerCourse[]
   onClose: () => void
-  onSendReminder: () => void
 }
 
 function formatDateSplit(iso: string): { top: string; year: string } {
@@ -42,7 +39,6 @@ function CoursesDrawer({
   memberInitials,
   courses,
   onClose,
-  onSendReminder,
 }: Props) {
   const [closing, setClosing] = useState(false)
 
@@ -95,7 +91,6 @@ function CoursesDrawer({
                 <p className="cd-drawer__member-role">{memberRole}</p>
               </div>
             </div>
-            <CloseButton onClick={handleClose} className="cd-drawer__close" />
           </div>
           <div className="modal__divider" />
         </div>
@@ -113,6 +108,7 @@ function CoursesDrawer({
               const filled = Math.round((c.progress / 100) * segments)
               const start = formatDateSplit(c.startDate)
               const due = formatDateSplit(c.dueDate)
+              const isOverdue = new Date(c.dueDate) < new Date()
               return (
                 <div className="cd-table__row" key={c.id}>
                   <div className="cd-table__cell cd-table__cell--course">
@@ -125,7 +121,7 @@ function CoursesDrawer({
                       <span className="cd-table__date-year">{start.year}</span>
                     </div>
                   </div>
-                  <div className="cd-table__cell cd-table__cell--date">
+                  <div className={`cd-table__cell cd-table__cell--date${isOverdue ? ' cd-table__cell--overdue' : ''}`}>
                     <div className="cd-table__date-stack">
                       <span className="cd-table__date-top">{due.top}</span>
                       <span className="cd-table__date-year">{due.year}</span>
@@ -145,18 +141,6 @@ function CoursesDrawer({
           </div>
         </div>
 
-        <div className="side-drawer__footer">
-          <div className="side-drawer__footer-divider" />
-          <div className="side-drawer__buttons">
-            <button type="button" className="side-drawer__btn-primary" onClick={onSendReminder}>
-              <SmsNotification size={20} color="currentColor" variant="Linear" />
-              <span>Send reminder</span>
-            </button>
-            <button type="button" className="side-drawer__btn-secondary" onClick={handleClose}>
-              Close
-            </button>
-          </div>
-        </div>
       </aside>
     </>
   )

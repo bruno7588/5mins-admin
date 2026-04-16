@@ -787,7 +787,6 @@ function MyTeam() {
             memberInitials={member.initials}
             courses={courses}
             onClose={() => setDrawerState(null)}
-            onSendReminder={() => setDrawerState(null)}
           />
         )
       })()}
