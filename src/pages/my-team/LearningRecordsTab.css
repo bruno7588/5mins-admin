@@ -71,7 +71,44 @@
 }
 
 .lr__download-btn:hover {
-  background: var(--input-background);
+  background: rgba(0, 206, 230, 0.16);
+  color: var(--primary-600);
+  border-color: var(--primary-600);
+}
+
+.lr__download-btn:active {
+  background: rgba(0, 206, 230, 0.16);
+  color: var(--primary-700);
+  border-color: var(--primary-700);
+}
+
+.lr__actions-right {
+  display: flex;
+  gap: var(--space-m);
+  align-items: center;
+}
+
+.lr__add-training-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: 10px var(--space-ml);
+  border: none;
+  border-radius: var(--radius-s);
+  background: var(--primary-600);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--neutral-25);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 150ms ease;
+}
+
+.lr__add-training-btn:hover {
+  background: var(--primary-700);
 }
 
 /* ── Filters bar ── */
@@ -252,7 +289,7 @@
 
 .lr__email {
   font-size: 14px;
-  color: var(--text-primary);
+  color: var(--text-secondary);
   line-height: 1.5;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -321,6 +358,87 @@
 .lr__badge--in-progress {
   background: rgba(0, 206, 230, 0.16);
   color: var(--primary-600);
+}
+
+.lr__badge--not-passed {
+  background: rgba(223, 22, 66, 0.16);
+  color: var(--danger-400);
+}
+
+/* ── External Training columns ── */
+.lr__cell--ext-email {
+  width: 240px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+}
+
+.lr__cell--ext-training  { width: 200px; }
+.lr__cell--ext-provider  { width: 200px; }
+.lr__cell--ext-expiration { width: 92px; }
+.lr__cell--ext-score     { width: 64px; }
+.lr__cell--ext-result    { width: 128px; }
+.lr__cell--ext-cert      { width: 140px; }
+.lr__cell--ext-more      { width: 48px; }
+
+/* Sticky email column for external table */
+.lr__table-wrap .lr__cell--ext-email {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: var(--page-background);
+}
+
+.lr__row:hover .lr__cell--ext-email {
+  background: var(--cards-background-hover, var(--neutral-25));
+}
+
+.lr__cell--ext-email::after {
+  content: '';
+  position: absolute;
+  right: -12px;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.08), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.lr__table-wrap--scrolled .lr__cell--ext-email::after {
+  opacity: 1;
+}
+
+/* Certificate download button */
+.lr__cert-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border: 1px solid var(--primary-600);
+  border-radius: var(--radius-s);
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--primary-600);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 150ms ease;
+}
+
+.lr__cert-btn:hover {
+  background: var(--primary-100);
+  color: var(--primary-700);
+  border-color: var(--primary-700);
+}
+
+.lr__cert-btn:active {
+  background: var(--primary-100);
+  color: var(--primary-800);
+  border-color: var(--primary-800);
 }
 
 /* ── Pagination (matches mt-cp__pagination) ── */
