@@ -44,7 +44,7 @@
 }
 
 .input-field__input::placeholder {
-  color: var(--text-tertiary);
+  color: var(--text-disabled);
 }
 
 .input-field__icons {

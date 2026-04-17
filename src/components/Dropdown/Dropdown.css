@@ -83,6 +83,10 @@
   text-align: left;
 }
 
+.dropdown-trigger-text--placeholder {
+  color: var(--text-disabled);
+}
+
 .dropdown-chevron {
   flex-shrink: 0;
   transition: transform 150ms ease;

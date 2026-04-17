@@ -82,7 +82,7 @@ function Dropdown({
         }}
       >
         {iconLeft && <span className="dropdown-trigger-leading">{iconLeft}</span>}
-        <span className="dropdown-trigger-text">{selected?.label ?? placeholder}</span>
+        <span className={`dropdown-trigger-text${!selected ? ' dropdown-trigger-text--placeholder' : ''}`}>{selected?.label ?? placeholder}</span>
         <ArrowDown2
           size={size === 'sm' ? 16 : 20}
           color="currentColor"

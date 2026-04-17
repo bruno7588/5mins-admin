@@ -1,8 +1,9 @@
-import { useCallback, useRef, useState } from 'react'
-import { ArrowLeft2, ArrowRight2, Add, ArrowDown2, More, Danger } from 'iconsax-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { ArrowLeft2, ArrowRight2, Add, ArrowDown2, More, Danger, DocumentUpload } from 'iconsax-react'
 import Checkbox from '../../components/Checkbox/Checkbox'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import ToastContainer, { useToast } from '../../components/Toast/Toast'
+import AddTrainingDrawer from './AddTrainingDrawer'
 import './LearningRecordsTab.css'
 
 type ChipType = '5mins' | 'external'
@@ -234,7 +235,19 @@ function LearningRecordsTab() {
   const [selectedExtIds, setSelectedExtIds] = useState<Set<string>>(new Set())
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [confirmInput, setConfirmInput] = useState('')
+  const [addMenuOpen, setAddMenuOpen] = useState(false)
+  const [addDrawerOpen, setAddDrawerOpen] = useState(false)
+  const addMenuRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!addMenuOpen) return
+    const handler = (e: MouseEvent) => {
+      if (addMenuRef.current && !addMenuRef.current.contains(e.target as Node)) setAddMenuOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [addMenuOpen])
   const toast = useToast()
 
   const toggleExtRow = (id: string) => {
@@ -305,10 +318,28 @@ function LearningRecordsTab() {
             </svg>
           </button>
           {activeChip === 'external' && (
-            <button type="button" className="lr__add-training-btn">
-              <span>Add Training</span>
-              <Add size={20} color="currentColor" variant="Linear" />
-            </button>
+            <div className="lr__add-training-wrap" ref={addMenuRef}>
+              <button type="button" className="lr__add-training-btn" onClick={() => setAddMenuOpen(o => !o)}>
+                <span>Add Training</span>
+                <Add size={20} color="currentColor" variant="Linear" />
+              </button>
+              {addMenuOpen && (
+                <ul className="lr__add-menu" role="menu">
+                  <li>
+                    <button type="button" className="lr__add-menu-item" role="menuitem" onClick={() => { setAddMenuOpen(false); setAddDrawerOpen(true) }}>
+                      <Add size={20} color="var(--text-primary)" variant="Linear" />
+                      <span>Add training</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button type="button" className="lr__add-menu-item" role="menuitem" onClick={() => setAddMenuOpen(false)}>
+                      <DocumentUpload size={20} color="var(--text-primary)" variant="Linear" />
+                      <span>Bulk upload CSV</span>
+                    </button>
+                  </li>
+                </ul>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -551,6 +582,15 @@ function LearningRecordsTab() {
           </button>
         </div>
       </ConfirmModal>
+
+      <AddTrainingDrawer
+        open={addDrawerOpen}
+        onClose={() => setAddDrawerOpen(false)}
+        onAdd={() => {
+          setAddDrawerOpen(false)
+          toast.show('success', 'Training added successfully')
+        }}
+      />
 
       <ToastContainer toasts={toast.toasts} />
     </section>

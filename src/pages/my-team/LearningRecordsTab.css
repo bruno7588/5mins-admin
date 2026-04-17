@@ -113,6 +113,49 @@
   border-color: var(--primary-700);
 }
 
+.lr__add-training-wrap {
+  position: relative;
+}
+
+.lr__add-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 1000;
+  min-width: 200px;
+  width: max-content;
+  background: var(--cards-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: -4px 0 24px 0 rgba(32, 34, 42, 0.12);
+  padding: 8px;
+  margin: 0;
+  list-style: none;
+}
+
+.lr__add-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--space-s) var(--space-sm);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-s);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background 100ms ease;
+}
+
+.lr__add-menu-item:hover {
+  background: var(--cards-background-hover);
+}
+
 /* ── Filters bar ── */
 .lr__filters {
   display: flex;
