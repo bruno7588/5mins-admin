@@ -1,6 +1,8 @@
 import { useCallback, useRef, useState } from 'react'
-import { ArrowLeft2, ArrowRight2, Add, ArrowDown2, More } from 'iconsax-react'
+import { ArrowLeft2, ArrowRight2, Add, ArrowDown2, More, Danger } from 'iconsax-react'
 import Checkbox from '../../components/Checkbox/Checkbox'
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
+import ToastContainer, { useToast } from '../../components/Toast/Toast'
 import './LearningRecordsTab.css'
 
 type ChipType = '5mins' | 'external'
@@ -229,7 +231,40 @@ function formatDate(dateStr: string): { line1: string; line2: string } {
 function LearningRecordsTab() {
   const [activeChip, setActiveChip] = useState<ChipType>('5mins')
   const [isScrolled, setIsScrolled] = useState(false)
+  const [selectedExtIds, setSelectedExtIds] = useState<Set<string>>(new Set())
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [confirmInput, setConfirmInput] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
+  const toast = useToast()
+
+  const toggleExtRow = (id: string) => {
+    setSelectedExtIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const allExtSelected = externalData.length > 0 && externalData.every(r => selectedExtIds.has(r.id))
+
+  const toggleAllExt = () => {
+    if (allExtSelected) setSelectedExtIds(new Set())
+    else setSelectedExtIds(new Set(externalData.map(r => r.id)))
+  }
+
+  const handleDeleteTrainings = () => {
+    const count = selectedExtIds.size
+    setSelectedExtIds(new Set())
+    setShowDeleteConfirm(false)
+    setConfirmInput('')
+    toast.show('success', `${count} training${count === 1 ? '' : 's'} deleted`)
+  }
+
+  const closeDeleteConfirm = () => {
+    setShowDeleteConfirm(false)
+    setConfirmInput('')
+  }
 
   const handleScroll = useCallback(() => {
     if (scrollRef.current) {
@@ -245,7 +280,7 @@ function LearningRecordsTab() {
           <button
             type="button"
             className={`lr__chip${activeChip === '5mins' ? ' lr__chip--active' : ''}`}
-            onClick={() => setActiveChip('5mins')}
+            onClick={() => { setActiveChip('5mins'); setSelectedExtIds(new Set()) }}
           >
             5Mins Courses
           </button>
@@ -375,7 +410,7 @@ function LearningRecordsTab() {
           <div className="lr__table lr__table--external">
             <div className="lr__header">
               <div className="lr__cell lr__cell--ext-email">
-                <Checkbox checked={false} onChange={() => {}} />
+                <Checkbox checked={allExtSelected} onChange={toggleAllExt} />
                 <span>Email</span>
               </div>
               <div className="lr__cell lr__cell--ext-training">Training</div>
@@ -397,9 +432,9 @@ function LearningRecordsTab() {
               const resultClass = row.result === 'Passed' ? 'lr__badge--completed' : 'lr__badge--not-passed'
 
               return (
-                <div className="lr__row" key={row.id}>
+                <div className={`lr__row${selectedExtIds.has(row.id) ? ' lr__row--selected' : ''}`} key={row.id}>
                   <div className="lr__cell lr__cell--ext-email">
-                    <Checkbox checked={false} onChange={() => {}} />
+                    <Checkbox checked={selectedExtIds.has(row.id)} onChange={() => toggleExtRow(row.id)} />
                     <span>{row.email}</span>
                   </div>
                   <div className="lr__cell lr__cell--ext-training">{row.training}</div>
@@ -462,6 +497,62 @@ function LearningRecordsTab() {
           <ArrowRight2 size={16} color="var(--text-secondary)" variant="Linear" />
         </button>
       </div>
+
+      {/* Floating bulk action bar */}
+      {selectedExtIds.size > 0 && activeChip === 'external' && (
+        <div className="lr__bulk-bar">
+          <button
+            className="lr__bulk-bar-close"
+            aria-label="Clear selection"
+            onClick={() => setSelectedExtIds(new Set())}
+          >
+            <Add size={18} color="currentColor" style={{ transform: 'rotate(45deg)' }} />
+          </button>
+          <span className="lr__bulk-bar-count">{selectedExtIds.size} selected</span>
+          <div className="lr__bulk-bar-divider" />
+          <button className="lr__bulk-bar-btn" onClick={() => setShowDeleteConfirm(true)}>
+            Delete {selectedExtIds.size} {selectedExtIds.size === 1 ? 'Training' : 'Trainings'}
+          </button>
+        </div>
+      )}
+
+      <ConfirmModal open={showDeleteConfirm} onClose={closeDeleteConfirm}>
+        <div className="confirm-modal-header confirm-modal-header--center">
+          <div className="confirm-modal-icon">
+            <Danger size={72} color="var(--danger-500)" variant="Linear" />
+          </div>
+          <h2 className="confirm-modal-title">
+            Delete {selectedExtIds.size} {selectedExtIds.size === 1 ? 'training' : 'trainings'}
+          </h2>
+          <p className="confirm-modal-body">
+            This action cannot be undone. The selected training records will be permanently removed.
+          </p>
+        </div>
+        <div className="confirm-modal-input-group">
+          <label className="confirm-modal-label">
+            Type <span className="confirm-modal-label-danger">'Delete'</span> below, to confirm
+          </label>
+          <input
+            className="confirm-modal-input"
+            type="text"
+            value={confirmInput}
+            onChange={e => setConfirmInput(e.target.value)}
+            placeholder="Delete"
+          />
+        </div>
+        <div className="confirm-modal-actions">
+          <button className="confirm-modal-btn confirm-modal-btn--outlined" onClick={closeDeleteConfirm}>Cancel</button>
+          <button
+            className="confirm-modal-btn confirm-modal-btn--danger"
+            disabled={confirmInput !== 'Delete'}
+            onClick={handleDeleteTrainings}
+          >
+            Delete Permanently
+          </button>
+        </div>
+      </ConfirmModal>
+
+      <ToastContainer toasts={toast.toasts} />
     </section>
   )
 }

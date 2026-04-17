@@ -38,6 +38,7 @@
   padding: var(--s, 8px) var(--sm, 12px);
   border-radius: var(--sm, 12px);
   max-width: 288px;
+  text-align: center;
   filter: drop-shadow(-4px 0px 24px rgba(32, 34, 42, 0.12));
 }
 

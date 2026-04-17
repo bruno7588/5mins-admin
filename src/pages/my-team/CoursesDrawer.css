@@ -238,6 +238,25 @@
   min-width: 0;
 }
 
+.cd-table__cell--status {
+  width: 148px;
+  flex-shrink: 0;
+}
+
+.cd-table__status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 165, 56, 0.16);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-warning, #FFA538);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
 .cd-table__cell--overdue {
   text-decoration: line-through;
 }

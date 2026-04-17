@@ -62,7 +62,8 @@ function CoursesDrawer({
 
   if (!open) return null
 
-  const firstColLabel = bucket === 'overdue' ? 'Overdue courses' : 'Courses due soon'
+  const firstColLabel = bucket === 'overdue' ? 'Overdue courses' : 'Courses At Risk'
+  const isAtRisk = bucket === 'at-risk'
   const segments = 8
 
   return (
@@ -101,6 +102,7 @@ function CoursesDrawer({
               <div className="cd-table__cell cd-table__cell--course">{firstColLabel}</div>
               <div className="cd-table__cell cd-table__cell--date">Start date</div>
               <div className="cd-table__cell cd-table__cell--date">Due date</div>
+              {isAtRisk && <div className="cd-table__cell cd-table__cell--status">Status</div>}
               <div className="cd-table__cell cd-table__cell--progress">Progress</div>
             </div>
 
@@ -127,6 +129,13 @@ function CoursesDrawer({
                       <span className="cd-table__date-year">{due.year}</span>
                     </div>
                   </div>
+                  {isAtRisk && (
+                    <div className="cd-table__cell cd-table__cell--status">
+                      <span className="cd-table__status-badge">
+                        {c.progress === 0 ? 'Not Started' : 'Low Progress'}
+                      </span>
+                    </div>
+                  )}
                   <div className="cd-table__cell cd-table__cell--progress">
                     <div className="cd-table__progress" role="progressbar" aria-valuenow={c.progress} aria-valuemin={0} aria-valuemax={100}>
                       {Array.from({ length: segments }).map((_, i) => (

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ArrowDown2, Diagram } from 'iconsax-react'
+import Tooltip from '../../components/Tooltip/Tooltip'
 import avatar1 from './assets/m1.jpg'
 import avatar2 from './assets/m2.jpg'
 import avatar3 from './assets/m3.jpg'
@@ -22,24 +23,25 @@ function InfoIcon({ className }: { className?: string }) {
 interface Skill {
   name: string
   icon: string
+  description: string
   level: number
   maxLevel: number
 }
 
 const hardSkills: Skill[] = [
-  { name: 'Product Discovery & Development', icon: '🛒', level: 5, maxLevel: 5 },
-  { name: 'Software Development', icon: '📄', level: 4, maxLevel: 5 },
-  { name: 'Agile Methodologies', icon: '🔄', level: 3, maxLevel: 5 },
-  { name: 'Commercial Acumen', icon: '💼', level: 2, maxLevel: 5 },
-  { name: 'Learning Program Design & Delivery', icon: '📖', level: 1, maxLevel: 5 },
+  { name: 'Product Discovery & Development', icon: '🛒', description: 'Ability to identify market needs, validate ideas, and bring products from concept to launch.', level: 5, maxLevel: 5 },
+  { name: 'Software Development', icon: '📄', description: 'Proficiency in writing, testing, and maintaining code across various programming languages and frameworks.', level: 4, maxLevel: 5 },
+  { name: 'Agile Methodologies', icon: '🔄', description: 'Understanding of Scrum, Kanban, and iterative delivery practices for cross-functional teams.', level: 3, maxLevel: 5 },
+  { name: 'Commercial Acumen', icon: '💼', description: 'Awareness of business strategy, revenue models, and market dynamics that drive commercial decisions.', level: 2, maxLevel: 5 },
+  { name: 'Learning Program Design & Delivery', icon: '📖', description: 'Skill in designing, structuring, and facilitating effective learning experiences for teams.', level: 1, maxLevel: 5 },
 ]
 
 const softSkills: Skill[] = [
-  { name: 'Communication', icon: '💬', level: 4, maxLevel: 5 },
-  { name: 'Leadership', icon: '⭐', level: 3, maxLevel: 5 },
-  { name: 'Teamwork', icon: '🤝', level: 5, maxLevel: 5 },
-  { name: 'Problem Solving', icon: '🧩', level: 3, maxLevel: 5 },
-  { name: 'Time Management', icon: '⏰', level: 2, maxLevel: 5 },
+  { name: 'Communication', icon: '💬', description: 'Ability to convey ideas clearly and listen actively across written and verbal channels.', level: 4, maxLevel: 5 },
+  { name: 'Leadership', icon: '⭐', description: 'Capacity to guide, motivate, and empower team members toward shared goals.', level: 3, maxLevel: 5 },
+  { name: 'Teamwork', icon: '🤝', description: 'Effectiveness in collaborating with others, sharing responsibility, and resolving group challenges.', level: 5, maxLevel: 5 },
+  { name: 'Problem Solving', icon: '🧩', description: 'Aptitude for analysing complex situations and developing practical, creative solutions.', level: 3, maxLevel: 5 },
+  { name: 'Time Management', icon: '⏰', description: 'Ability to prioritise tasks, manage deadlines, and maintain productivity under pressure.', level: 2, maxLevel: 5 },
 ]
 
 interface LeaderboardEntry {
@@ -145,7 +147,9 @@ function SkillsCompetency() {
           <span className="eng-skills__header-name">Skill name</span>
           <div className="eng-skills__header-level">
             <span>Skill level</span>
-            <InfoIcon />
+            <Tooltip text="Top 5 skills of your team, rated from Level 1 to 5" position="Top" alignment="Center" icon={false}>
+              <InfoIcon />
+            </Tooltip>
           </div>
         </div>
 
@@ -158,7 +162,9 @@ function SkillsCompetency() {
               <div className="eng-skills__row-name">
                 <span className="eng-skills__icon">{skill.icon}</span>
                 <span>{skill.name}</span>
-                <InfoIcon />
+                <Tooltip text={skill.description} position="Top" alignment="Center" icon={false}>
+                  <InfoIcon />
+                </Tooltip>
               </div>
               <div className="eng-skills__row-level">
                 <div className="eng-skills__bar">

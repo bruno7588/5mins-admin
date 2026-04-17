@@ -144,7 +144,9 @@ function coursesFor(memberId: string, bucket: CourseBucket, count: number): Draw
       : ((seed + i * 3) % 28) + 2    // 2–29 days ahead
     // start date: typically 30–60 days before due date
     const startOffset = dueOffset - (30 + ((seed + i * 5) % 30))
-    const progress = bucket === 'overdue' ? (i * 11) % 40 : 0
+    const progress = bucket === 'overdue'
+      ? (i * 11) % 40
+      : ((seed + i * 13) % 3 === 0 ? 0 : ((seed + i * 7) % 45) + 5)  // mix of 0% (not started) and 5-49% (low progress)
     return {
       id: `${memberId}-${bucket}-${i}`,
       title,
