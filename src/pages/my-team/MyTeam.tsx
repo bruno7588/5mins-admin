@@ -30,7 +30,9 @@ import Tooltip from '../../components/Tooltip/Tooltip'
 import Search from '../../components/Search/Search'
 import Checkbox from '../../components/Checkbox/Checkbox'
 import Dropdown, { type DropdownOption } from '../../components/Dropdown/Dropdown'
+import ToastContainer, { useToast } from '../../components/Toast/Toast'
 import CoursesDrawer, { type CourseBucket, type DrawerCourse } from './CoursesDrawer'
+import ReminderDrawer from './ReminderDrawer'
 import EngagementTab from './EngagementTab'
 import LearningRecordsTab from './LearningRecordsTab'
 import avatar1 from './assets/m1.jpg'
@@ -195,6 +197,8 @@ function MyTeam() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [drawerState, setDrawerState] = useState<{ memberId: string; bucket: CourseBucket } | null>(null)
+  const [reminderOpen, setReminderOpen] = useState(false)
+  const toast = useToast()
   const [sortKey, setSortKey] = useState<'overdue' | 'atRisk' | 'inProgress' | 'completed' | 'progress'>('overdue')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [courseFilter, setCourseFilter] = useState<'all' | 'compliance'>('all')
@@ -480,7 +484,7 @@ function MyTeam() {
                   />
                 </div>
                 {canSendReminders ? (
-                  <button type="button" className="mt-cp__reminders-btn mt-cp__reminders-btn--active">
+                  <button type="button" className="mt-cp__reminders-btn mt-cp__reminders-btn--active" onClick={() => setReminderOpen(true)}>
                     <span>Send Reminders ({selectedCount})</span>
                     <SmsNotification size={20} color="currentColor" variant="Linear" />
                   </button>
@@ -616,7 +620,23 @@ function MyTeam() {
                   <div className="mt-cp__table-cell mt-cp__table-cell--action" aria-hidden="true" />
                 </div>
 
-                {paginatedRows.map((r) => {
+                {rows.length === 0 ? (
+                  <div className="mt-cp__empty">
+                    <div className="mt-cp__empty-illustration">
+                      <span className="mt-cp__empty-zero">0</span>
+                      <svg className="mt-cp__empty-accents" width="61" height="50" viewBox="0 0 61 50" fill="none">
+                        <path d="M5.5 30C3.5 32 1.5 35.5 1 38" stroke="var(--neutral-400)" strokeWidth="3" strokeLinecap="round"/>
+                        <path d="M10 37C8.5 38.5 7 41 6.5 43" stroke="var(--neutral-400)" strokeWidth="3" strokeLinecap="round"/>
+                        <path d="M51 8C53 5.5 55.5 2.5 56 1" stroke="var(--neutral-400)" strokeWidth="3" strokeLinecap="round"/>
+                        <path d="M55.5 15C57 13 59 10.5 59.5 9" stroke="var(--neutral-400)" strokeWidth="3" strokeLinecap="round"/>
+                      </svg>
+                    </div>
+                    <div className="mt-cp__empty-info">
+                      <p className="mt-cp__empty-text">No results found!</p>
+                      <p className="mt-cp__empty-subtext">Search for a different name or email</p>
+                    </div>
+                  </div>
+                ) : paginatedRows.map((r) => {
                   const needsAttention = r.overdue > 0 || r.atRisk > 0
                   const progressMuted = !needsAttention && r.overallProgress === 0
                   return (
@@ -728,6 +748,10 @@ function MyTeam() {
                               type="button"
                               className="mt-cp__row-action"
                               aria-label={`Send reminder to ${r.name}`}
+                              onClick={() => {
+                                setSelectedIds(new Set([r.id]))
+                                setReminderOpen(true)
+                              }}
                             >
                               <SmsNotification size={20} color="var(--text-secondary)" variant="Linear" />
                             </button>
@@ -738,7 +762,7 @@ function MyTeam() {
                   )
                 })}
 
-                {totalRows > 0 && (
+                {totalRows > 0 && rows.length > 0 && (
                   <div className="mt-cp__pagination">
                     <span className="mt-cp__pagination-label">{pageStart + 1}–{pageEnd} of {totalRows}</span>
                     <button
@@ -785,6 +809,19 @@ function MyTeam() {
           />
         )
       })()}
+
+      <ReminderDrawer
+        open={reminderOpen}
+        members={team.filter((m) => selectedIds.has(m.id))}
+        onClose={() => setReminderOpen(false)}
+        onSend={(count) => {
+          setReminderOpen(false)
+          setSelectedIds(new Set())
+          toast.show('success', `${count} reminder${count === 1 ? '' : 's'} sent successfully`)
+        }}
+      />
+
+      <ToastContainer toasts={toast.toasts} />
     </div>
   )
 }

@@ -135,8 +135,8 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-s);
-  background: var(--primary-button-background, var(--primary-500, #00CEE6));
-  color: var(--text-button-foreground, var(--neutral-800));
+  background: var(--primary-600);
+  color: var(--neutral-0);
   padding: 10px var(--space-ml);
   border-radius: var(--radius-s);
   font-family: 'Poppins', sans-serif;
@@ -147,7 +147,7 @@
   cursor: pointer;
   transition: background 150ms ease;
 }
-.side-drawer__btn-primary:hover { background: var(--primary-600); }
+.side-drawer__btn-primary:hover { background: var(--primary-700); }
 .side-drawer__btn-secondary {
   background: transparent;
   color: var(--primary-button-background, var(--primary-600));
