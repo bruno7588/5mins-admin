@@ -94,21 +94,23 @@
   justify-content: center;
   gap: var(--space-xs);
   padding: 10px var(--space-ml);
-  border: none;
+  border: 1px solid var(--primary-600);
   border-radius: var(--radius-s);
-  background: var(--primary-600);
+  background: transparent;
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
   font-weight: 700;
   line-height: 1.5;
-  color: var(--neutral-25);
+  color: var(--primary-600);
   cursor: pointer;
   white-space: nowrap;
-  transition: background 150ms ease;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
 }
 
 .lr__add-training-btn:hover {
-  background: var(--primary-700);
+  background: var(--primary-100);
+  color: var(--primary-700);
+  border-color: var(--primary-700);
 }
 
 /* ── Filters bar ── */

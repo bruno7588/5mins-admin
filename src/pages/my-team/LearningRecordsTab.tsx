@@ -307,7 +307,7 @@ function LearningRecordsTab() {
           {activeChip === 'external' && (
             <button type="button" className="lr__add-training-btn">
               <span>Add Training</span>
-              <Add size={20} color="var(--neutral-25)" variant="Linear" />
+              <Add size={20} color="currentColor" variant="Linear" />
             </button>
           )}
         </div>
