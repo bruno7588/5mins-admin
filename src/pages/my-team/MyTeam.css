@@ -883,7 +883,7 @@
 }
 
 .mt-cp__table-cell--metric {
-  width: 140px;
+  width: 110px;
   flex-shrink: 0;
   justify-content: center;
 }

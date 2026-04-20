@@ -445,14 +445,9 @@ function MyTeam() {
 
             <div className="mt-cp__stats">
               <StatCard
-                icon={<Danger size={40} color="var(--danger-500)" variant="Linear" />}
-                label="Overdue"
-                value={pct(totals.overdue)}
-              />
-              <StatCard
-                icon={<InfoCircle size={40} color="var(--warning-500)" variant="Linear" />}
-                label="At Risk"
-                value={pct(totals.atRisk)}
+                icon={<TickCircle size={40} color="var(--success-500)" variant="Linear" />}
+                label="Completed"
+                value={pct(totals.completed)}
               />
               <StatCard
                 icon={<TaskSquare size={40} color="var(--primary-600)" variant="Linear" />}
@@ -460,9 +455,14 @@ function MyTeam() {
                 value={pct(totals.inProgress)}
               />
               <StatCard
-                icon={<TickCircle size={40} color="var(--success-500)" variant="Linear" />}
-                label="Completed"
-                value={pct(totals.completed)}
+                icon={<InfoCircle size={40} color="var(--warning-500)" variant="Linear" />}
+                label="At Risk"
+                value={pct(totals.atRisk)}
+              />
+              <StatCard
+                icon={<Danger size={40} color="var(--danger-500)" variant="Linear" />}
+                label="Overdue"
+                value={pct(totals.overdue)}
               />
             </div>
 
@@ -529,32 +529,13 @@ function MyTeam() {
                   <button
                     type="button"
                     className="mt-cp__table-cell mt-cp__table-cell--metric mt-cp__th-btn"
-                    onClick={() => toggleSort('overdue')}
-                    aria-label={`Sort by Overdue, currently ${sortKey === 'overdue' ? sortDir : 'unsorted'}`}
+                    onClick={() => toggleSort('completed')}
+                    aria-label={`Sort by Completed, currently ${sortKey === 'completed' ? sortDir : 'unsorted'}`}
                   >
-                    <Tooltip text="Courses past their due date" position="Top" alignment="Center" icon={false}>
-                      <span className="mt-cp__th-label">Overdue</span>
+                    <Tooltip text="Courses completed all-time" position="Top" alignment="Center" icon={false}>
+                      <span className="mt-cp__th-label">Completed</span>
                     </Tooltip>
-                    {sortKey === 'overdue' ? (
-                      sortDir === 'asc' ? (
-                        <ArrowUp size={16} color="var(--text-secondary)" variant="Linear" />
-                      ) : (
-                        <ArrowDown size={16} color="var(--text-secondary)" variant="Linear" />
-                      )
-                    ) : (
-                      <span className="mt-cp__th-sort-hint"><ArrowDown size={16} color="var(--text-tertiary)" variant="Linear" /></span>
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    className="mt-cp__table-cell mt-cp__table-cell--metric mt-cp__th-btn"
-                    onClick={() => toggleSort('atRisk')}
-                    aria-label={`Sort by At Risk, currently ${sortKey === 'atRisk' ? sortDir : 'unsorted'}`}
-                  >
-                    <Tooltip text="Courses due within the next 30 days" position="Top" alignment="Center" icon={false}>
-                      <span className="mt-cp__th-label">At Risk</span>
-                    </Tooltip>
-                    {sortKey === 'atRisk' ? (
+                    {sortKey === 'completed' ? (
                       sortDir === 'asc' ? (
                         <ArrowUp size={16} color="var(--text-secondary)" variant="Linear" />
                       ) : (
@@ -586,13 +567,32 @@ function MyTeam() {
                   <button
                     type="button"
                     className="mt-cp__table-cell mt-cp__table-cell--metric mt-cp__th-btn"
-                    onClick={() => toggleSort('completed')}
-                    aria-label={`Sort by Completed, currently ${sortKey === 'completed' ? sortDir : 'unsorted'}`}
+                    onClick={() => toggleSort('atRisk')}
+                    aria-label={`Sort by At Risk, currently ${sortKey === 'atRisk' ? sortDir : 'unsorted'}`}
                   >
-                    <Tooltip text="Courses completed all-time" position="Top" alignment="Center" icon={false}>
-                      <span className="mt-cp__th-label">Completed</span>
+                    <Tooltip text="Courses due within the next 30 days" position="Top" alignment="Center" icon={false}>
+                      <span className="mt-cp__th-label">At Risk</span>
                     </Tooltip>
-                    {sortKey === 'completed' ? (
+                    {sortKey === 'atRisk' ? (
+                      sortDir === 'asc' ? (
+                        <ArrowUp size={16} color="var(--text-secondary)" variant="Linear" />
+                      ) : (
+                        <ArrowDown size={16} color="var(--text-secondary)" variant="Linear" />
+                      )
+                    ) : (
+                      <span className="mt-cp__th-sort-hint"><ArrowDown size={16} color="var(--text-tertiary)" variant="Linear" /></span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="mt-cp__table-cell mt-cp__table-cell--metric mt-cp__th-btn"
+                    onClick={() => toggleSort('overdue')}
+                    aria-label={`Sort by Overdue, currently ${sortKey === 'overdue' ? sortDir : 'unsorted'}`}
+                  >
+                    <Tooltip text="Courses past their due date" position="Top" alignment="Center" icon={false}>
+                      <span className="mt-cp__th-label">Overdue</span>
+                    </Tooltip>
+                    {sortKey === 'overdue' ? (
                       sortDir === 'asc' ? (
                         <ArrowUp size={16} color="var(--text-secondary)" variant="Linear" />
                       ) : (
@@ -688,25 +688,14 @@ function MyTeam() {
                         )
                       })()}
                       <div className="mt-cp__table-cell mt-cp__table-cell--metric">
-                        {r.overdue > 0 ? (
-                          <Tooltip
-                            text="View courses"
-                            position="Top"
-                            alignment="Center"
-                            icon={false}
-                          >
-                            <button
-                              type="button"
-                              className="mt-cp__metric-link mt-cp__metric-link--danger"
-                              onClick={() => setDrawerState({ memberId: r.id, bucket: 'overdue' })}
-                              aria-label={`View ${r.overdue} overdue course${r.overdue === 1 ? '' : 's'} for ${r.name}`}
-                            >
-                              {r.overdue}
-                            </button>
-                          </Tooltip>
-                        ) : (
-                          <span className="mt-cp__status-dash">–</span>
-                        )}
+                        <span className={`mt-cp__metric-plain${r.completed === 0 ? ' mt-cp__metric-plain--zero' : ''}`}>
+                          {r.completed}
+                        </span>
+                      </div>
+                      <div className="mt-cp__table-cell mt-cp__table-cell--metric">
+                        <span className={`mt-cp__metric-plain${r.inProgress === 0 ? ' mt-cp__metric-plain--zero' : ''}`}>
+                          {r.inProgress}
+                        </span>
                       </div>
                       <div className="mt-cp__table-cell mt-cp__table-cell--metric">
                         {r.atRisk > 0 ? (
@@ -730,14 +719,25 @@ function MyTeam() {
                         )}
                       </div>
                       <div className="mt-cp__table-cell mt-cp__table-cell--metric">
-                        <span className={`mt-cp__metric-plain${r.inProgress === 0 ? ' mt-cp__metric-plain--zero' : ''}`}>
-                          {r.inProgress}
-                        </span>
-                      </div>
-                      <div className="mt-cp__table-cell mt-cp__table-cell--metric">
-                        <span className={`mt-cp__metric-plain${r.completed === 0 ? ' mt-cp__metric-plain--zero' : ''}`}>
-                          {r.completed}
-                        </span>
+                        {r.overdue > 0 ? (
+                          <Tooltip
+                            text="View courses"
+                            position="Top"
+                            alignment="Center"
+                            icon={false}
+                          >
+                            <button
+                              type="button"
+                              className="mt-cp__metric-link mt-cp__metric-link--danger"
+                              onClick={() => setDrawerState({ memberId: r.id, bucket: 'overdue' })}
+                              aria-label={`View ${r.overdue} overdue course${r.overdue === 1 ? '' : 's'} for ${r.name}`}
+                            >
+                              {r.overdue}
+                            </button>
+                          </Tooltip>
+                        ) : (
+                          <span className="mt-cp__status-dash">–</span>
+                        )}
                       </div>
                       <div className={`mt-cp__table-cell mt-cp__table-cell--metric${progressMuted ? ' mt-cp__table-cell--muted' : ''}`}>
                         <ProgressBar value={r.overallProgress} muted={progressMuted} />
