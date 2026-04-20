@@ -515,7 +515,7 @@
   font-size: 14px;
   font-weight: 400;
   color: var(--text-secondary);
-  padding: 0 var(--space-m);
+  padding: 0 var(--space-sm);
   white-space: nowrap;
 }
 
@@ -535,7 +535,7 @@
 .mt-cp__table-cell {
   display: flex;
   align-items: center;
-  padding: var(--space-sm) var(--space-m);
+  padding: var(--space-s) var(--space-sm);
   font-size: 14px;
   font-weight: 400;
   color: var(--text-primary);
@@ -883,7 +883,7 @@
 }
 
 .mt-cp__table-cell--metric {
-  width: 110px;
+  width: 120px;
   flex-shrink: 0;
   justify-content: center;
 }
