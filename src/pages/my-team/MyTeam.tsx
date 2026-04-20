@@ -78,12 +78,24 @@ function ProgressBar({ value, muted }: { value: number; muted?: boolean }) {
   )
 }
 
-function StatCard({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
+function StatCard({ icon, label, value, tooltip }: { icon: ReactNode; label: string; value: string; tooltip?: string }) {
   return (
     <div className="mt-stat-card">
       <span className="mt-stat-icon">{icon}</span>
       <div className="mt-stat-info">
-        <p className="mt-stat-label">{label}</p>
+        <p className="mt-stat-label">
+          {label}
+          {tooltip && (
+            <Tooltip text={tooltip} position="Top" alignment="Center" icon={false}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M7.75 2C4.57469 2 2 4.57469 2 7.75C2 10.9253 4.57469 13.5 7.75 13.5C10.9253 13.5 13.5 10.9253 13.5 7.75C13.5 4.57469 10.9253 2 7.75 2Z" stroke="#454C5E" strokeMiterlimit="10"/>
+                <path d="M6.875 6.875H7.875V10.5" stroke="#454C5E" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M6.5 10.625H9.25" stroke="#454C5E" strokeMiterlimit="10" strokeLinecap="round"/>
+                <path d="M7.75 4.0625C7.5893 4.0625 7.43221 4.11015 7.2986 4.19943C7.16498 4.28871 7.06084 4.4156 6.99935 4.56407C6.93785 4.71253 6.92176 4.8759 6.95311 5.03351C6.98446 5.19112 7.06185 5.33589 7.17548 5.44952C7.28911 5.56315 7.43388 5.64054 7.59149 5.67189C7.7491 5.70324 7.91247 5.68715 8.06093 5.62565C8.2094 5.56416 8.33629 5.46002 8.42557 5.3264C8.51485 5.19279 8.5625 5.0357 8.5625 4.875C8.5625 4.65951 8.4769 4.45285 8.32452 4.30048C8.17215 4.1481 7.96549 4.0625 7.75 4.0625Z" fill="#454C5E"/>
+              </svg>
+            </Tooltip>
+          )}
+        </p>
         <p className="mt-stat-value">{value}</p>
       </div>
     </div>
@@ -448,21 +460,25 @@ function MyTeam() {
                 icon={<TickCircle size={40} color="var(--success-500)" variant="Linear" />}
                 label="Completed"
                 value={pct(totals.completed)}
+                tooltip="Courses completed all-time"
               />
               <StatCard
                 icon={<TaskSquare size={40} color="var(--primary-600)" variant="Linear" />}
                 label="In Progress"
                 value={pct(totals.inProgress)}
+                tooltip="Courses started but not yet complete"
               />
               <StatCard
                 icon={<InfoCircle size={40} color="var(--warning-500)" variant="Linear" />}
                 label="At Risk"
                 value={pct(totals.atRisk)}
+                tooltip="Courses due within the next 30 days"
               />
               <StatCard
                 icon={<Danger size={40} color="var(--danger-500)" variant="Linear" />}
                 label="Overdue"
                 value={pct(totals.overdue)}
+                tooltip="Courses past their due date"
               />
             </div>
 
