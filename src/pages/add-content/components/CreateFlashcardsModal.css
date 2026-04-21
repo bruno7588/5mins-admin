@@ -61,18 +61,11 @@
     1px 1px 4px 0 rgba(32, 34, 42, 0.06);
   cursor: pointer;
   text-align: left;
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  transition: background 150ms ease;
 }
 
 .cfm-option:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    -2px -2px 8px 0 rgba(32, 34, 42, 0.08),
-    2px 2px 12px 0 rgba(32, 34, 42, 0.12);
-}
-
-.cfm-option:hover .cfm-option-icon {
-  transform: scale(1.08);
+  background: var(--cards-background-hover);
 }
 
 .cfm-option:focus-visible {
@@ -87,7 +80,6 @@
   width: 40px;
   height: 40px;
   flex-shrink: 0;
-  transition: transform 200ms ease;
   z-index: 1;
 }
 
