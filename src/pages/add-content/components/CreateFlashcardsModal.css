@@ -1,0 +1,115 @@
+.cfm-modal {
+  width: 720px;
+  background: var(--page-background);
+}
+
+.cfm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+  width: 100%;
+}
+
+.cfm-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.cfm-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-xs);
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 150ms ease;
+}
+
+.cfm-close:hover {
+  background: var(--cards-background-hover);
+}
+
+.cfm-options {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-m);
+  width: 100%;
+}
+
+.cfm-option {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-m);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: #FFFFFF;
+  box-shadow:
+    -1px -1px 4px 0 rgba(32, 34, 42, 0.06),
+    1px 1px 4px 0 rgba(32, 34, 42, 0.06);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.cfm-option:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    -2px -2px 8px 0 rgba(32, 34, 42, 0.08),
+    2px 2px 12px 0 rgba(32, 34, 42, 0.12);
+}
+
+.cfm-option:hover .cfm-option-icon {
+  transform: scale(1.08);
+}
+
+.cfm-option:focus-visible {
+  outline: 2px solid var(--secondary-500);
+  outline-offset: 2px;
+}
+
+.cfm-option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  transition: transform 200ms ease;
+  z-index: 1;
+}
+
+.cfm-option-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  min-width: 0;
+  z-index: 1;
+}
+
+.cfm-option-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.cfm-option-desc {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+

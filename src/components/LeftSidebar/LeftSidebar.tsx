@@ -101,7 +101,7 @@ function LeftSidebar() {
               className={`sidebar-sub-item${activePage === '/content-library' ? ' sidebar-sub-item--active' : ''}`}
               onClick={() => navigate('/content-library')}
             >
-              Content Library
+              Your Content
             </button>
             <button
               className={`sidebar-sub-item${activePage === '/your-courses' ? ' sidebar-sub-item--active' : ''}`}

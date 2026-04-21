@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import ContentTable from './components/ContentTable/ContentTable'
 import type { ContentRow } from './components/ContentTable/ContentTable'
@@ -8,6 +9,7 @@ import './YourContent.css'
 type Tab = 'lessons' | 'scorm'
 
 function YourContent() {
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<Tab>('lessons')
   const [selectedLesson, setSelectedLesson] = useState<ContentRow | null>(null)
   const [isNewLesson, setIsNewLesson] = useState(false)
@@ -39,16 +41,7 @@ function YourContent() {
   }
 
   const handleAddContent = () => {
-    const newLesson: ContentRow = {
-      id: Date.now(),
-      fileName: 'Introduction to Agile Methodologies',
-      type: 'PDF',
-      uploadedBy: 'You',
-      updatedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      thumbColor: 'linear-gradient(135deg, #5a7fbf, #4a6fa8)',
-    }
-    setIsNewLesson(true)
-    setSelectedLesson(newLesson)
+    navigate('/content-library/add-content')
   }
 
   return (
@@ -56,7 +49,7 @@ function YourContent() {
       <LeftSidebar />
       <main className="your-content-main">
         <div className="your-content-header">
-          <h2 className="your-content-title">Content Library</h2>
+          <h2 className="your-content-title">Your Content</h2>
           <div className="page-header-divider" />
           <div className="content-tabs">
             <button

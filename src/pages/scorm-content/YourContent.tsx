@@ -13,7 +13,7 @@ function YourContent() {
       <LeftSidebar />
       <main className="your-content-main">
         <div className="your-content-header">
-          <h2 className="your-content-title">Content Library</h2>
+          <h2 className="your-content-title">Your Content</h2>
           <div className="page-header-divider" />
           <div className="content-tabs">
             <button

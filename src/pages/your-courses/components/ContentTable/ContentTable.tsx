@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import {
   SearchNormal1,
   Add,
-  Setting4,
   ArrowDown2,
   ExportSquare,
   Eye,
@@ -200,7 +199,6 @@ function ContentTable({ variant = 'lessons', onLessonClick, onAddContent, aiQuiz
       <div className="content-table-filters">
         <span className="content-table-filter-label">Show content from</span>
         <button className="content-table-filter-dropdown">
-          <Setting4 size={16} color="var(--text-secondary)" variant="Linear" />
           All
           <ArrowDown2 size={12} color="var(--text-tertiary)" />
         </button>
@@ -217,46 +215,44 @@ function ContentTable({ variant = 'lessons', onLessonClick, onAddContent, aiQuiz
       </div>
 
       {/* Table */}
-      <table className="content-table">
-        <thead>
-          <tr>
-            <th>File name</th>
-            <th>Type</th>
-            <th>Uploaded by</th>
-            <th className="col-sort">
-              Updated at
-              <span className="sort-indicator">
-                <ArrowDown2 size={14} color="var(--text-secondary)" />
+      <div className="content-table">
+        <div className="content-table-header">
+          <div className="content-table-cell content-table-cell--name">File name</div>
+          <div className="content-table-cell content-table-cell--type">Type</div>
+          <div className="content-table-cell content-table-cell--uploader">Uploaded by</div>
+          <div className="content-table-cell content-table-cell--date content-table-cell--sortable">
+            Updated at
+            <ArrowDown2 size={14} color="var(--text-secondary)" />
+          </div>
+          <div className="content-table-cell content-table-cell--actions" aria-hidden="true" />
+        </div>
+        {rows.map((row) => (
+          <div className="content-table-row" key={row.id}>
+            <div className="content-table-cell content-table-cell--name">
+              <div className="content-table-thumb">
+                <div
+                  className="content-table-thumb-img"
+                  style={{ background: row.thumbColor }}
+                />
+              </div>
+              <span
+                className="content-table-filename content-table-filename--clickable"
+                onClick={() => isScorm ? setEditScormRow(row) : onLessonClick?.(row)}
+                title={isScorm ? 'Click to edit SCORM' : 'Click to edit lesson'}
+              >
+                {row.fileName}
               </span>
-            </th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.id}>
-              <td>
-                <div className="content-table-file">
-                  <div className="content-table-thumb">
-                    <div
-                      className="content-table-thumb-img"
-                      style={{ background: row.thumbColor, borderRadius: 'var(--radius-s)' }}
-                    />
-                  </div>
-                  <span
-                    className={`content-table-filename${isScorm ? ' content-table-filename--clickable' : ' content-table-filename--clickable'}`}
-                    onClick={() => isScorm ? setEditScormRow(row) : onLessonClick?.(row)}
-                    title={isScorm ? 'Click to edit SCORM' : 'Click to edit lesson'}
-                  >
-                    {row.fileName}
-                  </span>
-                </div>
-              </td>
-              <td className="content-table-type">{row.type}</td>
-              <td className="content-table-uploader">{row.uploadedBy}</td>
-              <td className="content-table-date">{row.updatedAt}</td>
-              <td>
-                <div className="content-table-actions">
+            </div>
+            <div className="content-table-cell content-table-cell--type">{row.type}</div>
+            <div className="content-table-cell content-table-cell--uploader">{row.uploadedBy}</div>
+            <div className="content-table-cell content-table-cell--date">
+              <div className="content-table-date-stack">
+                <span>{row.updatedAt.replace(/,?\s*\d{4}$/, ',')}</span>
+                <span className="content-table-date-stack-year">{row.updatedAt.match(/\d{4}$/)?.[0]}</span>
+              </div>
+            </div>
+            <div className="content-table-cell content-table-cell--actions">
+              <div className="content-table-actions">
                   {isScorm && (
                     <button className="content-table-action-btn" aria-label="Preview" onClick={() => setPreviewRow(row)}>
                       <Eye size={20} color="var(--neutral-400)" variant="Linear" />
@@ -354,12 +350,11 @@ function ContentTable({ variant = 'lessons', onLessonClick, onAddContent, aiQuiz
                       </div>
                     )}
                   </div>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {/* Pagination */}
       <div className="content-table-pagination">

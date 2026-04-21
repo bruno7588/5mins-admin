@@ -5,9 +5,10 @@ interface ConfirmModalProps {
   open: boolean
   onClose: () => void
   children: React.ReactNode
+  className?: string
 }
 
-function ConfirmModal({ open, onClose, children }: ConfirmModalProps) {
+function ConfirmModal({ open, onClose, children, className }: ConfirmModalProps) {
   useEffect(() => {
     if (!open) return
     function handleKey(e: KeyboardEvent) {
@@ -21,7 +22,7 @@ function ConfirmModal({ open, onClose, children }: ConfirmModalProps) {
 
   return (
     <div className="confirm-modal-overlay" onMouseDown={onClose}>
-      <div className="confirm-modal" onMouseDown={e => e.stopPropagation()}>
+      <div className={`confirm-modal${className ? ` ${className}` : ''}`} onMouseDown={e => e.stopPropagation()}>
         {children}
       </div>
     </div>

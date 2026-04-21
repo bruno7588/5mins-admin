@@ -4,6 +4,7 @@ import TopNav from './components/TopNav/TopNav'
 import YourContent from './pages/your-courses/YourContent'
 import YourCourses from './pages/your-courses/YourCourses'
 import CreateCourse from './pages/your-courses/CreateCourse'
+import AddContent from './pages/add-content/AddContent'
 
 import People from './pages/people/People'
 import UserFields from './pages/people/UserFields'
@@ -54,6 +55,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Navigate to="/content-library" replace />} />
                 <Route path="/content-library" element={<YourContent />} />
+                <Route path="/content-library/add-content" element={<AddContent />} />
                 <Route path="/your-courses" element={<YourCourses />} />
                 <Route path="/people" element={<People />} />
                 <Route path="/user-fields" element={<UserFields />} />

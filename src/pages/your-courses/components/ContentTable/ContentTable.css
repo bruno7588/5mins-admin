@@ -70,48 +70,83 @@
   gap: var(--space-s);
 }
 
-/* Table */
+/* Table — flex-based, mirrors Figma Your Content / 4839:937 and People table pattern */
 .content-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
   width: 100%;
-  border-collapse: collapse;
 }
 
-.content-table th {
-  text-align: left;
+.content-table-header {
+  display: flex;
+  align-items: center;
+}
+
+.content-table-header .content-table-cell {
   font-size: 14px;
   font-weight: 400;
   color: var(--text-secondary);
-  padding: var(--space-sm) var(--space-m);
-  border-bottom: 1px solid var(--border);
+  padding: 0 var(--space-m);
   white-space: nowrap;
 }
 
-.content-table th.col-sort {
-  cursor: pointer;
-}
-
-.content-table th .sort-indicator {
-  display: inline-flex;
+.content-table-row {
+  display: flex;
   align-items: center;
-  margin-left: var(--space-xs);
-  vertical-align: middle;
-}
-
-.content-table td {
-  font-size: 14px;
-  font-weight: 400;
-  color: var(--text-primary);
-  padding: var(--space-sm) var(--space-m);
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-}
-
-.content-table tr {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
   transition: background 150ms ease;
 }
 
-.content-table tbody tr:hover {
-  background: var(--neutral-50);
+.content-table-row:hover {
+  background: var(--cards-background-hover);
+}
+
+.content-table-cell {
+  display: flex;
+  align-items: center;
+  padding: var(--space-sm) var(--space-m);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+/* Column widths — File name flexes; Type/Uploaded by/Updated at fixed; Actions auto */
+.content-table-cell--name {
+  flex: 1;
+  min-width: 0;
+  gap: var(--space-sm);
+}
+
+.content-table-cell--type {
+  width: 136px;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+.content-table-cell--uploader {
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.content-table-cell--date {
+  width: 136px;
+  flex-shrink: 0;
+  gap: var(--space-xs);
+  white-space: nowrap;
+}
+
+.content-table-cell--sortable {
+  cursor: pointer;
+}
+
+.content-table-cell--actions {
+  width: 128px;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  gap: var(--space-s);
 }
 
 /* File name cell */
@@ -122,9 +157,9 @@
 }
 
 .content-table-thumb {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-s);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-xs);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -139,6 +174,14 @@
   font-size: 14px;
   font-weight: 400;
   color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.content-table-file {
+  min-width: 0;
 }
 
 .content-table-filename--editable {
@@ -183,10 +226,21 @@
   color: var(--text-primary);
 }
 
-/* Date */
+/* Date — stacked (Mon DD, / YYYY) per Figma */
 .content-table-date {
   color: var(--text-primary);
   white-space: nowrap;
+}
+
+.content-table-date-stack {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.content-table-date-stack-year {
+  font-size: 12px;
+  color: var(--text-tertiary);
 }
 
 /* Action icons */
