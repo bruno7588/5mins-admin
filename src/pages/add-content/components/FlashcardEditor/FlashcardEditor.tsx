@@ -1,24 +1,24 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Add,
   AddSquare,
-  ArrowLeft,
-  ArrowRight,
+  ArrowLeft2,
+  ArrowRight2,
+  ArrowRotateLeft,
   Brush2,
   Copy,
   Edit2,
   Gallery,
   GalleryAdd,
   Trash,
-  TextalignLeft,
   TextBold,
   TextItalic,
   TextUnderline,
-  CloseCircle,
 } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import InputField from '../../../../components/InputField/InputField'
 import Checkbox from '../../../../components/Checkbox/Checkbox'
+import Tooltip from '../../../../components/Tooltip/Tooltip'
 import type { ContentRow } from '../../../your-courses/components/ContentTable/ContentTable'
 import './FlashcardEditor.css'
 
@@ -70,6 +70,29 @@ const AiSparkleIcon = ({ size = 24 }: { size?: number }) => (
   </svg>
 )
 
+const FontIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 14.5 L8 5.5 L12 14.5 M5.6 11.5 L10.4 11.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M4 17 H12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+)
+
+const NumberedListIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 3.5 L3.5 3 V8 M2.5 8 H4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M2.5 12.5 Q2.5 11.5 3.5 11.5 Q4.5 11.5 4.5 12.5 Q4.5 13.3 2.5 15 H4.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    <path d="M7 5.5 H17 M7 13 H17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+)
+
+const BulletListIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="3.5" cy="5.5" r="1.1" fill="currentColor" />
+    <circle cx="3.5" cy="13" r="1.1" fill="currentColor" />
+    <path d="M7 5.5 H17 M7 13 H17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+)
+
 const DragHandleIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <circle cx="5" cy="3" r="1.25" fill="var(--text-tertiary)" />
@@ -87,6 +110,20 @@ function FlashcardEditor({ open, onClose, onPublish }: FlashcardEditorProps) {
   const [activeIndex, setActiveIndex] = useState(0)
   const [activeTab, setActiveTab] = useState<EditorTab>('quiz')
   const [aiQuizChecked, setAiQuizChecked] = useState(false)
+  const [toolbarOpen, setToolbarOpen] = useState(false)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [trackWidth, setTrackWidth] = useState(0)
+
+  useEffect(() => {
+    if (!open || !trackRef.current) return
+    const el = trackRef.current
+    const ro = new ResizeObserver(entries => {
+      for (const entry of entries) setTrackWidth(entry.contentRect.width)
+    })
+    ro.observe(el)
+    setTrackWidth(el.getBoundingClientRect().width)
+    return () => ro.disconnect()
+  }, [open])
 
   useEffect(() => {
     if (!open) {
@@ -95,8 +132,13 @@ function FlashcardEditor({ open, onClose, onPublish }: FlashcardEditorProps) {
       setActiveIndex(0)
       setActiveTab('quiz')
       setAiQuizChecked(false)
+      setToolbarOpen(false)
     }
   }, [open])
+
+  useEffect(() => {
+    setToolbarOpen(false)
+  }, [activeIndex])
 
   useEffect(() => {
     if (!open) return
@@ -162,6 +204,11 @@ function FlashcardEditor({ open, onClose, onPublish }: FlashcardEditorProps) {
 
   const pagination = useMemo(() => cards.map((_, i) => i), [cards.length])
 
+  const CARD_STEP = 336
+  const stripWidth = cards.length * 320 + (cards.length - 1) * 16
+  const maxShift = Math.max(0, stripWidth - trackWidth)
+  const shift = Math.min(activeIndex * CARD_STEP, maxShift)
+
   if (!open) return null
 
   return (
@@ -209,13 +256,13 @@ function FlashcardEditor({ open, onClose, onPublish }: FlashcardEditorProps) {
               disabled={activeIndex === 0}
               aria-label="Previous card"
             >
-              <ArrowLeft size={16} color="var(--text-primary)" variant="Linear" />
+              <ArrowLeft2 size={24} color="currentColor" variant="Linear" />
             </button>
 
-            <div className="fce-cards-track">
+            <div className="fce-cards-track" ref={trackRef}>
               <div
                 className="fce-cards-strip"
-                style={{ transform: `translateX(-${activeIndex * 336}px)` }}
+                style={{ transform: `translateX(-${shift}px)` }}
               >
                 {cards.map((card, i) => {
                   const isActive = i === activeIndex
@@ -226,20 +273,19 @@ function FlashcardEditor({ open, onClose, onPublish }: FlashcardEditorProps) {
                       className={`fce-card-slot${isActive ? ' fce-card-slot--active' : ''}`}
                       onClick={() => !isActive && setActiveIndex(i)}
                     >
-                      {isActive && (
-                        <div className="fce-drag" aria-hidden="true">
-                          <DragHandleIcon />
-                        </div>
-                      )}
+                      <div className="fce-drag" aria-hidden="true">
+                        <DragHandleIcon />
+                      </div>
                       <div className="fce-card">
-                        {isActive && (
+                        {isActive && toolbarOpen && (
                           <div className="fce-toolbar" aria-hidden="true">
-                            <button type="button" className="fce-toolbar-btn"><TextalignLeft size={16} color="var(--text-primary)" variant="Linear" /></button>
-                            <button type="button" className="fce-toolbar-btn"><TextBold size={16} color="var(--text-primary)" variant="Linear" /></button>
-                            <button type="button" className="fce-toolbar-btn"><TextItalic size={16} color="var(--text-primary)" variant="Linear" /></button>
-                            <button type="button" className="fce-toolbar-btn"><TextUnderline size={16} color="var(--text-primary)" variant="Linear" /></button>
-                            <span className="fce-toolbar-sep" />
-                            <button type="button" className="fce-toolbar-btn" aria-label="Close toolbar"><CloseCircle size={16} color="var(--text-primary)" variant="Linear" /></button>
+                            <button type="button" className="fce-toolbar-btn"><FontIcon /></button>
+                            <button type="button" className="fce-toolbar-btn"><TextBold size={20} color="currentColor" variant="Linear" /></button>
+                            <button type="button" className="fce-toolbar-btn"><TextItalic size={20} color="currentColor" variant="Linear" /></button>
+                            <button type="button" className="fce-toolbar-btn"><TextUnderline size={20} color="currentColor" variant="Linear" /></button>
+                            <button type="button" className="fce-toolbar-btn"><NumberedListIcon /></button>
+                            <button type="button" className="fce-toolbar-btn"><BulletListIcon /></button>
+                            <button type="button" className="fce-toolbar-btn"><ArrowRotateLeft size={20} color="currentColor" variant="Linear" /></button>
                           </div>
                         )}
                         <textarea
@@ -260,11 +306,21 @@ function FlashcardEditor({ open, onClose, onPublish }: FlashcardEditorProps) {
                       </div>
                       {isActive && (
                         <div className="fce-card-actions">
-                          <button type="button" className="fce-card-action" aria-label="Edit text"><Edit2 size={20} color="var(--text-primary)" variant="Linear" /></button>
-                          <button type="button" className="fce-card-action" aria-label="Add image"><Gallery size={20} color="var(--text-primary)" variant="Linear" /></button>
-                          <button type="button" className="fce-card-action" aria-label="Add card" onClick={handleAddCard}><AddSquare size={20} color="var(--text-primary)" variant="Linear" /></button>
-                          <button type="button" className="fce-card-action" aria-label="Duplicate card" onClick={handleDuplicate}><Copy size={20} color="var(--text-primary)" variant="Linear" /></button>
-                          <button type="button" className="fce-card-action" aria-label="Delete card" onClick={handleDelete}><Trash size={20} color="var(--text-primary)" variant="Linear" /></button>
+                          <Tooltip text="Edit text" position="Top" icon={false}>
+                            <button type="button" className="fce-card-action" aria-label="Edit text" onClick={() => setToolbarOpen(v => !v)}><Edit2 size={20} color="var(--text-primary)" variant="Linear" /></button>
+                          </Tooltip>
+                          <Tooltip text="Add image" position="Top" icon={false}>
+                            <button type="button" className="fce-card-action" aria-label="Add image"><Gallery size={20} color="var(--text-primary)" variant="Linear" /></button>
+                          </Tooltip>
+                          <Tooltip text="Add card" position="Top" icon={false}>
+                            <button type="button" className="fce-card-action" aria-label="Add card" onClick={handleAddCard}><AddSquare size={20} color="var(--text-primary)" variant="Linear" /></button>
+                          </Tooltip>
+                          <Tooltip text="Duplicate card" position="Top" icon={false}>
+                            <button type="button" className="fce-card-action" aria-label="Duplicate card" onClick={handleDuplicate}><Copy size={20} color="var(--text-primary)" variant="Linear" /></button>
+                          </Tooltip>
+                          <Tooltip text="Delete card" position="Top" icon={false}>
+                            <button type="button" className="fce-card-action" aria-label="Delete card" onClick={handleDelete}><Trash size={20} color="var(--text-primary)" variant="Linear" /></button>
+                          </Tooltip>
                         </div>
                       )}
                     </div>
@@ -280,7 +336,7 @@ function FlashcardEditor({ open, onClose, onPublish }: FlashcardEditorProps) {
               disabled={activeIndex === cards.length - 1}
               aria-label="Next card"
             >
-              <ArrowRight size={16} color="var(--text-primary)" variant="Linear" />
+              <ArrowRight2 size={24} color="currentColor" variant="Linear" />
             </button>
           </div>
 

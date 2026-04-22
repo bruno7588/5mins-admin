@@ -130,6 +130,12 @@
   width: 24px;
   height: 24px;
   cursor: grab;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.fce-card-slot:hover .fce-drag {
+  opacity: 1;
 }
 
 .fce-card {
@@ -162,11 +168,13 @@
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 0;
-  padding: 4px 8px;
-  background: var(--neutral-0, #ffffff);
+  justify-content: space-between;
+  width: 304px;
+  padding: 4px 12px;
+  background: var(--cards-background);
   border-radius: 12px;
   box-shadow: -4px 0 24px rgba(32, 34, 42, 0.12);
+  color: var(--text-primary);
   z-index: 2;
 }
 
@@ -174,23 +182,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 28px;
+  height: 28px;
   padding: 4px;
   background: none;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  color: var(--text-primary);
   transition: background 150ms ease;
 }
 
 .fce-toolbar-btn:hover {
   background: var(--neutral-50);
-}
-
-.fce-toolbar-sep {
-  width: 1px;
-  height: 16px;
-  background: var(--border);
-  margin: 0 4px;
 }
 
 .fce-card-title,
@@ -243,6 +247,7 @@
 }
 
 .fce-card-action {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -268,31 +273,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-full);
-  background: var(--cards-background);
-  border: 1px solid var(--border);
+  background: var(--page-background);
+  border: none;
   cursor: pointer;
+  color: var(--text-primary);
   z-index: 3;
   transition: background 150ms ease, opacity 150ms ease;
 }
 
-.fce-chev:hover {
-  background: var(--input-background);
+.fce-chev:hover:not(:disabled) {
+  background: var(--cards-background-hover);
 }
 
 .fce-chev:disabled {
-  opacity: 0.4;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .fce-chev--left {
-  left: -16px;
+  left: -20px;
 }
 
 .fce-chev--right {
-  right: -16px;
+  right: -20px;
 }
 
 /* Pagination */
