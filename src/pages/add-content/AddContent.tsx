@@ -121,7 +121,6 @@ function AddContent() {
               <ArrowRight2 size={16} color="var(--text-tertiary)" variant="Linear" />
               <span className="add-content-breadcrumb-current">Add Content</span>
             </nav>
-            <h1 className="add-content-title">What do you want to upload?</h1>
           </div>
 
           <div className="add-content-grid">
