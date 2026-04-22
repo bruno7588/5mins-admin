@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import ContentTable from './components/ContentTable/ContentTable'
 import type { ContentRow } from './components/ContentTable/ContentTable'
 import LessonEditorModal from './components/LessonEditorModal/LessonEditorModal'
+import { readAddedLessons } from '../../utils/addedLessons'
 import './YourContent.css'
 
 type Tab = 'lessons' | 'scorm'
@@ -15,7 +16,11 @@ function YourContent() {
   const [isNewLesson, setIsNewLesson] = useState(false)
   const [aiQuizReadyIds, setAiQuizReadyIds] = useState<number[]>([])
   const [publishedWithQuizIds, setPublishedWithQuizIds] = useState<number[]>([])
-  const [addedLessons, setAddedLessons] = useState<ContentRow[]>([])
+  const [addedLessons, setAddedLessons] = useState<ContentRow[]>(() => readAddedLessons())
+
+  useEffect(() => {
+    setAddedLessons(readAddedLessons())
+  }, [])
 
   const handleLessonClick = (row: ContentRow) => {
     setIsNewLesson(false)

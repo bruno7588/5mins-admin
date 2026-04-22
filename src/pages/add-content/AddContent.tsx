@@ -10,6 +10,9 @@ import {
 } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import CreateFlashcardsModal from './components/CreateFlashcardsModal'
+import FlashcardEditor from './components/FlashcardEditor/FlashcardEditor'
+import type { ContentRow } from '../your-courses/components/ContentTable/ContentTable'
+import { appendAddedLesson } from '../../utils/addedLessons'
 import './AddContent.css'
 
 type CardKey = 'flashcards' | 'video' | 'audio' | 'document' | 'link'
@@ -76,6 +79,7 @@ const cards: CardDef[] = [
 function AddContent() {
   const navigate = useNavigate()
   const [showFlashcardsModal, setShowFlashcardsModal] = useState(false)
+  const [showFlashcardEditor, setShowFlashcardEditor] = useState(false)
 
   const handleCardClick = (key: CardKey) => {
     if (key === 'flashcards') {
@@ -86,12 +90,18 @@ function AddContent() {
 
   const handleCreateEmpty = () => {
     setShowFlashcardsModal(false)
-    // TODO: open flashcard editor seeded with 3 empty cards (Phase 4)
+    setShowFlashcardEditor(true)
   }
 
   const handleAiTransformer = () => {
     setShowFlashcardsModal(false)
     // TODO: open the existing Transform Your Content modal
+  }
+
+  const handlePublishLesson = (lesson: ContentRow) => {
+    appendAddedLesson(lesson)
+    setShowFlashcardEditor(false)
+    navigate('/content-library')
   }
 
   return (
@@ -143,6 +153,12 @@ function AddContent() {
         onClose={() => setShowFlashcardsModal(false)}
         onCreateEmpty={handleCreateEmpty}
         onAiTransformer={handleAiTransformer}
+      />
+
+      <FlashcardEditor
+        open={showFlashcardEditor}
+        onClose={() => setShowFlashcardEditor(false)}
+        onPublish={handlePublishLesson}
       />
     </div>
   )
