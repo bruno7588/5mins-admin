@@ -4,6 +4,7 @@ import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import ContentTable from './components/ContentTable/ContentTable'
 import type { ContentRow } from './components/ContentTable/ContentTable'
 import LessonEditorModal from './components/LessonEditorModal/LessonEditorModal'
+import FlashcardEditor from '../add-content/components/FlashcardEditor/FlashcardEditor'
 import { readAddedLessons } from '../../utils/addedLessons'
 import './YourContent.css'
 
@@ -74,7 +75,17 @@ function YourContent() {
         <ContentTable variant={activeTab} onLessonClick={handleLessonClick} onAddContent={handleAddContent} aiQuizReadyIds={aiQuizReadyIds} addedLessons={addedLessons} />
       </main>
 
-      {selectedLesson && (
+      {selectedLesson && selectedLesson.type === 'Flashcards' && (
+        <FlashcardEditor
+          open
+          mode="edit"
+          initialLessonName={selectedLesson.fileName}
+          onClose={handleCloseModal}
+          onPublish={handleCloseModal}
+        />
+      )}
+
+      {selectedLesson && selectedLesson.type !== 'Flashcards' && (
         <LessonEditorModal
           lesson={selectedLesson}
           isNew={isNewLesson}

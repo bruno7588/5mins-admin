@@ -11,10 +11,14 @@ import {
   More,
   ArrowLeft2,
   ArrowRight2,
+  Danger,
 } from 'iconsax-react'
 import AddScormModal from '../AddScormModal/AddScormModal'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
+import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal'
+import ToastContainer, { useToast } from '../../../../components/Toast/Toast'
 import './ContentTable.css'
+import '../../../people/People.css'
 
 export interface ContentRow {
   id: number
@@ -142,7 +146,22 @@ function ContentTable({ variant = 'lessons', onLessonClick, onAddContent, aiQuiz
   const [previewRow, setPreviewRow] = useState<ContentRow | null>(null)
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null)
   const [dismissedTooltipIds, setDismissedTooltipIds] = useState<number[]>([])
+  const [deleteRow, setDeleteRow] = useState<ContentRow | null>(null)
+  const [confirmInput, setConfirmInput] = useState('')
   const menuRef = useRef<HTMLDivElement>(null)
+  const { toasts, show: showToast } = useToast()
+
+  const closeDeleteModal = () => {
+    setDeleteRow(null)
+    setConfirmInput('')
+  }
+
+  const confirmDelete = () => {
+    if (!deleteRow || confirmInput !== 'Delete') return
+    setRows(prev => prev.filter(r => r.id !== deleteRow.id))
+    closeDeleteModal()
+    showToast('success', 'Lesson deleted')
+  }
 
   useEffect(() => {
     if (menuOpenId === null) return
@@ -341,7 +360,7 @@ function ContentTable({ variant = 'lessons', onLessonClick, onAddContent, aiQuiz
                           className="content-table-menu-item content-table-menu-item--danger"
                           onClick={() => {
                             setMenuOpenId(null)
-                            setRows(prev => prev.filter(r => r.id !== row.id))
+                            setDeleteRow(row)
                           }}
                         >
                           <Trash size={20} color="var(--danger-500)" variant="Linear" />
@@ -366,6 +385,47 @@ function ContentTable({ variant = 'lessons', onLessonClick, onAddContent, aiQuiz
           <ArrowRight2 size={16} color="var(--neutral-400)" />
         </button>
       </div>
+
+      <ConfirmModal open={!!deleteRow} onClose={closeDeleteModal}>
+        {deleteRow && (
+          <>
+            <div className="confirm-modal-header confirm-modal-header--center">
+              <div className="confirm-modal-icon">
+                <Danger size={72} color="var(--danger-500)" variant="Linear" />
+              </div>
+              <h2 className="confirm-modal-title">Delete lesson</h2>
+              <p className="confirm-modal-body">
+                All data concerning the lesson will be removed. This includes the progress made by the users.
+              </p>
+            </div>
+            <div className="confirm-modal-input-group">
+              <label className="confirm-modal-label">
+                Type <span className="confirm-modal-label-danger">'Delete'</span> below, to confirm
+              </label>
+              <input
+                className="confirm-modal-input"
+                type="text"
+                value={confirmInput}
+                onChange={e => setConfirmInput(e.target.value)}
+                placeholder="Delete"
+                autoFocus
+              />
+            </div>
+            <div className="confirm-modal-actions">
+              <button className="confirm-modal-btn confirm-modal-btn--outlined" onClick={closeDeleteModal}>Cancel</button>
+              <button
+                className="confirm-modal-btn confirm-modal-btn--danger"
+                disabled={confirmInput !== 'Delete'}
+                onClick={confirmDelete}
+              >
+                Delete Lesson
+              </button>
+            </div>
+          </>
+        )}
+      </ConfirmModal>
+
+      <ToastContainer toasts={toasts} />
     </div>
   )
 }

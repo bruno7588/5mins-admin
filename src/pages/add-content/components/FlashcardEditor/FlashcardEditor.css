@@ -120,6 +120,15 @@
   cursor: default;
 }
 
+.fce-card-slot--dragging .fce-card {
+  opacity: 0.4;
+}
+
+.fce-card-slot--drag-over .fce-card {
+  outline: 2px dashed var(--secondary-600);
+  outline-offset: 4px;
+}
+
 .fce-drag {
   position: absolute;
   top: 4px;
@@ -203,7 +212,7 @@
   width: 100%;
   background: transparent;
   border: none;
-  color: #ffffff;
+  color: var(--neutral-25);
   font-family: inherit;
   resize: none;
   outline: none;
@@ -231,7 +240,6 @@
 
 .fce-card-slot:not(.fce-card-slot--active) .fce-card-title,
 .fce-card-slot:not(.fce-card-slot--active) .fce-card-desc {
-  color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
 }
 

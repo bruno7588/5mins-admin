@@ -32,6 +32,8 @@ interface FlashcardEditorProps {
   open: boolean
   onClose: () => void
   onPublish: (lesson: ContentRow) => void
+  mode?: 'create' | 'edit'
+  initialLessonName?: string
 }
 
 type EditorTab = 'quiz' | 'skills' | 'category'
@@ -104,13 +106,15 @@ const DragHandleIcon = () => (
   </svg>
 )
 
-function FlashcardEditor({ open, onClose, onPublish }: FlashcardEditorProps) {
-  const [lessonName, setLessonName] = useState('')
+function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLessonName = '' }: FlashcardEditorProps) {
+  const [lessonName, setLessonName] = useState(initialLessonName)
   const [cards, setCards] = useState<Card[]>(seedCards)
   const [activeIndex, setActiveIndex] = useState(0)
   const [activeTab, setActiveTab] = useState<EditorTab>('quiz')
   const [aiQuizChecked, setAiQuizChecked] = useState(false)
   const [toolbarOpen, setToolbarOpen] = useState(false)
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const [trackWidth, setTrackWidth] = useState(0)
 
@@ -127,14 +131,16 @@ function FlashcardEditor({ open, onClose, onPublish }: FlashcardEditorProps) {
 
   useEffect(() => {
     if (!open) {
-      setLessonName('')
+      setLessonName(initialLessonName)
       setCards(seedCards())
       setActiveIndex(0)
       setActiveTab('quiz')
       setAiQuizChecked(false)
       setToolbarOpen(false)
+    } else {
+      setLessonName(initialLessonName)
     }
-  }, [open])
+  }, [open, initialLessonName])
 
   useEffect(() => {
     setToolbarOpen(false)
@@ -189,6 +195,42 @@ function FlashcardEditor({ open, onClose, onPublish }: FlashcardEditorProps) {
   const handlePrev = () => setActiveIndex(i => Math.max(0, i - 1))
   const handleNext = () => setActiveIndex(i => Math.min(cards.length - 1, i + 1))
 
+  const handleDragStart = (i: number) => (e: React.DragEvent) => {
+    setDragIndex(i)
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', String(i))
+  }
+
+  const handleDragOver = (i: number) => (e: React.DragEvent) => {
+    if (dragIndex === null || dragIndex === i) return
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    setDragOverIndex(i)
+  }
+
+  const handleDrop = (i: number) => (e: React.DragEvent) => {
+    e.preventDefault()
+    if (dragIndex === null || dragIndex === i) {
+      setDragIndex(null)
+      setDragOverIndex(null)
+      return
+    }
+    setCards(prev => {
+      const copy = [...prev]
+      const [moved] = copy.splice(dragIndex, 1)
+      copy.splice(i, 0, moved)
+      return copy
+    })
+    setActiveIndex(i)
+    setDragIndex(null)
+    setDragOverIndex(null)
+  }
+
+  const handleDragEnd = () => {
+    setDragIndex(null)
+    setDragOverIndex(null)
+  }
+
   const handlePublish = () => {
     if (!canPublish) return
     const lesson: ContentRow = {
@@ -218,7 +260,7 @@ function FlashcardEditor({ open, onClose, onPublish }: FlashcardEditorProps) {
       <div className="fce-content">
         {/* Header */}
         <div className="fce-header">
-          <h1 className="fce-title">Create Flashcard</h1>
+          <h1 className="fce-title">{mode === 'edit' ? 'Edit Flashcard' : 'Create Flashcard'}</h1>
           <div className="fce-header-actions">
             <button type="button" className="fce-icon-btn" aria-label="AI actions">
               <AiSparkleIcon size={24} />
@@ -233,7 +275,7 @@ function FlashcardEditor({ open, onClose, onPublish }: FlashcardEditorProps) {
               disabled={!canPublish}
               onClick={handlePublish}
             >
-              Publish Lesson
+              {mode === 'edit' ? 'Update Lesson' : 'Publish Lesson'}
             </button>
           </div>
         </div>
@@ -241,7 +283,7 @@ function FlashcardEditor({ open, onClose, onPublish }: FlashcardEditorProps) {
         {/* Lesson name */}
         <InputField
           label="Name of the lesson"
-          placeholder="Untitled flashcard lesson"
+          placeholder="Add a title to your lesson"
           value={lessonName}
           onChange={(e) => setLessonName(e.target.value)}
         />
@@ -270,10 +312,18 @@ function FlashcardEditor({ open, onClose, onPublish }: FlashcardEditorProps) {
                   return (
                     <div
                       key={card.id}
-                      className={`fce-card-slot${isActive ? ' fce-card-slot--active' : ''}`}
+                      className={`fce-card-slot${isActive ? ' fce-card-slot--active' : ''}${dragIndex === i ? ' fce-card-slot--dragging' : ''}${dragOverIndex === i ? ' fce-card-slot--drag-over' : ''}`}
                       onClick={() => !isActive && setActiveIndex(i)}
+                      onDragOver={handleDragOver(i)}
+                      onDrop={handleDrop(i)}
                     >
-                      <div className="fce-drag" aria-hidden="true">
+                      <div
+                        className="fce-drag"
+                        draggable
+                        onDragStart={handleDragStart(i)}
+                        onDragEnd={handleDragEnd}
+                        aria-hidden="true"
+                      >
                         <DragHandleIcon />
                       </div>
                       <div className="fce-card">
