@@ -10,8 +10,8 @@ import {
 } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import CreateFlashcardsModal from './components/CreateFlashcardsModal'
-import CreateFlashcardsFromPromptModal from './components/CreateFlashcardsFromPromptModal'
-import FlashcardEditor from './components/FlashcardEditor/FlashcardEditor'
+import CreateFlashcardsFromFileModal from './components/CreateFlashcardsFromFileModal'
+import FlashcardEditor, { type Card } from './components/FlashcardEditor/FlashcardEditor'
 import type { ContentRow } from '../your-courses/components/ContentTable/ContentTable'
 import { appendAddedLesson } from '../../utils/addedLessons'
 import './AddContent.css'
@@ -77,21 +77,38 @@ const cards: CardDef[] = [
   },
 ]
 
-const lessonNameFromPrompt = (prompt: string) => {
-  const clean = prompt.trim().replace(/\s+/g, ' ')
-  if (clean.length <= 60) return clean
-  const slice = clean.slice(0, 60)
+const lessonNameFromFile = (fileName: string) => {
+  const base = fileName.replace(/\.[^.]+$/, '').trim()
+  if (base.length <= 60) return base
+  const slice = base.slice(0, 60)
   const lastSpace = slice.lastIndexOf(' ')
   return (lastSpace > 30 ? slice.slice(0, lastSpace) : slice) + '…'
 }
 
+const MOCK_GENERATED_CARDS: Array<Pick<Card, 'title' | 'description'>> = [
+  { title: 'Getting started', description: 'A quick overview of what this lesson covers and why it matters for your role.' },
+  { title: 'Core principles', description: 'The three ideas that underpin everything that follows: clarity, accountability, and consistency.' },
+  { title: 'Step-by-step process', description: 'Walk through each stage carefully, in order, and verify each step before moving on to the next.' },
+  { title: 'Common mistakes to avoid', description: 'The most frequent issues teams run into — and how to spot them before they become problems.' },
+  { title: 'Tools and resources', description: 'Equip yourself with the right templates, checklists, and reference material for day-to-day use.' },
+  { title: 'Apply what you’ve learned', description: 'Put your new knowledge into practice with these short exercises and follow-up actions.' },
+]
+
+const buildMockCards = (includeImages: boolean): Card[] =>
+  MOCK_GENERATED_CARDS.map((c, i) => ({
+    id: Date.now() + i,
+    title: c.title,
+    description: c.description,
+    image: includeImages ? `https://picsum.photos/seed/fc${i + 1}/640/360` : undefined,
+  }))
+
 function AddContent() {
   const navigate = useNavigate()
   const [showFlashcardsModal, setShowFlashcardsModal] = useState(false)
-  const [showPromptModal, setShowPromptModal] = useState(false)
+  const [showTransformModal, setShowTransformModal] = useState(false)
   const [showFlashcardEditor, setShowFlashcardEditor] = useState(false)
   const [editorLessonName, setEditorLessonName] = useState('')
-  const [editorCardCount, setEditorCardCount] = useState(3)
+  const [editorInitialCards, setEditorInitialCards] = useState<Card[] | undefined>(undefined)
 
   const handleCardClick = (key: CardKey) => {
     if (key === 'flashcards') {
@@ -103,25 +120,20 @@ function AddContent() {
   const handleCreateEmpty = () => {
     setShowFlashcardsModal(false)
     setEditorLessonName('')
-    setEditorCardCount(3)
-    setShowFlashcardEditor(true)
-  }
-
-  const handleCreateFromPrompt = () => {
-    setShowFlashcardsModal(false)
-    setShowPromptModal(true)
-  }
-
-  const handleGenerateFromPrompt = (prompt: string, numCards: number) => {
-    setShowPromptModal(false)
-    setEditorLessonName(lessonNameFromPrompt(prompt))
-    setEditorCardCount(numCards)
+    setEditorInitialCards(undefined)
     setShowFlashcardEditor(true)
   }
 
   const handleAiTransformer = () => {
     setShowFlashcardsModal(false)
-    // TODO: open the existing Transform Your Content modal
+    setShowTransformModal(true)
+  }
+
+  const handleTransformGenerate = (fileName: string, includeImages: boolean) => {
+    setShowTransformModal(false)
+    setEditorLessonName(lessonNameFromFile(fileName))
+    setEditorInitialCards(buildMockCards(includeImages))
+    setShowFlashcardEditor(true)
   }
 
   const handlePublishLesson = (lesson: ContentRow) => {
@@ -177,14 +189,13 @@ function AddContent() {
         open={showFlashcardsModal}
         onClose={() => setShowFlashcardsModal(false)}
         onCreateEmpty={handleCreateEmpty}
-        onCreateFromPrompt={handleCreateFromPrompt}
         onAiTransformer={handleAiTransformer}
       />
 
-      <CreateFlashcardsFromPromptModal
-        open={showPromptModal}
-        onClose={() => setShowPromptModal(false)}
-        onGenerate={handleGenerateFromPrompt}
+      <CreateFlashcardsFromFileModal
+        open={showTransformModal}
+        onClose={() => setShowTransformModal(false)}
+        onGenerate={handleTransformGenerate}
       />
 
       <FlashcardEditor
@@ -192,7 +203,7 @@ function AddContent() {
         onClose={() => setShowFlashcardEditor(false)}
         onPublish={handlePublishLesson}
         initialLessonName={editorLessonName}
-        initialCardCount={editorCardCount}
+        initialCards={editorInitialCards}
       />
     </div>
   )

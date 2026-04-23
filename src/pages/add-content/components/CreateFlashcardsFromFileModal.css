@@ -1,0 +1,191 @@
+/* ──────────────────────────────────────────
+   Fullscreen shell
+   ────────────────────────────────────────── */
+
+.cffm-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: var(--page-background);
+  display: flex;
+  flex-direction: column;
+  animation: cffm-fade-in 200ms ease;
+}
+
+@keyframes cffm-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.cffm-topbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-l);
+}
+
+.cffm-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-l);
+  padding-bottom: 10vh;
+}
+
+/* ──────────────────────────────────────────
+   Upload & uploading panel
+   ────────────────────────────────────────── */
+
+.cffm-panel {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+}
+
+.cffm-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.cffm-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.cffm-title--center {
+  text-align: center;
+}
+
+.cffm-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.cffm-include-images {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.cffm-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-m);
+  width: 100%;
+  padding-top: var(--space-s);
+  border-top: 1px solid var(--border);
+}
+
+.cffm-generate {
+  padding: 10px var(--space-ml);
+}
+
+.cffm-generate:disabled {
+  background: var(--button-background-disabled);
+  color: var(--text-button-disabled);
+  cursor: not-allowed;
+}
+
+.cffm-generate:disabled:hover {
+  background: var(--button-background-disabled);
+}
+
+/* ──────────────────────────────────────────
+   Generating panel (stepper)
+   ────────────────────────────────────────── */
+
+.cffm-loading-panel {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.cffm-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.cffm-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+  transition: color 300ms ease;
+}
+
+.cffm-step--done,
+.cffm-step--active {
+  color: var(--text-primary);
+}
+
+.cffm-step-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.cffm-step-icon--pending {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  margin: 2px;
+}
+
+.cffm-step--active .cffm-step-icon {
+  animation: cffm-sparkle-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes cffm-sparkle-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
+
+.cffm-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.cffm-progress-track {
+  height: 6px;
+  background: var(--neutral-100);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.cffm-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00CEE6, #8158EC);
+  border-radius: 3px;
+  transition: width 300ms ease;
+}
+
+.cffm-progress-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: right;
+}

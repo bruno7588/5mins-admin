@@ -54,35 +54,63 @@
   gap: var(--space-m);
   padding: var(--space-m);
   border-radius: var(--radius-sm);
-  border: 1px solid transparent;
+  border: none;
   background-color: #FFFFFF;
   box-shadow:
     -1px -1px 4px 0 rgba(32, 34, 42, 0.06),
     1px 1px 4px 0 rgba(32, 34, 42, 0.06);
   cursor: pointer;
   text-align: left;
-  transition: background-image 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+/* Gradient fill (fades in on hover) */
+.cfm-option::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--cfm-grad-fill);
+  opacity: 0;
+  transition: opacity 240ms ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Gradient stroke (fades in on hover) */
+.cfm-option::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--cfm-grad-stroke);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 240ms ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cfm-option:hover::before,
+.cfm-option:hover::after {
+  opacity: 1;
 }
 
 .cfm-option--empty {
-  background-image: linear-gradient(135deg, rgba(255, 187, 56, 0.08), rgba(0, 206, 230, 0.08));
-}
-.cfm-option--empty:hover {
-  border-color: rgba(230, 168, 48, 0.5);
-}
-
-.cfm-option--prompt {
-  background-image: linear-gradient(135deg, rgba(155, 85, 201, 0.08), rgba(250, 113, 95, 0.08));
-}
-.cfm-option--prompt:hover {
-  border-color: rgba(129, 88, 236, 0.5);
+  --cfm-grad-fill: linear-gradient(135deg, rgba(255, 187, 56, 0.08), rgba(0, 206, 230, 0.08));
+  --cfm-grad-stroke: linear-gradient(135deg, #E6A830, #00AFC4);
 }
 
 .cfm-option--ai {
-  background-image: linear-gradient(135deg, rgba(0, 206, 230, 0.08), rgba(129, 88, 236, 0.08));
-}
-.cfm-option--ai:hover {
-  border-color: rgba(0, 175, 196, 0.5);
+  --cfm-grad-fill: linear-gradient(135deg, rgba(0, 206, 230, 0.08), rgba(129, 88, 236, 0.08));
+  --cfm-grad-stroke: linear-gradient(135deg, #00AFC4, #8158EC);
 }
 
 .cfm-option:focus-visible {

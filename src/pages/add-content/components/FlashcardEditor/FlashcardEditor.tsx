@@ -22,10 +22,11 @@ import Tooltip from '../../../../components/Tooltip/Tooltip'
 import type { ContentRow } from '../../../your-courses/components/ContentTable/ContentTable'
 import './FlashcardEditor.css'
 
-interface Card {
+export interface Card {
   id: number
   title: string
   description: string
+  image?: string
 }
 
 interface FlashcardEditorProps {
@@ -34,7 +35,7 @@ interface FlashcardEditorProps {
   onPublish: (lesson: ContentRow) => void
   mode?: 'create' | 'edit'
   initialLessonName?: string
-  initialCardCount?: number
+  initialCards?: Card[]
 }
 
 type EditorTab = 'quiz' | 'skills' | 'category'
@@ -45,7 +46,7 @@ const createEmptyCard = (): Card => ({
   description: '',
 })
 
-const seedCards = (count = 3): Card[] => Array.from({ length: count }, createEmptyCard)
+const seedCards = (): Card[] => [createEmptyCard(), createEmptyCard(), createEmptyCard()]
 
 const placeholderFor = (index: number): { title: string; description: string } => {
   if (index === 0) return { title: 'Your card title goes here', description: 'Add the main content for this card' }
@@ -107,9 +108,9 @@ const DragHandleIcon = () => (
   </svg>
 )
 
-function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLessonName = '', initialCardCount = 3 }: FlashcardEditorProps) {
+function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLessonName = '', initialCards }: FlashcardEditorProps) {
   const [lessonName, setLessonName] = useState(initialLessonName)
-  const [cards, setCards] = useState<Card[]>(() => seedCards(initialCardCount))
+  const [cards, setCards] = useState<Card[]>(() => initialCards && initialCards.length > 0 ? initialCards : seedCards())
   const [activeIndex, setActiveIndex] = useState(0)
   const [activeTab, setActiveTab] = useState<EditorTab>('quiz')
   const [aiQuizChecked, setAiQuizChecked] = useState(false)
@@ -131,18 +132,19 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
   }, [open])
 
   useEffect(() => {
+    const nextCards = initialCards && initialCards.length > 0 ? initialCards : seedCards()
     if (!open) {
       setLessonName(initialLessonName)
-      setCards(seedCards(initialCardCount))
+      setCards(nextCards)
       setActiveIndex(0)
       setActiveTab('quiz')
       setAiQuizChecked(false)
       setToolbarOpen(false)
     } else {
       setLessonName(initialLessonName)
-      setCards(seedCards(initialCardCount))
+      setCards(nextCards)
     }
-  }, [open, initialLessonName, initialCardCount])
+  }, [open, initialLessonName, initialCards])
 
   useEffect(() => {
     setToolbarOpen(false)
@@ -328,7 +330,12 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
                       >
                         <DragHandleIcon />
                       </div>
-                      <div className="fce-card">
+                      <div className={`fce-card${card.image ? ' fce-card--with-image' : ''}`}>
+                        {card.image && (
+                          <div className="fce-card-image">
+                            <img src={card.image} alt="" />
+                          </div>
+                        )}
                         {isActive && toolbarOpen && (
                           <div className="fce-toolbar" aria-hidden="true">
                             <button type="button" className="fce-toolbar-btn"><FontIcon /></button>

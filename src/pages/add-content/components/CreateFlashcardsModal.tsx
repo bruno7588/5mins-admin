@@ -1,4 +1,4 @@
-import { Notepad2, Add, ArrowRight, Magicpen } from 'iconsax-react'
+import { Notepad2, Add, ArrowRight } from 'iconsax-react'
 import ConfirmModal from '../../../components/ConfirmModal/ConfirmModal'
 import './CreateFlashcardsModal.css'
 
@@ -6,7 +6,6 @@ interface CreateFlashcardsModalProps {
   open: boolean
   onClose: () => void
   onCreateEmpty: () => void
-  onCreateFromPrompt: () => void
   onAiTransformer: () => void
 }
 
@@ -31,7 +30,7 @@ const AiSparkleIcon = ({ size = 32 }: { size?: number }) => (
   </svg>
 )
 
-function CreateFlashcardsModal({ open, onClose, onCreateEmpty, onCreateFromPrompt, onAiTransformer }: CreateFlashcardsModalProps) {
+function CreateFlashcardsModal({ open, onClose, onCreateEmpty, onAiTransformer }: CreateFlashcardsModalProps) {
   return (
     <ConfirmModal open={open} onClose={onClose} className="cfm-modal">
       <div className="cfm-header">
@@ -54,20 +53,6 @@ function CreateFlashcardsModal({ open, onClose, onCreateEmpty, onCreateFromPromp
             <div className="cfm-option-info">
               <h3 className="cfm-option-title">Create flashcard from scratch</h3>
               <p className="cfm-option-desc">Start with a blank template of 3 cards and build your lesson from scratch</p>
-            </div>
-          </div>
-          <span className="cfm-option-arrow" aria-hidden="true">
-            <ArrowRight size={20} color="var(--text-secondary)" variant="Linear" />
-          </span>
-        </button>
-        <button type="button" className="cfm-option cfm-option--prompt" onClick={onCreateFromPrompt}>
-          <div className="cfm-option-body">
-            <div className="cfm-option-icon">
-              <Magicpen size={32} color="#8158EC" variant="Linear" />
-            </div>
-            <div className="cfm-option-info">
-              <h3 className="cfm-option-title">With an AI Prompt</h3>
-              <p className="cfm-option-desc">From a plain-language prompt that describes the desired lesson</p>
             </div>
           </div>
           <span className="cfm-option-arrow" aria-hidden="true">
