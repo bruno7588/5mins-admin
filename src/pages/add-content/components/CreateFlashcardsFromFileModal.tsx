@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Magicpen, TickCircle } from 'iconsax-react'
+import { useEffect, useId, useState } from 'react'
+import { TickCircle } from 'iconsax-react'
 import CloseButton from '../../../components/CloseButton/CloseButton'
 import Checkbox from '../../../components/Checkbox/Checkbox'
 import FileUploader from '../../../components/FileUploader/FileUploader'
@@ -20,30 +20,44 @@ const LOADING_STEPS = [
   'Finishing up',
 ]
 
-const UPLOAD_DURATION_MS = 1500
-
 const ACCEPTED_EXTENSIONS = '.pdf,.doc,.docx,.ppt,.pptx,.mp4,.mov,.webm,.mp3,.wav,.m4a'
 
-function SparkleIcon({ size = 24 }: { size?: number }) {
+interface SparkleIconProps {
+  size?: number
+  color?: string
+}
+
+function SparkleIcon({ size = 24, color }: SparkleIconProps) {
+  const rawId = useId()
+  const gradientId = `cffm-sparkle-${rawId.replace(/:/g, '')}`
+  const fill = color ?? `url(#${gradientId})`
+
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12.6948 9.22578C13.0267 7.85703 14.9733 7.85703 15.3052 9.22578L16.2185 12.992C16.337 13.4807 16.7185 13.8622 17.2072 13.9807L20.9734 14.894C22.3422 15.2259 22.3422 17.1726 20.9734 17.5045L17.2072 18.4177C16.7185 18.5362 16.337 18.9178 16.2185 19.4064L15.3052 23.1727C14.9733 24.5414 13.0267 24.5414 12.6948 23.1727L11.7815 19.4064C11.663 18.9178 11.2815 18.5362 10.7928 18.4177L7.02656 17.5045C5.65781 17.1726 5.65781 15.2259 7.02656 14.894L10.7928 13.9807C11.2815 13.8622 11.663 13.4807 11.7815 12.992L12.6948 9.22578Z" fill="url(#cffm-sparkle)" />
-      <path d="M22.3705 6.71184C22.4795 6.26272 23.1182 6.26272 23.2271 6.71184L23.5268 7.94763C23.5657 8.10798 23.6909 8.23318 23.8512 8.27206L25.087 8.57172C25.5361 8.68062 25.5361 9.31938 25.087 9.42828L23.8512 9.72794C23.6909 9.76682 23.5657 9.89202 23.5268 10.0524L23.2271 11.2882C23.1182 11.7373 22.4795 11.7373 22.3705 11.2882L22.0709 10.0524C22.032 9.89202 21.9068 9.76682 21.7465 9.72794L20.5107 9.42828C20.0615 9.31938 20.0615 8.68062 20.5107 8.57172L21.7465 8.27206C21.9068 8.23318 22.032 8.10798 22.0709 7.94763L22.3705 6.71184Z" fill="url(#cffm-sparkle)" />
-      <defs>
-        <linearGradient id="cffm-sparkle" x1="5" y1="6" x2="26" y2="24" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#00AFC4" />
-          <stop offset="1" stopColor="#8158EC" />
-        </linearGradient>
-      </defs>
+      {!color && (
+        <defs>
+          <linearGradient id={gradientId} x1="4" y1="6" x2="28" y2="26" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#00AFC4" />
+            <stop offset="1" stopColor="#8158EC" />
+          </linearGradient>
+        </defs>
+      )}
+      <path
+        d="M11.593 6.96772C12.0355 5.14272 14.6311 5.14272 15.0736 6.96772L16.2913 11.9893C16.4493 12.6409 16.958 13.1497 17.6096 13.3076L22.6312 14.5253C24.4562 14.9679 24.4562 17.5634 22.6312 18.006L17.6096 19.2236C16.958 19.3816 16.4493 19.8904 16.2913 20.5419L15.0736 25.5636C14.6311 27.3886 12.0355 27.3886 11.593 25.5636L10.3753 20.5419C10.2173 19.8904 9.70857 19.3816 9.05699 19.2236L4.03538 18.006C2.21038 17.5634 2.21037 14.9679 4.03538 14.5253L9.05699 13.3076C9.70857 13.1497 10.2173 12.6409 10.3753 11.9893L11.593 6.96772Z"
+        fill={fill}
+      />
+      <path
+        d="M24.494 3.61578C24.6392 3.01695 25.4909 3.01695 25.6361 3.61578L26.0357 5.26349C26.0875 5.47729 26.2544 5.64422 26.4682 5.69607L28.1159 6.09561C28.7148 6.24082 28.7148 7.09249 28.1159 7.2377L26.4682 7.63725C26.2544 7.68909 26.0875 7.85602 26.0357 8.06982L25.6361 9.71753C25.4909 10.3164 24.6392 10.3164 24.494 9.71754L24.0945 8.06982C24.0426 7.85602 23.8757 7.68909 23.6619 7.63725L22.0142 7.2377C21.4154 7.09249 21.4154 6.24082 22.0142 6.09561L23.6619 5.69607C23.8757 5.64422 24.0426 5.47729 24.0945 5.26349L24.494 3.61578Z"
+        fill={fill}
+      />
     </svg>
   )
 }
 
 function CreateFlashcardsFromFileModal({ open, onClose, onGenerate }: CreateFlashcardsFromFileModalProps) {
-  const [step, setStep] = useState<'upload' | 'uploading' | 'generating'>('upload')
+  const [step, setStep] = useState<'upload' | 'generating'>('upload')
   const [file, setFile] = useState<File | null>(null)
   const [includeImages, setIncludeImages] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
   const [currentStep, setCurrentStep] = useState(0)
   const [progress, setProgress] = useState(0)
 
@@ -52,28 +66,10 @@ function CreateFlashcardsFromFileModal({ open, onClose, onGenerate }: CreateFlas
       setStep('upload')
       setFile(null)
       setIncludeImages(false)
-      setUploadProgress(0)
       setCurrentStep(0)
       setProgress(0)
     }
   }, [open])
-
-  useEffect(() => {
-    if (!open || step !== 'uploading') return
-    const tickMs = 50
-    const ticks = UPLOAD_DURATION_MS / tickMs
-    let t = 0
-    const id = setInterval(() => {
-      t += 1
-      const pct = Math.min(100, Math.round((t / ticks) * 100))
-      setUploadProgress(pct)
-      if (pct >= 100) {
-        clearInterval(id)
-        setTimeout(() => setStep('generating'), 250)
-      }
-    }, tickMs)
-    return () => clearInterval(id)
-  }, [step, open])
 
   useEffect(() => {
     if (!open || step !== 'generating') return
@@ -106,7 +102,7 @@ function CreateFlashcardsFromFileModal({ open, onClose, onGenerate }: CreateFlas
 
   const handleStart = () => {
     if (!file) return
-    setStep('uploading')
+    setStep('generating')
   }
 
   return (
@@ -138,32 +134,23 @@ function CreateFlashcardsFromFileModal({ open, onClose, onGenerate }: CreateFlas
 
             <label className="cffm-include-images">
               <Checkbox checked={includeImages} onChange={() => setIncludeImages((v) => !v)} />
-              <span>Include images from the file in the generated cards</span>
+              <span className="cffm-include-images-text">
+                <span className="cffm-include-images-label">Include images</span>
+                <span className="cffm-include-images-helper">Images are sourced from Freepik</span>
+              </span>
             </label>
 
             <div className="cffm-footer">
               <button
                 type="button"
-                className="btn-primary cffm-generate"
+                className="cffm-generate"
                 disabled={!file}
                 onClick={handleStart}
               >
-                <Magicpen size={18} color="currentColor" variant="Linear" />
                 Generate flashcards
+                <SparkleIcon size={20} color="#FFFFFF" />
               </button>
             </div>
-          </div>
-        )}
-
-        {step === 'uploading' && (
-          <div className="cffm-panel">
-            <h2 className="cffm-title cffm-title--center">Uploading your file…</h2>
-            <FileUploader
-              size="L"
-              state="Uploading"
-              fileName={file?.name}
-              progress={uploadProgress}
-            />
           </div>
         )}
 
