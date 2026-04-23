@@ -51,21 +51,38 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-sm);
+  gap: var(--space-m);
   padding: var(--space-m);
   border-radius: var(--radius-sm);
-  border: none;
-  background: #FFFFFF;
+  border: 1px solid transparent;
+  background-color: #FFFFFF;
   box-shadow:
     -1px -1px 4px 0 rgba(32, 34, 42, 0.06),
     1px 1px 4px 0 rgba(32, 34, 42, 0.06);
   cursor: pointer;
   text-align: left;
-  transition: background 150ms ease;
+  transition: background-image 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
 }
 
-.cfm-option:hover {
-  background: var(--cards-background-hover);
+.cfm-option--empty {
+  background-image: linear-gradient(135deg, rgba(255, 187, 56, 0.08), rgba(0, 206, 230, 0.08));
+}
+.cfm-option--empty:hover {
+  border-color: rgba(230, 168, 48, 0.5);
+}
+
+.cfm-option--prompt {
+  background-image: linear-gradient(135deg, rgba(155, 85, 201, 0.08), rgba(250, 113, 95, 0.08));
+}
+.cfm-option--prompt:hover {
+  border-color: rgba(129, 88, 236, 0.5);
+}
+
+.cfm-option--ai {
+  background-image: linear-gradient(135deg, rgba(0, 206, 230, 0.08), rgba(129, 88, 236, 0.08));
+}
+.cfm-option--ai:hover {
+  border-color: rgba(0, 175, 196, 0.5);
 }
 
 .cfm-option:focus-visible {
@@ -76,8 +93,9 @@
 .cfm-option-body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-m);
   width: 100%;
+  flex: 1 1 auto;
   z-index: 1;
 }
 
@@ -123,6 +141,7 @@
   align-items: center;
   justify-content: center;
   align-self: flex-end;
+  margin-top: auto;
   padding: var(--space-s);
   border-radius: 100px;
   background: var(--input-background);

@@ -10,6 +10,7 @@ import {
 } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import CreateFlashcardsModal from './components/CreateFlashcardsModal'
+import CreateFlashcardsFromPromptModal from './components/CreateFlashcardsFromPromptModal'
 import FlashcardEditor from './components/FlashcardEditor/FlashcardEditor'
 import type { ContentRow } from '../your-courses/components/ContentTable/ContentTable'
 import { appendAddedLesson } from '../../utils/addedLessons'
@@ -76,10 +77,21 @@ const cards: CardDef[] = [
   },
 ]
 
+const lessonNameFromPrompt = (prompt: string) => {
+  const clean = prompt.trim().replace(/\s+/g, ' ')
+  if (clean.length <= 60) return clean
+  const slice = clean.slice(0, 60)
+  const lastSpace = slice.lastIndexOf(' ')
+  return (lastSpace > 30 ? slice.slice(0, lastSpace) : slice) + '…'
+}
+
 function AddContent() {
   const navigate = useNavigate()
   const [showFlashcardsModal, setShowFlashcardsModal] = useState(false)
+  const [showPromptModal, setShowPromptModal] = useState(false)
   const [showFlashcardEditor, setShowFlashcardEditor] = useState(false)
+  const [editorLessonName, setEditorLessonName] = useState('')
+  const [editorCardCount, setEditorCardCount] = useState(3)
 
   const handleCardClick = (key: CardKey) => {
     if (key === 'flashcards') {
@@ -90,6 +102,20 @@ function AddContent() {
 
   const handleCreateEmpty = () => {
     setShowFlashcardsModal(false)
+    setEditorLessonName('')
+    setEditorCardCount(3)
+    setShowFlashcardEditor(true)
+  }
+
+  const handleCreateFromPrompt = () => {
+    setShowFlashcardsModal(false)
+    setShowPromptModal(true)
+  }
+
+  const handleGenerateFromPrompt = (prompt: string, numCards: number) => {
+    setShowPromptModal(false)
+    setEditorLessonName(lessonNameFromPrompt(prompt))
+    setEditorCardCount(numCards)
     setShowFlashcardEditor(true)
   }
 
@@ -151,13 +177,22 @@ function AddContent() {
         open={showFlashcardsModal}
         onClose={() => setShowFlashcardsModal(false)}
         onCreateEmpty={handleCreateEmpty}
+        onCreateFromPrompt={handleCreateFromPrompt}
         onAiTransformer={handleAiTransformer}
+      />
+
+      <CreateFlashcardsFromPromptModal
+        open={showPromptModal}
+        onClose={() => setShowPromptModal(false)}
+        onGenerate={handleGenerateFromPrompt}
       />
 
       <FlashcardEditor
         open={showFlashcardEditor}
         onClose={() => setShowFlashcardEditor(false)}
         onPublish={handlePublishLesson}
+        initialLessonName={editorLessonName}
+        initialCardCount={editorCardCount}
       />
     </div>
   )
