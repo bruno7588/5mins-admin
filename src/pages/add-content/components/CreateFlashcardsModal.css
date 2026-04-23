@@ -1,5 +1,5 @@
 .cfm-modal {
-  width: 720px;
+  width: 600px;
   background: var(--page-background);
 }
 
@@ -39,7 +39,7 @@
 .cfm-options {
   display: flex;
   flex-direction: row;
-  gap: var(--space-m);
+  gap: var(--space-ml);
   width: 100%;
 }
 
