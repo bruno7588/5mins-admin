@@ -10,6 +10,7 @@ interface TooltipProps {
   position?: TooltipPosition
   alignment?: TooltipAlignment
   icon?: boolean
+  disabled?: boolean
   children?: ReactNode
   className?: string
 }
@@ -19,6 +20,7 @@ function Tooltip({
   position = 'Top',
   alignment = 'Center',
   icon = true,
+  disabled = false,
   children,
   className = '',
 }: TooltipProps) {
@@ -31,6 +33,10 @@ function Tooltip({
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
   }, [])
+
+  useEffect(() => {
+    if (disabled) setVisible(false)
+  }, [disabled])
 
   const posClass = `tooltip__body--${position.toLowerCase()}-${alignment.toLowerCase()}`
   const caretBefore = position === 'Bottom' || position === 'Right'
@@ -80,7 +86,7 @@ function Tooltip({
   return (
     <div className={`tooltip-wrapper ${className}`.trim()}>
       {trigger}
-      {visible && (
+      {visible && !disabled && (
         <div role="tooltip" className={`tooltip__body ${posClass}`}>
           {caretBefore && caret}
           <div className="tooltip__content">{text}</div>

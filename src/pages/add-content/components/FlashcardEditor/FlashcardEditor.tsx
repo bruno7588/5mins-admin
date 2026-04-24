@@ -10,6 +10,7 @@ import {
   Edit2,
   Gallery,
   GalleryAdd,
+  TextalignLeft,
   Trash,
   TextBold,
   TextItalic,
@@ -19,6 +20,7 @@ import CloseButton from '../../../../components/CloseButton/CloseButton'
 import InputField from '../../../../components/InputField/InputField'
 import Checkbox from '../../../../components/Checkbox/Checkbox'
 import Tooltip from '../../../../components/Tooltip/Tooltip'
+import AddImageModal from '../AddImageModal/AddImageModal'
 import type { ContentRow } from '../../../your-courses/components/ContentTable/ContentTable'
 import './FlashcardEditor.css'
 
@@ -115,9 +117,12 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
   const [activeTab, setActiveTab] = useState<EditorTab>('quiz')
   const [aiQuizChecked, setAiQuizChecked] = useState(false)
   const [toolbarOpen, setToolbarOpen] = useState(false)
+  const [imageMenuOpen, setImageMenuOpen] = useState(false)
+  const [addImageModalOpen, setAddImageModalOpen] = useState(false)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const trackRef = useRef<HTMLDivElement>(null)
+  const imageMenuRef = useRef<HTMLDivElement>(null)
   const [trackWidth, setTrackWidth] = useState(0)
 
   useEffect(() => {
@@ -148,7 +153,19 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
 
   useEffect(() => {
     setToolbarOpen(false)
+    setImageMenuOpen(false)
   }, [activeIndex])
+
+  useEffect(() => {
+    if (!imageMenuOpen) return
+    const onClick = (e: MouseEvent) => {
+      if (imageMenuRef.current && !imageMenuRef.current.contains(e.target as Node)) {
+        setImageMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
+  }, [imageMenuOpen])
 
   useEffect(() => {
     if (!open) return
@@ -164,6 +181,16 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
 
   const updateActive = (patch: Partial<Card>) => {
     setCards(prev => prev.map((c, i) => (i === activeIndex ? { ...c, ...patch } : c)))
+  }
+
+  const handlePickImage = () => {
+    setImageMenuOpen(false)
+    setAddImageModalOpen(true)
+  }
+
+  const handleAddBackground = () => {
+    setImageMenuOpen(false)
+    // TODO: wire up background picker
   }
 
   const handleAddCard = () => {
@@ -368,9 +395,47 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
                           <Tooltip text="Edit text" position="Top" icon={false}>
                             <button type="button" className="fce-card-action" aria-label="Edit text" onClick={() => setToolbarOpen(v => !v)}><Edit2 size={20} color="var(--text-primary)" variant="Linear" /></button>
                           </Tooltip>
-                          <Tooltip text="Add image" position="Top" icon={false}>
-                            <button type="button" className="fce-card-action" aria-label="Add image"><Gallery size={20} color="var(--text-primary)" variant="Linear" /></button>
-                          </Tooltip>
+                          <div className="fce-card-action-wrap" ref={imageMenuRef}>
+                            <Tooltip text="Add image" position="Top" icon={false} disabled={imageMenuOpen}>
+                              <button
+                                type="button"
+                                className={`fce-card-action${imageMenuOpen ? ' fce-card-action--active' : ''}`}
+                                aria-label="Add image"
+                                aria-haspopup="menu"
+                                aria-expanded={imageMenuOpen}
+                                onClick={() => setImageMenuOpen(v => !v)}
+                              >
+                                <Gallery size={20} color="var(--text-primary)" variant="Linear" />
+                              </button>
+                            </Tooltip>
+                            {imageMenuOpen && (
+                              <div className="fce-image-menu" role="menu">
+                                <button
+                                  type="button"
+                                  role="menuitem"
+                                  className="fce-image-menu-item"
+                                  onClick={handleAddBackground}
+                                >
+                                  <span className="fce-image-menu-icon fce-image-menu-icon--solid">
+                                    <TextalignLeft size={16} color="var(--neutral-0)" variant="Bold" />
+                                  </span>
+                                  <span>Add background</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  role="menuitem"
+                                  className="fce-image-menu-item"
+                                  onClick={handlePickImage}
+                                >
+                                  <span className="fce-image-menu-icon">
+                                    <Gallery size={20} color="var(--text-primary)" variant="Linear" />
+                                  </span>
+                                  <span>Add image</span>
+                                </button>
+                                <span className="fce-image-menu-caret" aria-hidden="true" />
+                              </div>
+                            )}
+                          </div>
                           <Tooltip text="Add card" position="Top" icon={false}>
                             <button type="button" className="fce-card-action" aria-label="Add card" onClick={handleAddCard}><AddSquare size={20} color="var(--text-primary)" variant="Linear" /></button>
                           </Tooltip>
@@ -465,6 +530,12 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
           </div>
         )}
       </div>
+
+      <AddImageModal
+        open={addImageModalOpen}
+        onClose={() => setAddImageModalOpen(false)}
+        onSelect={(url) => updateActive({ image: url })}
+      />
     </div>
   )
 }
