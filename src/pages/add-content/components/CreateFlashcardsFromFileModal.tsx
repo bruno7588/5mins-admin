@@ -1,7 +1,7 @@
 import { useEffect, useId, useState } from 'react'
-import { TickCircle } from 'iconsax-react'
+import { ArrowDown2 } from 'iconsax-react'
 import CloseButton from '../../../components/CloseButton/CloseButton'
-import Checkbox from '../../../components/Checkbox/Checkbox'
+import Toggle from '../../../components/Toggle/Toggle'
 import FileUploader from '../../../components/FileUploader/FileUploader'
 import './CreateFlashcardsFromFileModal.css'
 
@@ -14,9 +14,10 @@ interface CreateFlashcardsFromFileModalProps {
 const STEP_DELAY = 750
 
 const LOADING_STEPS = [
-  'Analyzing your file',
-  'Extracting key concepts',
-  'Writing flashcards',
+  'Analyzing your content...',
+  'Summarising key messages',
+  'Adding images',
+  'Sprinkling some magic',
   'Finishing up',
 ]
 
@@ -57,7 +58,8 @@ function SparkleIcon({ size = 24, color }: SparkleIconProps) {
 function CreateFlashcardsFromFileModal({ open, onClose, onGenerate }: CreateFlashcardsFromFileModalProps) {
   const [step, setStep] = useState<'upload' | 'generating'>('upload')
   const [file, setFile] = useState<File | null>(null)
-  const [includeImages, setIncludeImages] = useState(false)
+  const [includeImages, setIncludeImages] = useState(true)
+  const [guidelinesOpen, setGuidelinesOpen] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
   const [progress, setProgress] = useState(0)
 
@@ -65,7 +67,8 @@ function CreateFlashcardsFromFileModal({ open, onClose, onGenerate }: CreateFlas
     if (open) {
       setStep('upload')
       setFile(null)
-      setIncludeImages(false)
+      setIncludeImages(true)
+      setGuidelinesOpen(false)
       setCurrentStep(0)
       setProgress(0)
     }
@@ -118,9 +121,32 @@ function CreateFlashcardsFromFileModal({ open, onClose, onGenerate }: CreateFlas
           <div className="cffm-panel">
             <div className="cffm-heading">
               <h2 className="cffm-title">Upload your content</h2>
-              <p className="cffm-subtitle">
-                We'll transform it into flashcards. Supports PDF, Word, PowerPoint, video and audio files.
-              </p>
+              <p className="cffm-subtitle">We'll transform it into flashcards</p>
+            </div>
+
+            <div className={`cffm-guidelines${guidelinesOpen ? ' cffm-guidelines--open' : ''}`}>
+              <button
+                type="button"
+                className="cffm-guidelines-trigger"
+                aria-expanded={guidelinesOpen}
+                onClick={() => setGuidelinesOpen((v) => !v)}
+              >
+                <span className="cffm-guidelines-label">Guidelines for transforming content</span>
+                <ArrowDown2
+                  size={20}
+                  color="var(--text-secondary)"
+                  className={`cffm-guidelines-chevron${guidelinesOpen ? ' cffm-guidelines-chevron--open' : ''}`}
+                />
+              </button>
+              {guidelinesOpen && (
+                <div className="cffm-guidelines-body">
+                  <ul>
+                    <li>Clear headings, bullet points, and short paragraphs work best.</li>
+                    <li>Keep files under 50 MB. Text-heavy PDFs and slide decks give the best results.</li>
+                    <li>For video and audio, clear speech and minimal background noise produce stronger flashcards.</li>
+                  </ul>
+                </div>
+              )}
             </div>
 
             <FileUploader
@@ -132,61 +158,68 @@ function CreateFlashcardsFromFileModal({ open, onClose, onGenerate }: CreateFlas
               onChangeFile={() => setFile(null)}
             />
 
-            <label className="cffm-include-images">
-              <Checkbox checked={includeImages} onChange={() => setIncludeImages((v) => !v)} />
-              <span className="cffm-include-images-text">
-                <span className="cffm-include-images-label">Include images</span>
-                <span className="cffm-include-images-helper">Images are sourced from Freepik</span>
-              </span>
-            </label>
+            <Toggle
+              checked={includeImages}
+              onChange={() => setIncludeImages((v) => !v)}
+              className="cffm-include-images"
+              label={
+                <>
+                  <span className="cffm-include-images-label">Include images </span>
+                  <span className="cffm-include-images-helper">(sourced from Freepik)</span>
+                </>
+              }
+            />
 
-            <div className="cffm-footer">
-              <button
-                type="button"
-                className="cffm-generate"
-                disabled={!file}
-                onClick={handleStart}
-              >
-                Generate flashcards
-                <SparkleIcon size={20} color="#FFFFFF" />
-              </button>
-            </div>
+            <button
+              type="button"
+              className="cffm-generate"
+              disabled={!file}
+              onClick={handleStart}
+            >
+              Generate flashcards
+              <SparkleIcon size={20} color={file ? '#FFFFFF' : 'var(--text-button-disabled)'} />
+            </button>
           </div>
         )}
 
         {step === 'generating' && (
           <div className="cffm-loading-panel">
-            <h2 className="cffm-title cffm-title--center">Creating your flashcards…</h2>
+            <div className="cffm-heading">
+              <h2 className="cffm-title">Generating flashcards...</h2>
+            </div>
 
-            <div className="cffm-steps">
-              {LOADING_STEPS.map((label, i) => {
-                let status: 'done' | 'active' | 'pending' = 'pending'
-                if (i < currentStep) status = 'done'
-                else if (i === currentStep) status = 'active'
+            <div className="cffm-ai-wrapper">
+              <div className="cffm-ai-wrapper-inner">
+                <div className="cffm-steps">
+                  {LOADING_STEPS.map((label, i) => {
+                    const isActive = i === currentStep
+                    return (
+                      <div
+                        key={i}
+                        className={`cffm-step${isActive ? ' cffm-step--active' : ''}`}
+                      >
+                        <span className="cffm-step-icon">
+                          {isActive && <SparkleIcon size={20} />}
+                        </span>
+                        <span>{label}</span>
+                      </div>
+                    )
+                  })}
+                </div>
 
-                return (
-                  <div key={i} className={`cffm-step cffm-step--${status}`}>
-                    <span className="cffm-step-icon">
-                      {status === 'done' ? (
-                        <TickCircle size={24} color="var(--success-500)" variant="Bold" />
-                      ) : status === 'active' ? (
-                        <SparkleIcon size={24} />
-                      ) : (
-                        <span className="cffm-step-icon--pending" />
-                      )}
-                    </span>
-                    <span>{label}</span>
+                <div className="cffm-progress">
+                  <div className="cffm-progress-track">
+                    <div className="cffm-progress-fill" style={{ width: `${progress}%` }} />
                   </div>
-                )
-              })}
+                  <span className="cffm-progress-label">{progress}%</span>
+                </div>
+              </div>
             </div>
 
-            <div className="cffm-progress">
-              <div className="cffm-progress-track">
-                <div className="cffm-progress-fill" style={{ width: `${progress}%` }} />
-              </div>
-              <span className="cffm-progress-label">{progress}%</span>
-            </div>
+            <button type="button" className="cffm-generating-btn" disabled>
+              Generating
+              <span className="cffm-generating-spinner" aria-hidden="true" />
+            </button>
           </div>
         )}
       </div>

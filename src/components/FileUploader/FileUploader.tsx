@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
-import { DocumentUpload, ClipboardText } from 'iconsax-react'
+import { ExportCurve, ClipboardText } from 'iconsax-react'
 import './FileUploader.css'
 
 type FileUploaderSize = 'L' | 'S'
@@ -13,7 +13,6 @@ interface FileUploaderProps {
   errorMessage?: string
   onFileSelect?: (file: File) => void
   onChangeFile?: () => void
-  onPreview?: () => void
   accept?: string
   className?: string
 }
@@ -26,7 +25,6 @@ export function FileUploader({
   errorMessage = 'Error message here!',
   onFileSelect,
   onChangeFile,
-  onPreview,
   accept,
   className,
 }: FileUploaderProps) {
@@ -99,7 +97,7 @@ export function FileUploader({
       {(state === 'Enabled' || state === 'Hover') && (
         <>
           <div className="file-uploader__icon-group">
-            <DocumentUpload size={iconSize} color="var(--text-secondary)" variant="Linear" />
+            <ExportCurve size={iconSize} color="var(--text-secondary)" variant="Linear" />
             <p className="file-uploader__body">
               Drag and drop file here or click to upload
             </p>
@@ -116,7 +114,7 @@ export function FileUploader({
       {/* ERROR */}
       {state === 'Error' && (
         <>
-          <DocumentUpload size={iconSize} color="var(--danger-500)" variant="Linear" />
+          <ExportCurve size={iconSize} color="var(--danger-500)" variant="Linear" />
           <p className="file-uploader__error-text">{errorMessage}</p>
           <button className="file-uploader__btn-outlined" onClick={openPicker}>
             Select File
@@ -157,17 +155,9 @@ export function FileUploader({
             <ClipboardText size={iconSize} color="var(--text-secondary)" variant="Bold" />
             <p className="file-uploader__body file-uploader__body--filename">{fileName}</p>
           </div>
-          <div className={`file-uploader__actions ${isL ? 'file-uploader__actions--row' : 'file-uploader__actions--col'}`}>
-            {isL && (
-              <button className="file-uploader__btn-text" onClick={onPreview}>Preview</button>
-            )}
-            <button className="file-uploader__btn-outlined" onClick={openPicker}>
-              Change File
-            </button>
-            {!isL && (
-              <button className="file-uploader__btn-text file-uploader__btn-text--muted" onClick={onPreview}>Preview</button>
-            )}
-          </div>
+          <button className="file-uploader__btn-outlined" onClick={openPicker}>
+            Change File
+          </button>
         </>
       )}
     </div>

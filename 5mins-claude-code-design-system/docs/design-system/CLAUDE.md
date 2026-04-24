@@ -24,6 +24,7 @@ This directory contains the complete 5Mins.ai design system documentation.
 | `input.md` | Text inputs, form fields, search boxes, email/password/numeric fields — all states (Enabled, Hover, Active, Filled, Disabled), validation states, label, helper text, right-side icon | Any user text-entry element or form control |
 | `dropdown.md` | Dropdown/Select component — all sizes (S/M/L), all states (Default, Hover, Open, Selected, Disabled, Error), label, helper/error text, searchable variant, multi-select with chips, option groups, React implementation | Any dropdown, select field, option picker, filter selector, or combobox |
 | `file-uploader.md` | File upload component — two sizes (L/S), all five states (Enabled, Hover, Error, Uploading, Filled), circular progress, filename display, Preview + Change File CTAs | Any file input, drag-and-drop zone, CSV import, document or media upload |
+| `selection-controls.md` | Radio button, Checkbox (including indeterminate), and Toggle switch; all states (enabled, hover, disabled), dimensions, design tokens, CSS and React TypeScript implementations, grouping and accessibility patterns | Any single-choice option group (radio), multi-choice list or consent acknowledgement (checkbox), or instant on/off setting (toggle); filter panels, settings rows, permission switches, feature flags |
 
 ## Usage Pattern
 
