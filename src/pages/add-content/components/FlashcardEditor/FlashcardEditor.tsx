@@ -29,6 +29,7 @@ export interface Card {
   title: string
   description: string
   image?: string
+  imageAlign?: 'top' | 'bottom'
 }
 
 interface FlashcardEditorProps {
@@ -99,6 +100,34 @@ const BulletListIcon = () => (
   </svg>
 )
 
+const AlignIcon = ({ align }: { align: 'top' | 'bottom' }) => {
+  const solid = align === 'top' ? { x: 3, y: 4, w: 14, h: 3 } : { x: 3, y: 13, w: 14, h: 3 }
+  const dashed = align === 'top' ? { x: 3, y: 9, w: 14, h: 7 } : { x: 3, y: 4, w: 14, h: 7 }
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <rect
+        x={dashed.x}
+        y={dashed.y}
+        width={dashed.w}
+        height={dashed.h}
+        rx="1.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeDasharray="2 2"
+        fill="none"
+      />
+      <rect
+        x={solid.x}
+        y={solid.y}
+        width={solid.w}
+        height={solid.h}
+        rx="1"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
 const DragHandleIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <circle cx="5" cy="3" r="1.25" fill="var(--text-tertiary)" />
@@ -118,6 +147,7 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
   const [aiQuizChecked, setAiQuizChecked] = useState(false)
   const [toolbarOpen, setToolbarOpen] = useState(false)
   const [imageMenuOpen, setImageMenuOpen] = useState(false)
+  const [imageSubmenuOpen, setImageSubmenuOpen] = useState(false)
   const [addImageModalOpen, setAddImageModalOpen] = useState(false)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
@@ -154,10 +184,14 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
   useEffect(() => {
     setToolbarOpen(false)
     setImageMenuOpen(false)
+    setImageSubmenuOpen(false)
   }, [activeIndex])
 
   useEffect(() => {
-    if (!imageMenuOpen) return
+    if (!imageMenuOpen) {
+      setImageSubmenuOpen(false)
+      return
+    }
     const onClick = (e: MouseEvent) => {
       if (imageMenuRef.current && !imageMenuRef.current.contains(e.target as Node)) {
         setImageMenuOpen(false)
@@ -185,12 +219,26 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
 
   const handlePickImage = () => {
     setImageMenuOpen(false)
+    setImageSubmenuOpen(false)
     setAddImageModalOpen(true)
   }
 
   const handleAddBackground = () => {
     setImageMenuOpen(false)
+    setImageSubmenuOpen(false)
     // TODO: wire up background picker
+  }
+
+  const handleAlignImage = (align: 'top' | 'bottom') => {
+    updateActive({ imageAlign: align })
+    setImageMenuOpen(false)
+    setImageSubmenuOpen(false)
+  }
+
+  const handleRemoveImage = () => {
+    updateActive({ image: undefined, imageAlign: undefined })
+    setImageMenuOpen(false)
+    setImageSubmenuOpen(false)
   }
 
   const handleAddCard = () => {
@@ -357,7 +405,9 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
                       >
                         <DragHandleIcon />
                       </div>
-                      <div className={`fce-card${card.image ? ' fce-card--with-image' : ''}`}>
+                      <div
+                        className={`fce-card${card.image ? ' fce-card--with-image' : ''}${card.image && card.imageAlign === 'bottom' ? ' fce-card--image-bottom' : ''}`}
+                      >
                         {card.image && (
                           <div className="fce-card-image">
                             <img src={card.image} alt="" />
@@ -396,11 +446,16 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
                             <button type="button" className="fce-card-action" aria-label="Edit text" onClick={() => setToolbarOpen(v => !v)}><Edit2 size={20} color="var(--text-primary)" variant="Linear" /></button>
                           </Tooltip>
                           <div className="fce-card-action-wrap" ref={imageMenuRef}>
-                            <Tooltip text="Add image" position="Top" icon={false} disabled={imageMenuOpen}>
+                            <Tooltip
+                              text={card.image ? 'Edit image' : 'Add image'}
+                              position="Top"
+                              icon={false}
+                              disabled={imageMenuOpen}
+                            >
                               <button
                                 type="button"
                                 className={`fce-card-action${imageMenuOpen ? ' fce-card-action--active' : ''}`}
-                                aria-label="Add image"
+                                aria-label={card.image ? 'Edit image' : 'Add image'}
                                 aria-haspopup="menu"
                                 aria-expanded={imageMenuOpen}
                                 onClick={() => setImageMenuOpen(v => !v)}
@@ -421,17 +476,85 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
                                   </span>
                                   <span>Add background</span>
                                 </button>
-                                <button
-                                  type="button"
-                                  role="menuitem"
-                                  className="fce-image-menu-item"
-                                  onClick={handlePickImage}
-                                >
-                                  <span className="fce-image-menu-icon">
-                                    <Gallery size={20} color="var(--text-primary)" variant="Linear" />
-                                  </span>
-                                  <span>Add image</span>
-                                </button>
+                                {card.image ? (
+                                  <div
+                                    className="fce-image-menu-submenu-host"
+                                    onMouseEnter={() => setImageSubmenuOpen(true)}
+                                    onMouseLeave={() => setImageSubmenuOpen(false)}
+                                  >
+                                    <button
+                                      type="button"
+                                      role="menuitem"
+                                      aria-haspopup="menu"
+                                      aria-expanded={imageSubmenuOpen}
+                                      className={`fce-image-menu-item fce-image-menu-item--has-submenu${imageSubmenuOpen ? ' fce-image-menu-item--submenu-open' : ''}`}
+                                      onFocus={() => setImageSubmenuOpen(true)}
+                                    >
+                                      <span className="fce-image-menu-icon">
+                                        <Gallery size={20} color="var(--text-primary)" variant="Linear" />
+                                      </span>
+                                      <span className="fce-image-menu-label">Edit image</span>
+                                      <ArrowRight2 size={16} color="var(--text-secondary)" variant="Linear" />
+                                    </button>
+                                    {imageSubmenuOpen && (
+                                      <div className="fce-image-submenu" role="menu">
+                                        <button
+                                          type="button"
+                                          role="menuitem"
+                                          className="fce-image-menu-item"
+                                          onClick={() => handleAlignImage('top')}
+                                        >
+                                          <span className="fce-image-menu-icon">
+                                            <AlignIcon align="top" />
+                                          </span>
+                                          <span>Align top</span>
+                                        </button>
+                                        <button
+                                          type="button"
+                                          role="menuitem"
+                                          className="fce-image-menu-item"
+                                          onClick={() => handleAlignImage('bottom')}
+                                        >
+                                          <span className="fce-image-menu-icon">
+                                            <AlignIcon align="bottom" />
+                                          </span>
+                                          <span>Align bottom</span>
+                                        </button>
+                                        <button
+                                          type="button"
+                                          role="menuitem"
+                                          className="fce-image-menu-item fce-image-menu-item--danger"
+                                          onClick={handleRemoveImage}
+                                        >
+                                          <span className="fce-image-menu-icon">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                              <path
+                                                d="M17.25 17.25L6.75 6.75M17.25 6.75L6.75 17.25"
+                                                stroke="currentColor"
+                                                strokeWidth="1.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                              />
+                                            </svg>
+                                          </span>
+                                          <span>Remove</span>
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    role="menuitem"
+                                    className="fce-image-menu-item"
+                                    onClick={handlePickImage}
+                                  >
+                                    <span className="fce-image-menu-icon">
+                                      <Gallery size={20} color="var(--text-primary)" variant="Linear" />
+                                    </span>
+                                    <span>Add image</span>
+                                  </button>
+                                )}
                                 <span className="fce-image-menu-caret" aria-hidden="true" />
                               </div>
                             )}

@@ -118,6 +118,7 @@
 
 .fce-card-slot--active {
   cursor: default;
+  z-index: 10;
 }
 
 .fce-card-slot--dragging .fce-card {
@@ -162,6 +163,18 @@
 
 .fce-card--with-image {
   padding-top: 0;
+}
+
+.fce-card--image-bottom {
+  padding-top: 40px;
+  padding-bottom: 0;
+  justify-content: flex-start;
+}
+
+.fce-card--image-bottom .fce-card-image {
+  order: 2;
+  margin-top: auto;
+  margin-bottom: 0;
 }
 
 .fce-card-image {
@@ -355,6 +368,66 @@
 .fce-image-menu-item:focus-visible {
   background: var(--cards-background-hover);
   outline: none;
+}
+
+.fce-image-menu-item--submenu-open {
+  background: var(--cards-background-hover);
+}
+
+.fce-image-menu-item--has-submenu {
+  padding-right: var(--space-s);
+}
+
+.fce-image-menu-label {
+  flex: 1;
+  text-align: left;
+}
+
+.fce-image-menu-item--danger {
+  color: var(--danger-500);
+}
+
+.fce-image-menu-item--danger:hover,
+.fce-image-menu-item--danger:focus-visible {
+  background: rgba(223, 22, 66, 0.08);
+}
+
+/* Submenu host — wraps the Edit image item + submenu so hover is continuous */
+.fce-image-menu-submenu-host {
+  position: relative;
+}
+
+/* Submenu — opens to the right of "Edit image" row, grows upward so all items fit */
+.fce-image-submenu {
+  position: absolute;
+  top: auto;
+  bottom: 0;
+  left: calc(100% + var(--space-s));
+  padding: var(--space-s);
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--cards-background);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(32, 34, 42, 0.16), 0 2px 4px rgba(32, 34, 42, 0.08);
+  animation: fce-image-submenu-in 150ms ease-out;
+  z-index: 1;
+}
+
+/* Invisible bridge so the hover stays active while moving cursor into the submenu */
+.fce-image-submenu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  width: var(--space-s);
+}
+
+@keyframes fce-image-submenu-in {
+  from { opacity: 0; transform: translateX(-4px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 .fce-image-menu-icon {
