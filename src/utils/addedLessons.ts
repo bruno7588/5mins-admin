@@ -17,3 +17,17 @@ export function appendAddedLesson(lesson: ContentRow): void {
   const existing = readAddedLessons()
   localStorage.setItem(KEY, JSON.stringify([lesson, ...existing]))
 }
+
+export function updateAddedLesson(id: number, patch: Partial<ContentRow>): ContentRow[] {
+  const existing = readAddedLessons()
+  const next = existing.map(l => (l.id === id ? { ...l, ...patch } : l))
+  localStorage.setItem(KEY, JSON.stringify(next))
+  return next
+}
+
+export function removeAddedLesson(id: number): ContentRow[] {
+  const existing = readAddedLessons()
+  const next = existing.filter(l => l.id !== id)
+  localStorage.setItem(KEY, JSON.stringify(next))
+  return next
+}

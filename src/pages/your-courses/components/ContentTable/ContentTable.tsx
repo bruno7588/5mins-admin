@@ -121,9 +121,10 @@ interface ContentTableProps {
   onAddContent?: () => void
   aiQuizReadyIds?: number[]
   addedLessons?: ContentRow[]
+  onDeleteLesson?: (row: ContentRow) => void
 }
 
-function ContentTable({ variant = 'lessons', onLessonClick, onAddContent, aiQuizReadyIds = [], addedLessons = [] }: ContentTableProps) {
+function ContentTable({ variant = 'lessons', onLessonClick, onAddContent, aiQuizReadyIds = [], addedLessons = [], onDeleteLesson }: ContentTableProps) {
   const isScorm = variant === 'scorm'
   const [lessons, setLessons] = useState(lessonRows)
   const [scorm, setScorm] = useState(scormRows)
@@ -158,7 +159,9 @@ function ContentTable({ variant = 'lessons', onLessonClick, onAddContent, aiQuiz
 
   const confirmDelete = () => {
     if (!deleteRow || confirmInput !== 'Delete') return
-    setRows(prev => prev.filter(r => r.id !== deleteRow.id))
+    const removed = deleteRow
+    setRows(prev => prev.filter(r => r.id !== removed.id))
+    if (!isScorm) onDeleteLesson?.(removed)
     closeDeleteModal()
     showToast('success', 'Lesson deleted')
   }

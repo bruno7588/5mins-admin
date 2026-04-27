@@ -5,7 +5,7 @@ import ContentTable from './components/ContentTable/ContentTable'
 import type { ContentRow } from './components/ContentTable/ContentTable'
 import LessonEditorModal from './components/LessonEditorModal/LessonEditorModal'
 import FlashcardEditor from '../add-content/components/FlashcardEditor/FlashcardEditor'
-import { readAddedLessons } from '../../utils/addedLessons'
+import { readAddedLessons, updateAddedLesson, removeAddedLesson } from '../../utils/addedLessons'
 import './YourContent.css'
 
 type Tab = 'lessons' | 'scorm'
@@ -42,6 +42,20 @@ function YourContent() {
     }
   }
 
+  const handleFlashcardEdit = (lesson: ContentRow) => {
+    const next = updateAddedLesson(lesson.id, {
+      fileName: lesson.fileName,
+      updatedAt: lesson.updatedAt,
+    })
+    setAddedLessons(next)
+    setSelectedLesson(null)
+  }
+
+  const handleDeleteLesson = (row: ContentRow) => {
+    const next = removeAddedLesson(row.id)
+    setAddedLessons(next)
+  }
+
   const handleQuizReviewed = (lessonId: number) => {
     setAiQuizReadyIds(prev => prev.filter(id => id !== lessonId))
   }
@@ -72,16 +86,17 @@ function YourContent() {
             </button>
           </div>
         </div>
-        <ContentTable variant={activeTab} onLessonClick={handleLessonClick} onAddContent={handleAddContent} aiQuizReadyIds={aiQuizReadyIds} addedLessons={addedLessons} />
+        <ContentTable variant={activeTab} onLessonClick={handleLessonClick} onAddContent={handleAddContent} aiQuizReadyIds={aiQuizReadyIds} addedLessons={addedLessons} onDeleteLesson={handleDeleteLesson} />
       </main>
 
       {selectedLesson && selectedLesson.type === 'Flashcards' && (
         <FlashcardEditor
           open
           mode="edit"
+          initialLessonId={selectedLesson.id}
           initialLessonName={selectedLesson.fileName}
           onClose={handleCloseModal}
-          onPublish={handleCloseModal}
+          onPublish={handleFlashcardEdit}
         />
       )}
 

@@ -37,6 +37,7 @@ interface FlashcardEditorProps {
   onClose: () => void
   onPublish: (lesson: ContentRow) => void
   mode?: 'create' | 'edit'
+  initialLessonId?: number
   initialLessonName?: string
   initialCards?: Card[]
 }
@@ -139,7 +140,7 @@ const DragHandleIcon = () => (
   </svg>
 )
 
-function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLessonName = '', initialCards }: FlashcardEditorProps) {
+function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLessonId, initialLessonName = '', initialCards }: FlashcardEditorProps) {
   const [lessonName, setLessonName] = useState(initialLessonName)
   const [cards, setCards] = useState<Card[]>(() => initialCards && initialCards.length > 0 ? initialCards : seedCards())
   const [activeIndex, setActiveIndex] = useState(0)
@@ -211,7 +212,13 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
   }, [open, onClose])
 
   const activeCard = cards[activeIndex]
-  const canPublish = lessonName.trim().length > 0
+  const hasCardContent = cards.some(c => c.title.trim().length > 0 || c.description.trim().length > 0)
+  const canPublish = lessonName.trim().length > 0 && hasCardContent
+  const disabledReason = !lessonName.trim()
+    ? 'Add a name for your lesson'
+    : !hasCardContent
+      ? 'Add content to at least one card'
+      : ''
 
   const updateActive = (patch: Partial<Card>) => {
     setCards(prev => prev.map((c, i) => (i === activeIndex ? { ...c, ...patch } : c)))
@@ -313,7 +320,7 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
   const handlePublish = () => {
     if (!canPublish) return
     const lesson: ContentRow = {
-      id: Date.now(),
+      id: initialLessonId ?? Date.now(),
       fileName: lessonName.trim(),
       type: 'Flashcards',
       uploadedBy: 'You',
@@ -348,14 +355,22 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
               Edit Theme
               <Brush2 size={20} color="currentColor" variant="Linear" />
             </button>
-            <button
-              type="button"
-              className="btn-primary fce-publish"
-              disabled={!canPublish}
-              onClick={handlePublish}
+            <Tooltip
+              text={disabledReason}
+              position="Bottom"
+              alignment="End"
+              icon={false}
+              disabled={canPublish}
             >
-              {mode === 'edit' ? 'Update Lesson' : 'Publish Lesson'}
-            </button>
+              <button
+                type="button"
+                className="btn-primary fce-publish"
+                disabled={!canPublish}
+                onClick={handlePublish}
+              >
+                {mode === 'edit' ? 'Update Lesson' : 'Publish Lesson'}
+              </button>
+            </Tooltip>
           </div>
         </div>
 
