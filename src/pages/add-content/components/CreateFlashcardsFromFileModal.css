@@ -167,6 +167,11 @@
   color: var(--text-tertiary);
 }
 
+.cffm-include-images--off .cffm-include-images-label,
+.cffm-include-images--off .cffm-include-images-helper {
+  color: var(--text-tertiary);
+}
+
 /* Generate button */
 .cffm-generate {
   display: inline-flex;
