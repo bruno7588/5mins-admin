@@ -26,9 +26,10 @@
 .cffm-center {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: var(--space-l);
+  padding-top: 32px;
   padding-bottom: 10vh;
 }
 
@@ -43,7 +44,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-m);
-  padding: var(--space-xl) 0;
+  padding: 0;
 }
 
 .cffm-heading {
