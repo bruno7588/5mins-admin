@@ -92,8 +92,7 @@
 /* Body */
 .aim-body {
   width: 100%;
-  min-height: 320px;
-  max-height: 480px;
+  height: 480px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -102,7 +101,7 @@
 
 .aim-uploader {
   flex: 1;
-  min-height: 320px;
+  min-height: 0;
 }
 
 /* Freepik tab */
@@ -165,20 +164,22 @@
 }
 
 .aim-freepik-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-s);
+  column-count: 3;
+  column-gap: var(--space-s);
 }
 
 .aim-freepik-card {
   position: relative;
-  aspect-ratio: 4 / 3;
+  display: block;
+  width: 100%;
+  margin: 0 0 var(--space-s) 0;
   padding: 0;
   border: 2px solid transparent;
   border-radius: var(--radius-sm);
   background: var(--input-background);
   cursor: pointer;
   overflow: hidden;
+  break-inside: avoid;
   transition: border-color 150ms ease, transform 150ms ease;
 }
 

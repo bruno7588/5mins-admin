@@ -14,6 +14,10 @@ type Tab = 'upload' | 'freepik'
 
 const ACCEPTED_IMAGE_EXTENSIONS = '.jpg,.jpeg,.png'
 
+const ASPECT_POOL = ['4 / 3', '3 / 4', '1 / 1', '3 / 2', '16 / 9', '2 / 3'] as const
+
+const pickAspect = (id: number) => ASPECT_POOL[id % ASPECT_POOL.length]
+
 const FREEPIK_STUBS = [
   { id: 1, seed: 'compliance-team', title: 'Team meeting', premium: false },
   { id: 2, seed: 'classroom-students', title: 'Classroom', premium: true },
@@ -24,9 +28,18 @@ const FREEPIK_STUBS = [
   { id: 7, seed: 'training-session', title: 'Training session', premium: false },
   { id: 8, seed: 'boardroom-glass', title: 'Boardroom', premium: true },
   { id: 9, seed: 'hospital-ward', title: 'Hospital ward', premium: false },
+  { id: 10, seed: 'product-launch', title: 'Product launch', premium: false },
+  { id: 11, seed: 'data-analytics', title: 'Analytics', premium: true },
+  { id: 12, seed: 'mountain-hiker', title: 'Hiker', premium: false },
 ]
 
-const freepikThumb = (seed: string) => `https://picsum.photos/seed/${seed}/600/400`
+const freepikThumb = (seed: string, aspect: string) => {
+  const [w, h] = aspect.split(' / ').map(Number)
+  const base = 600
+  const width = w >= h ? base : Math.round((base * w) / h)
+  const height = h >= w ? base : Math.round((base * h) / w)
+  return `https://picsum.photos/seed/${seed}/${width}/${height}`
+}
 
 function AddImageModal({ open, onClose, onSelect }: AddImageModalProps) {
   const [tab, setTab] = useState<Tab>('upload')
@@ -41,7 +54,7 @@ function AddImageModal({ open, onClose, onSelect }: AddImageModalProps) {
 
   const q = query.trim()
   const filteredFreepik = q
-    ? Array.from({ length: 9 }, (_, i) => ({
+    ? Array.from({ length: 12 }, (_, i) => ({
         id: 100 + i,
         seed: `${q.toLowerCase().replace(/\s+/g, '-')}-${i + 1}`,
         title: `${q} · ${i + 1}`,
@@ -60,8 +73,8 @@ function AddImageModal({ open, onClose, onSelect }: AddImageModalProps) {
     reader.readAsDataURL(file)
   }
 
-  const handleFreepikPick = (seed: string) => {
-    onSelect(freepikThumb(seed))
+  const handleFreepikPick = (seed: string, aspect: string) => {
+    onSelect(freepikThumb(seed, aspect))
     onClose()
   }
 
@@ -90,7 +103,7 @@ function AddImageModal({ open, onClose, onSelect }: AddImageModalProps) {
             className={`aim-tab${tab === 'upload' ? ' aim-tab--active' : ''}`}
             onClick={() => setTab('upload')}
           >
-            Upload image
+            Upload Image
           </button>
           <button
             type="button"
@@ -99,7 +112,7 @@ function AddImageModal({ open, onClose, onSelect }: AddImageModalProps) {
             className={`aim-tab${tab === 'freepik' ? ' aim-tab--active' : ''}`}
             onClick={() => setTab('freepik')}
           >
-            Freepik images
+            Freepik Images
           </button>
         </div>
       </div>
@@ -146,28 +159,25 @@ function AddImageModal({ open, onClose, onSelect }: AddImageModalProps) {
             </div>
 
             <div className="aim-freepik-grid">
-              {filteredFreepik.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className="aim-freepik-card"
-                  onClick={() => handleFreepikPick(item.seed)}
-                  aria-label={`Use ${item.title}`}
-                >
-                  <img src={freepikThumb(item.seed)} alt={item.title} loading="lazy" />
-                  {item.premium && <span className="aim-freepik-badge">Premium</span>}
-                </button>
-              ))}
+              {filteredFreepik.map((item) => {
+                const aspect = pickAspect(item.id)
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className="aim-freepik-card"
+                    style={{ aspectRatio: aspect }}
+                    onClick={() => handleFreepikPick(item.seed, aspect)}
+                    aria-label={`Use ${item.title}`}
+                  >
+                    <img src={freepikThumb(item.seed, aspect)} alt={item.title} loading="lazy" />
+                  </button>
+                )
+              })}
             </div>
           </div>
         )}
       </div>
-
-      {tab === 'freepik' && (
-        <p className="aim-freepik-attribution">
-          Free images require attribution: "Designed by Freepik".
-        </p>
-      )}
     </ConfirmModal>
   )
 }
