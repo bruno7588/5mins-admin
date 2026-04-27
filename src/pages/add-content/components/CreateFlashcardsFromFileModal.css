@@ -294,6 +294,10 @@
   color: var(--text-primary);
 }
 
+.cffm-step--complete {
+  color: var(--text-secondary);
+}
+
 .cffm-step-icon {
   display: flex;
   align-items: center;

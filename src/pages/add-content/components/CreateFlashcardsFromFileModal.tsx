@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from 'react'
-import { ArrowDown2 } from 'iconsax-react'
+import { ArrowDown2, TickCircle } from 'iconsax-react'
 import CloseButton from '../../../components/CloseButton/CloseButton'
 import Toggle from '../../../components/Toggle/Toggle'
 import FileUploader from '../../../components/FileUploader/FileUploader'
@@ -193,13 +193,17 @@ function CreateFlashcardsFromFileModal({ open, onClose, onGenerate }: CreateFlas
                 <div className="cffm-steps">
                   {LOADING_STEPS.map((label, i) => {
                     const isActive = i === currentStep
+                    const isComplete = i < currentStep
                     return (
                       <div
                         key={i}
-                        className={`cffm-step${isActive ? ' cffm-step--active' : ''}`}
+                        className={`cffm-step${isActive ? ' cffm-step--active' : ''}${isComplete ? ' cffm-step--complete' : ''}`}
                       >
                         <span className="cffm-step-icon">
                           {isActive && <SparkleIcon size={20} />}
+                          {isComplete && (
+                            <TickCircle size={20} color="var(--success-500)" variant="Bold" />
+                          )}
                         </span>
                         <span>{label}</span>
                       </div>
