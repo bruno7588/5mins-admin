@@ -86,16 +86,158 @@
 
 .workflow-card__footer {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
   padding-top: var(--space-m);
   border-top: 1px solid var(--border);
 }
 
-/* Compact metadata badge — matches Figma 7433:4523 */
-.badge.workflow-card__last-sent-badge {
-  padding: 4px 8px;
-  font-size: 12px;
+.workflow-card__info {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-s);
+  font-size: 14px;
   font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.workflow-card__info > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* "Last sent" badge — Figma 7440:6039 */
+.badge.workflow-card__last-sent-badge {
+  display: flex;
+  width: fit-content;
+  padding: 4px 12px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
   color: var(--text-tertiary);
+}
+
+/* Course reminders rows */
+.course-reminders-row {
+  flex-wrap: nowrap;
+}
+
+/* Stepper — - | N | + */
+.course-reminders-row__stepper {
+  display: inline-flex;
+  align-items: stretch;
+  flex: 0 0 auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  overflow: hidden;
+}
+
+.course-reminders-row__stepper:focus-within {
+  border-color: var(--secondary-500);
+}
+
+.course-reminders-row__step-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.course-reminders-row__step-btn:hover:not(:disabled) {
+  background: var(--cards-background-hover);
+  color: var(--text-primary);
+}
+
+.course-reminders-row__step-btn:disabled {
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.course-reminders-row__step-input {
+  width: 36px;
+  border: none;
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  text-align: center;
+  outline: none;
+  padding: 6px 0;
+}
+
+.course-reminders-row__step-input:disabled {
+  color: var(--text-disabled);
+}
+
+.course-reminders-row__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-shrink: 0;
+}
+
+.course-reminders-row__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-s);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.course-reminders-row__icon-btn:hover:not(:disabled) {
+  background: var(--cards-background-hover);
+  color: var(--text-primary);
+}
+
+.course-reminders-row__icon-btn--danger:hover:not(:disabled) {
+  color: var(--text-error, var(--danger-500));
+}
+
+.course-reminders-row__icon-btn:disabled {
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+/* Add reminder — Figma 7447:7753 (icon + bold label, no border) */
+.course-reminders-add__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-s);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.course-reminders-add__btn:hover:not(:disabled) {
+  color: var(--button-background-hover);
+}
+
+.course-reminders-add__btn:disabled {
+  color: var(--text-disabled);
+  cursor: not-allowed;
 }
 
 /* Rules / bullets */
@@ -116,28 +258,10 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
-  padding-left: 21px;
-  position: relative;
-}
-
-.workflow-card__rule::before {
-  content: '';
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--text-secondary);
-  transform: translateY(-50%);
 }
 
 .workflow-card__rules--disabled {
   color: var(--text-disabled);
-}
-
-.workflow-card__rules--disabled .workflow-card__rule::before {
-  background: var(--text-disabled);
 }
 
 /* Compact inline dropdown — overrides default 100% width */

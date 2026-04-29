@@ -1,3 +1,4 @@
+import { InfoCircle } from 'iconsax-react'
 import Toggle from '../../../../components/Toggle/Toggle'
 import Dropdown from '../../../../components/Dropdown/Dropdown'
 import Badge from '../../../../components/Badge/Badge'
@@ -81,21 +82,23 @@ function WorkflowCard({
             className="workflow-card__inline-dropdown"
           />
         </li>
-        <li className="workflow-card__rule">
-          <span>Send to managers with at least 1 team member</span>
-        </li>
-        <li className="workflow-card__rule">
-          <span>Only send if courses are due in the next 30 days</span>
-        </li>
       </ul>
 
-      {enabled && lastSent && (
+      {enabled && (
         <footer className="workflow-card__footer">
-          <Badge
-            type="informative"
-            label={`Last sent ${lastSent}`}
-            className="workflow-card__last-sent-badge"
-          />
+          <p className="workflow-card__info">
+            <InfoCircle size={16} color="currentColor" variant="Linear" />
+            <span>
+              Send to managers with at least 1 team member. Only send if courses are due in the next 30 days.
+            </span>
+          </p>
+          {lastSent && (
+            <Badge
+              type="informative"
+              label={`Last sent ${lastSent}`}
+              className="workflow-card__last-sent-badge"
+            />
+          )}
         </footer>
       )}
     </article>
