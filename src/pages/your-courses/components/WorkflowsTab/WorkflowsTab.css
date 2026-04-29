@@ -1,0 +1,154 @@
+.workflows-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.workflows-empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-xl);
+  background: var(--cards-background);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.workflows-empty__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.workflows-empty__sub {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Workflow card */
+.workflow-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+  padding: var(--space-m);
+  background: var(--cards-background);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-s);
+}
+
+.workflow-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-m);
+}
+
+.workflow-card__headline {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.workflow-card__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.workflow-card__desc {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.workflow-card__preview-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.workflow-card__preview-link:hover {
+  color: var(--button-background-hover);
+}
+
+.workflow-card__footer {
+  display: flex;
+  padding-top: var(--space-m);
+  border-top: 1px solid var(--border);
+}
+
+/* Compact metadata badge — matches Figma 7433:4523 */
+.badge.workflow-card__last-sent-badge {
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+}
+
+/* Rules / bullets */
+.workflow-card__rules {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  list-style: none;
+  padding: 0;
+  color: var(--text-secondary);
+}
+
+.workflow-card__rule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  padding-left: 21px;
+  position: relative;
+}
+
+.workflow-card__rule::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  transform: translateY(-50%);
+}
+
+.workflow-card__rules--disabled {
+  color: var(--text-disabled);
+}
+
+.workflow-card__rules--disabled .workflow-card__rule::before {
+  background: var(--text-disabled);
+}
+
+/* Compact inline dropdown — overrides default 100% width */
+.dropdown-field.workflow-card__inline-dropdown {
+  width: auto;
+  flex: 0 0 auto;
+}
+
+.dropdown-field.workflow-card__inline-dropdown .dropdown-trigger {
+  width: auto;
+  height: auto;
+  padding: 8px 12px;
+  font-size: 14px;
+}

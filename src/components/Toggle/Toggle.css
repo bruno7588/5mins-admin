@@ -21,6 +21,7 @@
   background: var(--neutral-400);
   border-radius: 10px;
   transition: background 150ms ease;
+  pointer-events: none;
 }
 
 .toggle__thumb {
@@ -37,7 +38,7 @@
 }
 
 .toggle--on .toggle__track {
-  background: var(--secondary-500);
+  background: var(--success-500);
 }
 
 .toggle--on .toggle__thumb {
@@ -53,12 +54,12 @@
 }
 
 .toggle--disabled.toggle--on .toggle__track {
-  background: var(--secondary-500);
+  background: var(--success-500);
   opacity: 0.4;
 }
 
 .toggle__input:focus-visible + .toggle__track {
-  outline: 2px solid var(--secondary-600);
+  outline: 2px solid var(--success-600);
   outline-offset: 2px;
 }
 

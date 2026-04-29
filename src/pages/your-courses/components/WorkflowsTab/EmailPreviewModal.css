@@ -1,0 +1,241 @@
+/* Modal shell uses .confirm-modal + .confirm-modal-overlay from ConfirmModal.css */
+
+.email-preview-modal {
+  width: 720px;
+  max-width: calc(100vw - 48px);
+  gap: var(--space-m);
+  align-items: stretch;
+  background: var(--page-background);
+}
+
+.email-preview-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-m);
+  width: 100%;
+}
+
+.email-preview-modal__title {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.email-preview-modal__heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.email-preview-modal__sub {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.email-preview-modal__divider {
+  height: 1px;
+  background: var(--border);
+  border-radius: var(--radius-xs);
+  width: 100%;
+}
+
+/* Email preview card */
+.email-preview {
+  background: var(--neutral-0);
+  border-radius: var(--radius-sm);
+  padding: var(--space-m);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+  width: 100%;
+}
+
+.email-preview__message {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--neutral-800, var(--text-primary));
+  line-height: 1.5;
+}
+
+/* Stat cards */
+.email-preview__stats {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.email-preview__stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-s);
+  padding: 12px 16px 8px;
+  border: 1px solid var(--neutral-100);
+  border-radius: var(--radius-sm);
+  background: transparent;
+}
+
+.email-preview__stat-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--neutral-400);
+  line-height: 1.2;
+}
+
+.email-preview__stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--neutral-800, var(--text-primary));
+  line-height: 1.5;
+}
+
+/* Table */
+.email-preview__table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.email-preview__table-head {
+  display: flex;
+  gap: 24px;
+  align-items: end;
+}
+
+.email-preview__row {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  background: var(--neutral-25);
+  border-radius: var(--radius-m);
+}
+
+.email-preview__col {
+  display: flex;
+  align-items: center;
+}
+
+.email-preview__col--name {
+  flex: 1;
+  min-width: 0;
+  gap: var(--space-s);
+  padding: 12px 16px;
+  overflow: hidden;
+}
+
+.email-preview__col--due {
+  width: 81px;
+  flex-shrink: 0;
+  padding: 12px;
+}
+
+.email-preview__col--progress {
+  width: 120px;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  padding: 12px;
+}
+
+.email-preview__table-head .email-preview__col {
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--neutral-300);
+  line-height: 1.2;
+  background: transparent;
+}
+
+.email-preview__table-head .email-preview__col--name {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.email-preview__table-head .email-preview__col--due {
+  padding-left: 12px;
+  padding-right: 12px;
+  justify-content: flex-start;
+}
+
+.email-preview__table-head .email-preview__col--progress {
+  padding-left: 12px;
+  padding-right: 20px;
+}
+
+/* Avatar circle */
+.email-preview__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* Placeholder bars */
+.email-preview__name-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  width: 168px;
+  flex-shrink: 0;
+}
+
+.email-preview__bar {
+  display: block;
+  background: var(--neutral-100);
+  border-radius: var(--radius-s);
+}
+
+.email-preview__bar--name {
+  height: 10px;
+  width: 139px;
+  background: var(--neutral-200);
+}
+
+.email-preview__bar--role {
+  height: 8px;
+  width: 100%;
+}
+
+.email-preview__bar--due {
+  flex: 1;
+  height: 8px;
+  background: var(--neutral-200);
+}
+
+.email-preview__bar--pct {
+  width: 16px;
+  height: 8px;
+  background: var(--neutral-200);
+}
+
+/* Segmented progress */
+.email-preview__progress {
+  flex: 1;
+  display: flex;
+  height: 8px;
+  background: var(--neutral-100);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.email-preview__segment {
+  flex: 1;
+  background: var(--neutral-100);
+}
+
+.email-preview__segment--filled {
+  background: var(--primary-600);
+}

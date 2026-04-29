@@ -137,10 +137,11 @@
   justify-content: center;
   padding: var(--space-l);
   position: relative;
-  transition: box-shadow 150ms ease;
+  transition: box-shadow 150ms ease, background-color 150ms ease;
 }
 
 .your-courses-folder-card:hover .your-courses-folder-thumb {
+  background: var(--cards-background-hover);
   box-shadow: var(--shadow-s);
 }
 
@@ -159,6 +160,12 @@
   transform: translate(-50%, -50%);
   background: var(--cards-background-hover);
   border-radius: var(--radius-s);
+  transition: background-color 300ms ease-in-out, transform 300ms ease-in-out;
+}
+
+.your-courses-folder-card:hover .your-courses-folder-img-back {
+  background: var(--neutral-200);
+  transform: translate(-50%, -50%) scale(0.92);
 }
 
 .your-courses-folder-img-mid {
@@ -170,6 +177,12 @@
   transform: translate(-50%, -50%);
   background: var(--neutral-100);
   border-radius: var(--radius-s);
+  transition: background-color 300ms ease-in-out, transform 300ms ease-in-out;
+}
+
+.your-courses-folder-card:hover .your-courses-folder-img-mid {
+  background: var(--neutral-100);
+  transform: translate(-50%, -50%) scale(0.92);
 }
 
 .your-courses-folder-img-front {
@@ -181,6 +194,11 @@
   transform: translateX(-50%);
   border-radius: var(--radius-s);
   overflow: hidden;
+  transition: transform 300ms ease-in-out;
+}
+
+.your-courses-folder-card:hover .your-courses-folder-img-front {
+  transform: translateX(-50%) scale(0.92);
 }
 
 .your-courses-folder-img-front img {

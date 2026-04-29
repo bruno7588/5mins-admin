@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Add } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
+import WorkflowsTab from './components/WorkflowsTab/WorkflowsTab'
 import './YourCourses.css'
 
-type Tab = 'created' | 'enrolments'
+type Tab = 'created' | 'enrolments' | 'workflows' | 'dashboard'
 
 const courseImage = 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=480&h=300&fit=crop'
 
@@ -38,31 +39,47 @@ function YourCourses() {
             >
               Active Enrolments
             </button>
+            <button
+              className={`your-courses-tab${activeTab === 'workflows' ? ' your-courses-tab--active' : ''}`}
+              onClick={() => setActiveTab('workflows')}
+            >
+              Workflows
+            </button>
+            <button
+              className={`your-courses-tab${activeTab === 'dashboard' ? ' your-courses-tab--active' : ''}`}
+              onClick={() => setActiveTab('dashboard')}
+            >
+              Dashboard
+            </button>
           </div>
         </div>
 
-        <div className="your-courses-folders">
-          <div className="your-courses-new-folder">
-            <span className="your-courses-new-folder-icon">+</span>
-            <span className="your-courses-new-folder-label">New Folder</span>
-          </div>
+        {activeTab === 'workflows' ? (
+          <WorkflowsTab />
+        ) : (
+          <div className="your-courses-folders">
+            <div className="your-courses-new-folder">
+              <span className="your-courses-new-folder-icon">+</span>
+              <span className="your-courses-new-folder-label">New Folder</span>
+            </div>
 
-          <div className="your-courses-folder-card">
-            <div className="your-courses-folder-thumb">
-              <div className="your-courses-folder-thumbs">
-                <div className="your-courses-folder-img-back" />
-                <div className="your-courses-folder-img-mid" />
-                <div className="your-courses-folder-img-front">
-                  <img src={courseImage} alt="Course thumbnail" />
+            <div className="your-courses-folder-card">
+              <div className="your-courses-folder-thumb">
+                <div className="your-courses-folder-thumbs">
+                  <div className="your-courses-folder-img-back" />
+                  <div className="your-courses-folder-img-mid" />
+                  <div className="your-courses-folder-img-front">
+                    <img src={courseImage} alt="Course thumbnail" />
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="your-courses-folder-info">
-              <span className="your-courses-folder-name">Your courses</span>
-              <span className="your-courses-folder-count">27 courses</span>
+              <div className="your-courses-folder-info">
+                <span className="your-courses-folder-name">Your courses</span>
+                <span className="your-courses-folder-count">27 courses</span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </main>
 
     </div>
