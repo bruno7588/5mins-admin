@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react'
-import { ArrowDown2, TickCircle } from 'iconsax-react'
+import { ArrowDown2 } from 'iconsax-react'
 import './Dropdown.css'
 
 export interface DropdownOption {
@@ -120,9 +120,6 @@ function Dropdown({
                     <span>{opt.label}</span>
                     {opt.description && <span className="dropdown-option__desc">{opt.description}</span>}
                   </span>
-                  {isSelected && (
-                    <TickCircle size={16} color="var(--secondary-500)" variant="Bold" />
-                  )}
                 </button>
               </li>
             )

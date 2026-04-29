@@ -20,8 +20,16 @@ const FREQUENCY_OPTIONS = [
 ]
 
 const SCOPE_OPTIONS = [
-  { value: 'direct', label: 'Direct reports only' },
-  { value: 'all', label: 'All team members' },
+  {
+    value: 'direct',
+    label: 'Direct reports',
+    description: 'Team members who report to you',
+  },
+  {
+    value: 'org',
+    label: 'My organisation',
+    description: 'Includes indirect reports from each manager under you',
+  },
 ]
 
 function WorkflowCard({

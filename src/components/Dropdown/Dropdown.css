@@ -100,7 +100,7 @@
 .dropdown-menu {
   position: absolute;
   top: calc(100% + 4px);
-  right: 0;
+  left: 0;
   z-index: 1000;
   min-width: 100%;
   width: max-content;
@@ -139,7 +139,8 @@
   background: var(--page-background-hover, var(--neutral-50));
 }
 
-.dropdown-option.is-selected {
+.dropdown-option.is-selected,
+.dropdown-option.is-selected:hover:not(:disabled) {
   background: var(--secondary-500);
   color: var(--text-primary);
   font-weight: 500;
