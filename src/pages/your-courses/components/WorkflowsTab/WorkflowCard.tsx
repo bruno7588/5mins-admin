@@ -84,23 +84,28 @@ function WorkflowCard({
         </li>
       </ul>
 
-      {enabled && (
-        <footer className="workflow-card__footer">
-          <p className="workflow-card__info">
-            <InfoCircle size={16} color="currentColor" variant="Linear" />
-            <span>
-              Send to managers with at least 1 team member. Only send if courses are due in the next 30 days.
-            </span>
-          </p>
-          {lastSent && (
-            <Badge
-              type="informative"
-              label={`Last sent ${lastSent}`}
-              className="workflow-card__last-sent-badge"
-            />
-          )}
-        </footer>
-      )}
+      <div
+        className={`workflow-card__collapsible${enabled ? ' workflow-card__collapsible--open' : ''}`}
+        aria-hidden={!enabled}
+      >
+        <div className="workflow-card__collapsible-inner">
+          <footer className="workflow-card__footer">
+            <p className="workflow-card__info">
+              <InfoCircle size={16} color="currentColor" variant="Linear" />
+              <span>
+                Send to managers with at least 1 team member. Only send if courses are due in the next 30 days.
+              </span>
+            </p>
+            {lastSent && (
+              <Badge
+                type="informative"
+                label={`Last sent ${lastSent}`}
+                className="workflow-card__last-sent-badge"
+              />
+            )}
+          </footer>
+        </div>
+      </div>
     </article>
   )
 }

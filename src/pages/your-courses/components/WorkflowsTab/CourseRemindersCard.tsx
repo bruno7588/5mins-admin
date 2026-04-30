@@ -190,23 +190,28 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
         </li>
       </ul>
 
-      {enabled && (
-        <footer className="workflow-card__footer">
-          <p className="workflow-card__info">
-            <InfoCircle size={16} color="currentColor" variant="Linear" />
-            <span>
-              Reminders are sent by email at 9:00 AM UTC on the scheduled day. Applies to every course.
-            </span>
-          </p>
-          {lastSent && (
-            <Badge
-              type="informative"
-              label={`Last sent ${lastSent}`}
-              className="workflow-card__last-sent-badge"
-            />
-          )}
-        </footer>
-      )}
+      <div
+        className={`workflow-card__collapsible${enabled ? ' workflow-card__collapsible--open' : ''}`}
+        aria-hidden={!enabled}
+      >
+        <div className="workflow-card__collapsible-inner">
+          <footer className="workflow-card__footer">
+            <p className="workflow-card__info">
+              <InfoCircle size={16} color="currentColor" variant="Linear" />
+              <span>
+                Reminders are sent by email at 9:00 AM UTC on the scheduled day. Applies to every course.
+              </span>
+            </p>
+            {lastSent && (
+              <Badge
+                type="informative"
+                label={`Last sent ${lastSent}`}
+                className="workflow-card__last-sent-badge"
+              />
+            )}
+          </footer>
+        </div>
+      </div>
 
       <EditReminderModal
         open={editing !== null}
