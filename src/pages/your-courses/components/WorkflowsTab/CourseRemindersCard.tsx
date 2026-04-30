@@ -183,17 +183,18 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
           )
         })}
 
-        <li className="course-reminders-add">
-          <button
-            type="button"
-            className="course-reminders-add__btn"
-            onClick={handleAdd}
-            disabled={!enabled}
-          >
-            <Add size={20} color="currentColor" variant="Linear" />
-            Add Reminder
-          </button>
-        </li>
+        {enabled && (
+          <li className="course-reminders-add">
+            <button
+              type="button"
+              className="course-reminders-add__btn"
+              onClick={handleAdd}
+            >
+              <Add size={20} color="currentColor" variant="Linear" />
+              Add Reminder
+            </button>
+          </li>
+        )}
       </ul>
 
       <div
