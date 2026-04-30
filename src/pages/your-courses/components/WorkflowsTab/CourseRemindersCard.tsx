@@ -52,6 +52,15 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
     () => [...reminders].sort((a, b) => b.days - a.days),
     [reminders],
   )
+  const duplicateDays = useMemo(() => {
+    const counts = new Map<number, number>()
+    for (const r of reminders) counts.set(r.days, (counts.get(r.days) ?? 0) + 1)
+    return new Set(
+      Array.from(counts.entries())
+        .filter(([, n]) => n > 1)
+        .map(([d]) => d),
+    )
+  }, [reminders])
   const editing = sorted.find((r) => r.id === editingId) ?? null
 
   const setDays = (id: string, days: number) => {
@@ -96,65 +105,77 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
       </header>
 
       <ul className={rulesClass}>
-        {sorted.map((r) => (
-          <li key={r.id} className="workflow-card__rule course-reminders-row">
-            <span>Send</span>
-            <div className="course-reminders-row__stepper">
-              <button
-                type="button"
-                className="course-reminders-row__step-btn"
-                onClick={() => setDays(r.id, r.days - 1)}
-                disabled={!enabled || r.days <= MIN_DAYS}
-                aria-label="Decrease days"
-              >
-                <Minus size={16} color="currentColor" variant="Linear" />
-              </button>
-              <input
-                type="text"
-                inputMode="numeric"
-                className="course-reminders-row__step-input"
-                value={String(r.days)}
-                onChange={(e) => handleDaysInput(r.id, e.target.value)}
-                disabled={!enabled}
-                aria-label="Days before due date"
-              />
-              <button
-                type="button"
-                className="course-reminders-row__step-btn"
-                onClick={() => setDays(r.id, r.days + 1)}
-                disabled={!enabled || r.days >= MAX_DAYS}
-                aria-label="Increase days"
-              >
-                <Add size={16} color="currentColor" variant="Linear" />
-              </button>
-            </div>
-            <span>{r.days === 1 ? 'day' : 'days'} before due date</span>
-            <span className="course-reminders-row__actions">
-              <Tooltip text="Edit reminder" icon={false} disabled={!enabled}>
-                <button
-                  type="button"
-                  className="course-reminders-row__icon-btn"
-                  onClick={() => setEditingId(r.id)}
-                  disabled={!enabled}
-                  aria-label="Edit reminder"
-                >
-                  <Edit2 size={16} color="currentColor" variant="Linear" />
-                </button>
-              </Tooltip>
-              <Tooltip text="Delete reminder" icon={false} disabled={!enabled}>
-                <button
-                  type="button"
-                  className="course-reminders-row__icon-btn course-reminders-row__icon-btn--danger"
-                  onClick={() => handleRemove(r.id)}
-                  disabled={!enabled}
-                  aria-label="Delete reminder"
-                >
-                  <Trash size={16} color="currentColor" variant="Linear" />
-                </button>
-              </Tooltip>
-            </span>
-          </li>
-        ))}
+        {sorted.map((r) => {
+          const hasError = enabled && duplicateDays.has(r.days)
+          const stepperClass = `course-reminders-row__stepper${hasError ? ' course-reminders-row__stepper--error' : ''}`
+          return (
+            <li key={r.id} className="course-reminders-row-wrapper">
+              <div className="workflow-card__rule course-reminders-row">
+                <span>Send</span>
+                <div className={stepperClass}>
+                  <button
+                    type="button"
+                    className="course-reminders-row__step-btn"
+                    onClick={() => setDays(r.id, r.days - 1)}
+                    disabled={!enabled || r.days <= MIN_DAYS}
+                    aria-label="Decrease days"
+                  >
+                    <Minus size={16} color="currentColor" variant="Linear" />
+                  </button>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className="course-reminders-row__step-input"
+                    value={String(r.days)}
+                    onChange={(e) => handleDaysInput(r.id, e.target.value)}
+                    disabled={!enabled}
+                    aria-label="Days before due date"
+                    aria-invalid={hasError || undefined}
+                  />
+                  <button
+                    type="button"
+                    className="course-reminders-row__step-btn"
+                    onClick={() => setDays(r.id, r.days + 1)}
+                    disabled={!enabled || r.days >= MAX_DAYS}
+                    aria-label="Increase days"
+                  >
+                    <Add size={16} color="currentColor" variant="Linear" />
+                  </button>
+                </div>
+                <span>{r.days === 1 ? 'day' : 'days'} before due date</span>
+                <span className="course-reminders-row__actions">
+                  <Tooltip text="Edit reminder" icon={false} disabled={!enabled}>
+                    <button
+                      type="button"
+                      className="course-reminders-row__icon-btn"
+                      onClick={() => setEditingId(r.id)}
+                      disabled={!enabled}
+                      aria-label="Edit reminder"
+                    >
+                      <Edit2 size={16} color="currentColor" variant="Linear" />
+                    </button>
+                  </Tooltip>
+                  <Tooltip text="Delete reminder" icon={false} disabled={!enabled}>
+                    <button
+                      type="button"
+                      className="course-reminders-row__icon-btn course-reminders-row__icon-btn--danger"
+                      onClick={() => handleRemove(r.id)}
+                      disabled={!enabled}
+                      aria-label="Delete reminder"
+                    >
+                      <Trash size={16} color="currentColor" variant="Linear" />
+                    </button>
+                  </Tooltip>
+                </span>
+              </div>
+              {hasError && (
+                <p className="course-reminders-row__error" role="alert">
+                  This day is already used by another reminder
+                </p>
+              )}
+            </li>
+          )
+        })}
 
         <li className="course-reminders-add">
           <button

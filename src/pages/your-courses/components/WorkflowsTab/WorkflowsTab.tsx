@@ -46,7 +46,7 @@ function WorkflowsTab() {
         enabled={enabled}
         frequency={frequency}
         scope={scope}
-        lastSent="Mon, Apr 27 — sent to 4 managers"
+        lastSent="Apr 27 to 4 managers"
         onToggle={() => setEnabled((v) => !v)}
         onFrequencyChange={setFrequency}
         onScopeChange={setScope}
