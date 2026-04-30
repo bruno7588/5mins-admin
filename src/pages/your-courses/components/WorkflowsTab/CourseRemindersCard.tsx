@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react'
-import { Add, Edit2, InfoCircle, Minus, Trash } from 'iconsax-react'
+import { Add, Danger, Edit2, InfoCircle, Minus, Trash } from 'iconsax-react'
 import Toggle from '../../../../components/Toggle/Toggle'
 import Badge from '../../../../components/Badge/Badge'
 import Tooltip from '../../../../components/Tooltip/Tooltip'
+import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal'
+import ToastContainer, { useToast } from '../../../../components/Toast/Toast'
 import EditReminderModal from './EditReminderModal'
 
 export interface Reminder {
@@ -47,6 +49,8 @@ const newId = () => `r_${Date.now()}_${nextId++}`
 
 function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const { toasts, show: showToast } = useToast()
 
   const sorted = useMemo(
     () => [...reminders].sort((a, b) => b.days - a.days),
@@ -62,6 +66,7 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
     )
   }, [reminders])
   const editing = sorted.find((r) => r.id === editingId) ?? null
+  const deleting = sorted.find((r) => r.id === deletingId) ?? null
 
   const setDays = (id: string, days: number) => {
     const clamped = Math.min(MAX_DAYS, Math.max(MIN_DAYS, days))
@@ -88,6 +93,7 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
   const handleSaveCopy = (id: string, subject: string, body: string) => {
     onChange(reminders.map((r) => (r.id === id ? { ...r, subject, body } : r)))
     setEditingId(null)
+    showToast('success', 'Reminder updated')
   }
 
   const rulesClass = `workflow-card__rules${enabled ? '' : ' workflow-card__rules--disabled'}`
@@ -159,7 +165,7 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
                     <button
                       type="button"
                       className="course-reminders-row__icon-btn course-reminders-row__icon-btn--danger"
-                      onClick={() => handleRemove(r.id)}
+                      onClick={() => setDeletingId(r.id)}
                       disabled={!enabled}
                       aria-label="Delete reminder"
                     >
@@ -221,6 +227,42 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
         onClose={() => setEditingId(null)}
         onSave={(subject, body) => editing && handleSaveCopy(editing.id, subject, body)}
       />
+
+      <ConfirmModal open={deleting !== null} onClose={() => setDeletingId(null)}>
+        {deleting && (
+          <>
+            <div className="confirm-modal-header confirm-modal-header--center">
+              <div className="confirm-modal-icon">
+                <Danger size={72} color="var(--danger-500)" variant="Linear" />
+              </div>
+              <h2 className="confirm-modal-title">Delete reminder</h2>
+              <p className="confirm-modal-body">
+                This reminder will be removed.
+              </p>
+            </div>
+            <div className="confirm-modal-actions confirm-modal-actions--center">
+              <button
+                className="confirm-modal-btn confirm-modal-btn--outlined-neutral"
+                onClick={() => setDeletingId(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="confirm-modal-btn confirm-modal-btn--danger"
+                onClick={() => {
+                  handleRemove(deleting.id)
+                  setDeletingId(null)
+                  showToast('success', 'Reminder deleted')
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </>
+        )}
+      </ConfirmModal>
+
+      <ToastContainer toasts={toasts} />
     </article>
   )
 }
