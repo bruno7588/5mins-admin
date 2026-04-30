@@ -50,7 +50,7 @@ function EditReminderModal({ open, days, subject, body, onClose, onSave }: Props
         <div className="edit-reminder-modal__header">
           <h2 className="edit-reminder-modal__heading">Edit reminder</h2>
           <p className="edit-reminder-modal__sub">
-            This message will be sent to learners {days} {dayLabel} before the course due date.
+            Send {days} {dayLabel} before course due date
           </p>
         </div>
         <div className="edit-reminder-modal__divider" />
