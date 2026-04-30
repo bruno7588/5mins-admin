@@ -211,7 +211,7 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
             {lastSent && (
               <Badge
                 type="informative"
-                label={`Last sent ${lastSent}`}
+                label={lastSent}
                 className="workflow-card__last-sent-badge"
               />
             )}
