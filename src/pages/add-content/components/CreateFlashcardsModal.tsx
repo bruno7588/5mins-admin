@@ -1,4 +1,4 @@
-import { Notepad2, Add, ArrowRight } from 'iconsax-react'
+import { Edit, Add, ArrowRight } from 'iconsax-react'
 import ConfirmModal from '../../../components/ConfirmModal/ConfirmModal'
 import './CreateFlashcardsModal.css'
 
@@ -48,10 +48,10 @@ function CreateFlashcardsModal({ open, onClose, onCreateEmpty, onAiTransformer }
         <button type="button" className="cfm-option cfm-option--empty" onClick={onCreateEmpty}>
           <div className="cfm-option-body">
             <div className="cfm-option-icon">
-              <Notepad2 size={32} color="#E6A830" variant="Linear" />
+              <Edit size={32} color="#E6A830" variant="Linear" />
             </div>
             <div className="cfm-option-info">
-              <h3 className="cfm-option-title">Create flashcard from scratch</h3>
+              <h3 className="cfm-option-title">Create from scratch</h3>
               <p className="cfm-option-desc">Start with a blank template of 3 cards and build your lesson from scratch</p>
             </div>
           </div>
@@ -65,7 +65,7 @@ function CreateFlashcardsModal({ open, onClose, onCreateEmpty, onAiTransformer }
               <AiSparkleIcon size={32} />
             </div>
             <div className="cfm-option-info">
-              <h3 className="cfm-option-title">Transform existing content with AI</h3>
+              <h3 className="cfm-option-title">Transform your content with AI</h3>
               <p className="cfm-option-desc">Upload a PDF, Word, PPT, video or audio file and let AI do the rest</p>
             </div>
           </div>

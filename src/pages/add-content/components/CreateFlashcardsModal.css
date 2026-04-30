@@ -104,8 +104,8 @@
 }
 
 .cfm-option--empty {
-  --cfm-grad-fill: linear-gradient(135deg, rgba(255, 187, 56, 0.08), rgba(0, 206, 230, 0.08));
-  --cfm-grad-stroke: linear-gradient(135deg, #E6A830, #00AFC4);
+  --cfm-grad-fill: linear-gradient(135deg, rgba(255, 187, 56, 0.08), rgba(233, 92, 123, 0.08));
+  --cfm-grad-stroke: linear-gradient(135deg, #E6A830, #e95c7b);
 }
 
 .cfm-option--ai {
