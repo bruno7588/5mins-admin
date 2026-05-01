@@ -91,33 +91,37 @@ function AutomationDetailsModal({ automation, onClose }: AutomationDetailsModalP
             <div className="automation-details-condition">
               <span className="automation-details-condition-label">With</span>
               <Dropdown
-                size="sm"
+                size="md"
                 options={[{ value: 'all', label: 'All roles' }]}
                 value="all"
+                className="automation-details-condition-dropdown"
               />
             </div>
             <div className="automation-details-condition">
               <span className="automation-details-condition-label">And with</span>
               <Dropdown
-                size="sm"
+                size="md"
                 options={[{ value: 'all', label: 'All cohorts' }]}
                 value="all"
+                className="automation-details-condition-dropdown"
               />
             </div>
             <div className="automation-details-condition">
               <span className="automation-details-condition-label">And from</span>
               <Dropdown
-                size="sm"
+                size="md"
                 options={[{ value: 'all', label: 'All regions' }]}
                 value="all"
+                className="automation-details-condition-dropdown"
               />
             </div>
             <div className="automation-details-condition">
               <span className="automation-details-condition-label">And join date is</span>
               <Dropdown
-                size="sm"
+                size="md"
                 options={[{ value: 'none', label: 'not required' }]}
                 value="none"
+                className="automation-details-condition-dropdown"
               />
             </div>
           </div>
@@ -143,6 +147,7 @@ function AutomationDetailsModal({ automation, onClose }: AutomationDetailsModalP
               </div>
             </div>
 
+            {automation.courses.length > 0 && (
             <div className="automation-details-table">
               <div className="automation-details-table-header">
                 <div className="automation-details-th automation-details-th--course">Course</div>
@@ -187,6 +192,7 @@ function AutomationDetailsModal({ automation, onClose }: AutomationDetailsModalP
                 </div>
               ))}
             </div>
+            )}
           </div>
         </section>
       </div>

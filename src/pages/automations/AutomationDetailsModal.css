@@ -167,17 +167,29 @@
   color: var(--text-secondary);
 }
 
+/* Compact inline dropdown — shrinks default 100% width to content */
+.dropdown-field.automation-details-condition-dropdown {
+  width: auto;
+  flex: 0 0 auto;
+}
+
+.dropdown-field.automation-details-condition-dropdown .dropdown-trigger {
+  width: auto;
+  height: auto;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
 /* ===== Actions toolbar ===== */
 .automation-details-actions-toolbar {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-sm); /* 12px between text and search */
 }
 
 .automation-details-search {
   flex: 1;
   max-width: 400px;
-  margin-left: auto;
 }
 
 /* ===== Table ===== */
