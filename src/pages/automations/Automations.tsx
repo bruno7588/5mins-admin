@@ -20,6 +20,7 @@ import {
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import ForceTriggerModal from './ForceTriggerModal'
+import AutomationDetailsModal from './AutomationDetailsModal'
 import ToastContainer, { useToast } from '../../components/Toast/Toast'
 import './Automations.css'
 
@@ -376,6 +377,9 @@ function Automations() {
   // Force trigger modal
   const [forceTriggerAutomation, setForceTriggerAutomation] = useState<AutomationRow | null>(null)
 
+  // Automation details modal (full-screen)
+  const [detailsAutomation, setDetailsAutomation] = useState<AutomationRow | null>(null)
+
   // Toasts
   const { toasts } = useToast()
 
@@ -493,9 +497,8 @@ function Automations() {
   }
 
   function editAutomation(id: string) {
-    // TODO: open edit modal once the design exists
     const automation = automations.find((a) => a.id === id)
-    window.alert(`Edit "${automation?.name ?? 'automation'}" — not yet implemented`)
+    if (automation) setDetailsAutomation(automation)
   }
 
   function toggleActive(id: string) {
@@ -1088,6 +1091,11 @@ function Automations() {
           setActiveTab('activity')
         }}
         onTrigger={handleForceTrigger}
+      />
+
+      <AutomationDetailsModal
+        automation={detailsAutomation}
+        onClose={() => setDetailsAutomation(null)}
       />
 
       <ToastContainer toasts={toasts} />
