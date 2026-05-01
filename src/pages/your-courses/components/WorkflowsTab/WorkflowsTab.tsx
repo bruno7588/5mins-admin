@@ -5,18 +5,21 @@ import EmailPreviewModal from './EmailPreviewModal'
 import CourseRemindersCard, { type Reminder } from './CourseRemindersCard'
 import './WorkflowsTab.css'
 
+const SEED_BODY =
+  "Hi there,\nA quick reminder that your assigned course is coming up. Just 5 minutes now and you're done.\nThanks!"
+
 const SEED_REMINDERS: Reminder[] = [
   {
     id: 'r_seed_7',
     days: 7,
-    subject: 'Heads up — your course is due in a week',
-    body: "Hi there,\nA quick reminder that your assigned course is due in 7 days. Just 5 minutes now and you're done.\nThanks!",
+    subject: 'Reminder: your course is due soon',
+    body: SEED_BODY,
   },
   {
     id: 'r_seed_1',
     days: 1,
-    subject: 'Last call — your course is due tomorrow',
-    body: 'Hi there,\nYour assigned course is due tomorrow. Please take 5 minutes today to wrap it up.\nThanks!',
+    subject: 'Reminder: your course is due soon',
+    body: SEED_BODY,
   },
 ]
 

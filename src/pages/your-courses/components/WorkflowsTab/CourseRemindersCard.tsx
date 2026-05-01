@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
-import { Add, Danger, Edit2, InfoCircle, Minus, Trash } from 'iconsax-react'
+import { Add, Danger, Edit2, InfoCircle, Trash } from 'iconsax-react'
 import Toggle from '../../../../components/Toggle/Toggle'
 import Badge from '../../../../components/Badge/Badge'
 import Tooltip from '../../../../components/Tooltip/Tooltip'
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal'
 import ToastContainer, { useToast } from '../../../../components/Toast/Toast'
-import EditReminderModal from './EditReminderModal'
+import EditReminderModal, { type ReminderDraft } from './EditReminderModal'
 
 export interface Reminder {
   id: string
@@ -22,33 +22,18 @@ interface Props {
   onChange: (reminders: Reminder[]) => void
 }
 
-const MIN_DAYS = 1
-const MAX_DAYS = 30
-
-function defaultCopy(days: number): { subject: string; body: string } {
-  if (days === 1) {
-    return {
-      subject: 'Last call — your course is due tomorrow',
-      body: 'Hi there,\nYour assigned course is due tomorrow. Please take 5 minutes today to wrap it up.\nThanks!',
-    }
-  }
-  if (days === 7) {
-    return {
-      subject: 'Heads up — your course is due in a week',
-      body: "Hi there,\nA quick reminder that your assigned course is due in 7 days. Just 5 minutes now and you're done.\nThanks!",
-    }
-  }
-  return {
-    subject: `Reminder: your course is due in ${days} days`,
-    body: `Hi there,\nA quick reminder that your assigned course is due in ${days} days. Just 5 minutes now and you're done.\nThanks!`,
-  }
+const DEFAULT_COPY = {
+  subject: 'Reminder: your course is due soon',
+  body: "Hi there,\nA quick reminder that your assigned course is coming up. Just 5 minutes now and you're done.\nThanks!",
 }
 
 let nextId = 0
 const newId = () => `r_${Date.now()}_${nextId++}`
 
+type ModalState = { mode: 'add' } | { mode: 'edit'; id: string } | null
+
 function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange }: Props) {
-  const [editingId, setEditingId] = useState<string | null>(null)
+  const [modal, setModal] = useState<ModalState>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const { toasts, show: showToast } = useToast()
 
@@ -56,44 +41,40 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
     () => [...reminders].sort((a, b) => b.days - a.days),
     [reminders],
   )
-  const duplicateDays = useMemo(() => {
-    const counts = new Map<number, number>()
-    for (const r of reminders) counts.set(r.days, (counts.get(r.days) ?? 0) + 1)
-    return new Set(
-      Array.from(counts.entries())
-        .filter(([, n]) => n > 1)
-        .map(([d]) => d),
-    )
-  }, [reminders])
-  const editing = sorted.find((r) => r.id === editingId) ?? null
   const deleting = sorted.find((r) => r.id === deletingId) ?? null
+  const editing = modal?.mode === 'edit' ? reminders.find((r) => r.id === modal.id) ?? null : null
 
-  const setDays = (id: string, days: number) => {
-    const clamped = Math.min(MAX_DAYS, Math.max(MIN_DAYS, days))
-    onChange(reminders.map((r) => (r.id === id ? { ...r, days: clamped } : r)))
-  }
+  const initial: ReminderDraft | undefined = useMemo(() => {
+    if (!modal) return undefined
+    if (modal.mode === 'edit' && editing) {
+      return { days: editing.days, subject: editing.subject, body: editing.body }
+    }
+    // Add mode — pick first available default day, prefill with default copy
+    const used = new Set(reminders.map((r) => r.days))
+    const fallback = [3, 5, 14, 2, 10, 21, 30].find((d) => !used.has(d)) ?? 3
+    return { days: fallback, ...DEFAULT_COPY }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modal])
 
-  const handleDaysInput = (id: string, raw: string) => {
-    const digitsOnly = raw.replace(/\D/g, '')
-    if (digitsOnly === '') return
-    setDays(id, parseInt(digitsOnly, 10))
+  const takenDays = useMemo(() => {
+    const ids = new Set(reminders.map((r) => r.id))
+    if (modal?.mode === 'edit') ids.delete(modal.id)
+    return new Set(reminders.filter((r) => ids.has(r.id)).map((r) => r.days))
+  }, [reminders, modal])
+
+  const handleSave = (data: ReminderDraft) => {
+    if (modal?.mode === 'edit') {
+      onChange(reminders.map((r) => (r.id === modal.id ? { ...r, ...data } : r)))
+      showToast('success', 'Reminder updated')
+    } else {
+      onChange([...reminders, { id: newId(), ...data }])
+      showToast('success', 'Reminder added')
+    }
+    setModal(null)
   }
 
   const handleRemove = (id: string) => {
     onChange(reminders.filter((r) => r.id !== id))
-  }
-
-  const handleAdd = () => {
-    const used = new Set(reminders.map((r) => r.days))
-    const fallback = [3, 5, 14, 2, 10, 21, 30].find((d) => !used.has(d)) ?? 3
-    const copy = defaultCopy(fallback)
-    onChange([...reminders, { id: newId(), days: fallback, ...copy }])
-  }
-
-  const handleSaveCopy = (id: string, subject: string, body: string) => {
-    onChange(reminders.map((r) => (r.id === id ? { ...r, subject, body } : r)))
-    setEditingId(null)
-    showToast('success', 'Reminder updated')
   }
 
   const rulesClass = `workflow-card__rules${enabled ? '' : ' workflow-card__rules--disabled'}`
@@ -111,84 +92,50 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
       </header>
 
       <ul className={rulesClass}>
-        {sorted.map((r) => {
-          const hasError = enabled && duplicateDays.has(r.days)
-          const stepperClass = `course-reminders-row__stepper${hasError ? ' course-reminders-row__stepper--error' : ''}`
-          return (
-            <li key={r.id} className="course-reminders-row-wrapper">
-              <div className="workflow-card__rule course-reminders-row">
-                <span>Send</span>
-                <div className={stepperClass}>
+        {sorted.map((r) => (
+          <li key={r.id} className="course-reminders-row-wrapper">
+            <div className="course-reminders-row">
+              <span className="course-reminders-row__text">Send email</span>
+              <span className="course-reminders-row__badge">
+                {r.days} {r.days === 1 ? 'day' : 'days'}
+              </span>
+              <span className="course-reminders-row__text course-reminders-row__text--grow">
+                before due date
+              </span>
+              <span className="course-reminders-row__actions">
+                <Tooltip text="Edit reminder" icon={false} disabled={!enabled}>
                   <button
                     type="button"
-                    className="course-reminders-row__step-btn"
-                    onClick={() => setDays(r.id, r.days - 1)}
-                    disabled={!enabled || r.days <= MIN_DAYS}
-                    aria-label="Decrease days"
-                  >
-                    <Minus size={16} color="currentColor" variant="Linear" />
-                  </button>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    className="course-reminders-row__step-input"
-                    value={String(r.days)}
-                    onChange={(e) => handleDaysInput(r.id, e.target.value)}
+                    className="course-reminders-row__icon-btn"
+                    onClick={() => setModal({ mode: 'edit', id: r.id })}
                     disabled={!enabled}
-                    aria-label="Days before due date"
-                    aria-invalid={hasError || undefined}
-                  />
+                    aria-label="Edit reminder"
+                  >
+                    <Edit2 size={16} color="currentColor" variant="Linear" />
+                  </button>
+                </Tooltip>
+                <Tooltip text="Delete reminder" icon={false} disabled={!enabled}>
                   <button
                     type="button"
-                    className="course-reminders-row__step-btn"
-                    onClick={() => setDays(r.id, r.days + 1)}
-                    disabled={!enabled || r.days >= MAX_DAYS}
-                    aria-label="Increase days"
+                    className="course-reminders-row__icon-btn course-reminders-row__icon-btn--danger"
+                    onClick={() => setDeletingId(r.id)}
+                    disabled={!enabled}
+                    aria-label="Delete reminder"
                   >
-                    <Add size={16} color="currentColor" variant="Linear" />
+                    <Trash size={16} color="currentColor" variant="Linear" />
                   </button>
-                </div>
-                <span>{r.days === 1 ? 'day' : 'days'} before due date</span>
-                <span className="course-reminders-row__actions">
-                  <Tooltip text="Edit reminder" icon={false} disabled={!enabled}>
-                    <button
-                      type="button"
-                      className="course-reminders-row__icon-btn"
-                      onClick={() => setEditingId(r.id)}
-                      disabled={!enabled}
-                      aria-label="Edit reminder"
-                    >
-                      <Edit2 size={16} color="currentColor" variant="Linear" />
-                    </button>
-                  </Tooltip>
-                  <Tooltip text="Delete reminder" icon={false} disabled={!enabled}>
-                    <button
-                      type="button"
-                      className="course-reminders-row__icon-btn course-reminders-row__icon-btn--danger"
-                      onClick={() => setDeletingId(r.id)}
-                      disabled={!enabled}
-                      aria-label="Delete reminder"
-                    >
-                      <Trash size={16} color="currentColor" variant="Linear" />
-                    </button>
-                  </Tooltip>
-                </span>
-              </div>
-              {hasError && (
-                <p className="course-reminders-row__error" role="alert">
-                  This day is already used by another reminder
-                </p>
-              )}
-            </li>
-          )
-        })}
+                </Tooltip>
+              </span>
+            </div>
+          </li>
+        ))}
 
         {enabled && (
           <li className="course-reminders-add">
             <button
               type="button"
               className="course-reminders-add__btn"
-              onClick={handleAdd}
+              onClick={() => setModal({ mode: 'add' })}
             >
               <Add size={20} color="currentColor" variant="Linear" />
               Add Reminder
@@ -221,12 +168,12 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
       </div>
 
       <EditReminderModal
-        open={editing !== null}
-        days={editing?.days ?? 0}
-        subject={editing?.subject ?? ''}
-        body={editing?.body ?? ''}
-        onClose={() => setEditingId(null)}
-        onSave={(subject, body) => editing && handleSaveCopy(editing.id, subject, body)}
+        open={modal !== null}
+        mode={modal?.mode === 'edit' ? 'edit' : 'add'}
+        initial={initial}
+        takenDays={takenDays}
+        onClose={() => setModal(null)}
+        onSave={handleSave}
       />
 
       <ConfirmModal open={deleting !== null} onClose={() => setDeletingId(null)}>

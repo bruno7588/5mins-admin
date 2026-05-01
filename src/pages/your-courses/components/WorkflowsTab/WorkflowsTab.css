@@ -117,8 +117,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  margin-top: var(--space-m);
-  padding-top: var(--space-m);
+  margin-top: var(--space-sm);
+  padding-top: var(--space-sm);
   border-top: 1px solid var(--border);
 }
 
@@ -150,81 +150,48 @@
 
 /* Course reminders rows */
 .course-reminders-row-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
   list-style: none;
 }
 
 .course-reminders-row {
-  flex-wrap: nowrap;
-}
-
-.course-reminders-row__error {
-  margin: 0;
-  padding-left: 44px; /* aligns under the stepper after "Send " label */
-  font-size: 12px;
-  line-height: 1.4;
-  color: var(--danger-500);
-}
-
-/* Stepper — - | N | + */
-.course-reminders-row__stepper {
-  display: inline-flex;
-  align-items: stretch;
-  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-sm);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: transparent;
-  overflow: hidden;
-}
-
-.course-reminders-row__stepper:focus-within {
-  border-color: var(--secondary-500);
-}
-
-.course-reminders-row__stepper--error,
-.course-reminders-row__stepper--error:focus-within {
-  border-color: var(--danger-500);
-}
-
-.course-reminders-row__step-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
-}
-
-.course-reminders-row__step-btn:hover:not(:disabled) {
-  background: var(--cards-background-hover);
-  color: var(--text-primary);
-}
-
-.course-reminders-row__step-btn:disabled {
-  color: var(--text-disabled);
-  cursor: not-allowed;
-}
-
-.course-reminders-row__step-input {
-  width: 36px;
-  border: none;
-  background: transparent;
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
   font-weight: 400;
-  color: var(--text-primary);
-  text-align: center;
-  outline: none;
-  padding: 6px 0;
+  line-height: 1.5;
 }
 
-.course-reminders-row__step-input:disabled {
+.course-reminders-row__text {
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.course-reminders-row__text--grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.course-reminders-row__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-xs) var(--space-s);
+  border-radius: var(--radius-full);
+  background: var(--input-background);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.workflow-card__rules--disabled .course-reminders-row__text,
+.workflow-card__rules--disabled .course-reminders-row__badge {
   color: var(--text-disabled);
 }
 
