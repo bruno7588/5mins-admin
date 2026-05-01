@@ -56,6 +56,7 @@
 }
 
 .workflow-card__title {
+  margin: 0;
   font-size: 16px;
   font-weight: 700;
   color: var(--text-primary);
@@ -63,6 +64,7 @@
 }
 
 .workflow-card__desc {
+  margin: 0;
   font-size: 14px;
   font-weight: 400;
   color: var(--text-secondary);
@@ -190,12 +192,84 @@
   white-space: nowrap;
 }
 
+.course-reminders-row__badge--system {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px var(--space-s);
+  background: var(--neutral-50);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* Default reminders group — visually packages D-7 + D-1 under one label */
+.course-reminders-group {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.course-reminders-group__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+}
+
+.course-reminders-group__title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.course-reminders-group__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Smaller toggle for per-row pause control (default reminders) */
+.course-reminders-group__body .toggle {
+  width: 28px;
+  height: 16px;
+}
+
+.course-reminders-group__body .toggle__thumb {
+  width: 12px;
+  height: 12px;
+}
+
+.course-reminders-group__body .toggle--on .toggle__thumb {
+  transform: translateX(12px);
+}
+
+.course-reminders-row__paused-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.course-reminders-row__actions:has(.course-reminders-row__paused-label) {
+  gap: var(--space-s);
+}
+
+.course-reminders-row--paused .course-reminders-row__text,
+.course-reminders-row--paused .course-reminders-row__badge {
+  color: var(--text-disabled);
+  transition: color 200ms ease;
+}
+
 .workflow-card__rules--disabled .course-reminders-row__text,
 .workflow-card__rules--disabled .course-reminders-row__badge {
   color: var(--text-disabled);
 }
 
 .course-reminders-row__actions {
+  margin-left: auto;
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
@@ -261,7 +335,7 @@
 .workflow-card__rules {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-m);
   margin: var(--space-m) 0 0;
   list-style: none;
   padding: 0;

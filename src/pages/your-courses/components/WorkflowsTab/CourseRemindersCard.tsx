@@ -12,6 +12,8 @@ export interface Reminder {
   days: number
   subject: string
   body: string
+  system?: boolean
+  paused?: boolean
 }
 
 interface Props {
@@ -41,6 +43,8 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
     () => [...reminders].sort((a, b) => b.days - a.days),
     [reminders],
   )
+  const defaultReminders = useMemo(() => sorted.filter((r) => r.system), [sorted])
+  const customReminders = useMemo(() => sorted.filter((r) => !r.system), [sorted])
   const deleting = sorted.find((r) => r.id === deletingId) ?? null
   const editing = modal?.mode === 'edit' ? reminders.find((r) => r.id === modal.id) ?? null : null
 
@@ -77,6 +81,14 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
     onChange(reminders.filter((r) => r.id !== id))
   }
 
+  const togglePause = (id: string) => {
+    onChange(reminders.map((r) => (r.id === id ? { ...r, paused: !r.paused } : r)))
+    const target = reminders.find((r) => r.id === id)
+    if (target) {
+      showToast('success', target.paused ? 'Reminder resumed' : 'Reminder paused')
+    }
+  }
+
   const rulesClass = `workflow-card__rules${enabled ? '' : ' workflow-card__rules--disabled'}`
 
   return (
@@ -92,54 +104,92 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
       </header>
 
       <ul className={rulesClass}>
-        {sorted.map((r) => (
-          <li key={r.id} className="course-reminders-row-wrapper">
-            <div className="course-reminders-row">
-              <span className="course-reminders-row__text">Send email</span>
-              <span className="course-reminders-row__badge">
-                {r.days} {r.days === 1 ? 'day' : 'days'}
-              </span>
-              <span className="course-reminders-row__text course-reminders-row__text--grow">
-                before due date
-              </span>
-              <span className="course-reminders-row__actions">
-                <Tooltip text="Edit reminder" icon={false} disabled={!enabled}>
-                  <button
-                    type="button"
-                    className="course-reminders-row__icon-btn"
-                    onClick={() => setModal({ mode: 'edit', id: r.id })}
-                    disabled={!enabled}
-                    aria-label="Edit reminder"
-                  >
-                    <Edit2 size={16} color="currentColor" variant="Linear" />
-                  </button>
-                </Tooltip>
-                <Tooltip text="Delete reminder" icon={false} disabled={!enabled}>
-                  <button
-                    type="button"
-                    className="course-reminders-row__icon-btn course-reminders-row__icon-btn--danger"
-                    onClick={() => setDeletingId(r.id)}
-                    disabled={!enabled}
-                    aria-label="Delete reminder"
-                  >
-                    <Trash size={16} color="currentColor" variant="Linear" />
-                  </button>
-                </Tooltip>
-              </span>
+        {defaultReminders.length > 0 && (
+          <li className="course-reminders-group">
+            <div className="course-reminders-group__header">
+              <span className="course-reminders-group__title">Default Reminders</span>
+            </div>
+            <div className="course-reminders-group__body">
+              {defaultReminders.map((r) => {
+                const isPaused = !!r.paused
+                const rowClass = `course-reminders-row${isPaused ? ' course-reminders-row--paused' : ''}`
+                return (
+                  <div key={r.id} className={rowClass}>
+                    <span className="course-reminders-row__text">Send email</span>
+                    <span className="course-reminders-row__badge">
+                      {r.days} {r.days === 1 ? 'day' : 'days'}
+                    </span>
+                    <span className="course-reminders-row__text">before due date</span>
+                    <span className="course-reminders-row__actions">
+                      {isPaused && (
+                        <span className="course-reminders-row__paused-label">Paused</span>
+                      )}
+                      <Toggle
+                        checked={!isPaused}
+                        disabled={!enabled}
+                        onChange={() => togglePause(r.id)}
+                        aria-label={isPaused ? 'Resume reminder' : 'Pause reminder'}
+                      />
+                    </span>
+                  </div>
+                )
+              })}
             </div>
           </li>
-        ))}
+        )}
 
-        {enabled && (
-          <li className="course-reminders-add">
-            <button
-              type="button"
-              className="course-reminders-add__btn"
-              onClick={() => setModal({ mode: 'add' })}
-            >
-              <Add size={20} color="currentColor" variant="Linear" />
-              Add Reminder
-            </button>
+        {(customReminders.length > 0 || enabled) && (
+          <li className="course-reminders-group">
+            {customReminders.length > 0 && (
+              <div className="course-reminders-group__header">
+                <span className="course-reminders-group__title">Your reminders</span>
+              </div>
+            )}
+            <div className="course-reminders-group__body">
+              {customReminders.map((r) => (
+                <div key={r.id} className="course-reminders-row">
+                  <span className="course-reminders-row__text">Send email</span>
+                  <span className="course-reminders-row__badge">
+                    {r.days} {r.days === 1 ? 'day' : 'days'}
+                  </span>
+                  <span className="course-reminders-row__text">before due date</span>
+                  <span className="course-reminders-row__actions">
+                    <Tooltip text="Edit reminder" icon={false} disabled={!enabled}>
+                      <button
+                        type="button"
+                        className="course-reminders-row__icon-btn"
+                        onClick={() => setModal({ mode: 'edit', id: r.id })}
+                        disabled={!enabled}
+                        aria-label="Edit reminder"
+                      >
+                        <Edit2 size={16} color="currentColor" variant="Linear" />
+                      </button>
+                    </Tooltip>
+                    <Tooltip text="Delete reminder" icon={false} disabled={!enabled}>
+                      <button
+                        type="button"
+                        className="course-reminders-row__icon-btn course-reminders-row__icon-btn--danger"
+                        onClick={() => setDeletingId(r.id)}
+                        disabled={!enabled}
+                        aria-label="Delete reminder"
+                      >
+                        <Trash size={16} color="currentColor" variant="Linear" />
+                      </button>
+                    </Tooltip>
+                  </span>
+                </div>
+              ))}
+              {enabled && (
+                <button
+                  type="button"
+                  className="course-reminders-add__btn"
+                  onClick={() => setModal({ mode: 'add' })}
+                >
+                  <Add size={20} color="currentColor" variant="Linear" />
+                  Add Reminder
+                </button>
+              )}
+            </div>
           </li>
         )}
       </ul>

@@ -14,12 +14,14 @@ const SEED_REMINDERS: Reminder[] = [
     days: 7,
     subject: 'Reminder: your course is due soon',
     body: SEED_BODY,
+    system: true,
   },
   {
     id: 'r_seed_1',
     days: 1,
     subject: 'Reminder: your course is due soon',
     body: SEED_BODY,
+    system: true,
   },
 ]
 
