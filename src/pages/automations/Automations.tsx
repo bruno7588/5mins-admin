@@ -580,7 +580,19 @@ function Automations() {
         {activeTab === 'manage' && (
           <div className="automations-manage">
             <div className="automations-templates">
-              <button className="automations-template automations-template--purple">
+              <button
+                type="button"
+                className="automations-template automations-template--purple"
+                onClick={() =>
+                  setDetailsAutomation({
+                    id: 'template-new-employee',
+                    name: 'Copy of New Employee Onboarding',
+                    lastUpdated: new Date().toISOString().slice(0, 10),
+                    active: false,
+                    courses: [],
+                  })
+                }
+              >
                 <span className="automations-template-icon">
                   <UserCirlceAdd size={48} color="#8158EC" variant="Linear" />
                 </span>
@@ -673,6 +685,19 @@ function Automations() {
                             type="button"
                             className="automations-action-menu-item"
                             role="menuitem"
+                            onClick={() => {
+                              setOpenMenuId(null)
+                              setAutomationFilterId(row.id)
+                              setActiveTab('activity')
+                            }}
+                          >
+                            <Activity size={20} color="var(--text-secondary)" variant="Linear" />
+                            View activity
+                          </button>
+                          <button
+                            type="button"
+                            className="automations-action-menu-item"
+                            role="menuitem"
                             disabled={!row.active}
                             data-tooltip={row.active ? undefined : 'Automation must be active'}
                             onClick={() => {
@@ -698,7 +723,7 @@ function Automations() {
                             }}
                           >
                             <Trash size={20} color="var(--danger-500)" variant="Linear" />
-                            Delete automation
+                            Delete
                           </button>
                         </div>
                       )}
