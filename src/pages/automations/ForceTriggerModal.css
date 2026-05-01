@@ -255,6 +255,35 @@
   color: var(--text-tertiary);
 }
 
+/* Collapsible wrapper for overflow courses — animates height when toggle flips */
+.force-trigger-courses-collapsible {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: calc(-1 * var(--s, 8px));
+  transition:
+    grid-template-rows 200ms ease-in-out,
+    margin-top 200ms ease-in-out;
+}
+
+.force-trigger-courses-collapsible--open {
+  grid-template-rows: 1fr;
+  margin-top: 0;
+}
+
+.force-trigger-courses-collapsible-inner {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s, 8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .force-trigger-courses-collapsible {
+    transition: none;
+  }
+}
+
 .force-trigger-toggle-courses {
   all: unset;
   display: flex;

@@ -137,10 +137,8 @@ function ForceTriggerModal({
   const showResults = searchFocused && filteredResults.length > 0
   const triggerLabel = 'Run Automation'
   const COURSE_PREVIEW_COUNT = 3
-  const visibleCourses =
-    coursesExpanded || automation.courses.length <= COURSE_PREVIEW_COUNT
-      ? automation.courses
-      : automation.courses.slice(0, COURSE_PREVIEW_COUNT)
+  const previewCourses = automation.courses.slice(0, COURSE_PREVIEW_COUNT)
+  const overflowCourses = automation.courses.slice(COURSE_PREVIEW_COUNT)
 
   function handleTrigger() {
     if (!automation || selectedUsers.length === 0) return
@@ -214,7 +212,7 @@ function ForceTriggerModal({
                   Users will be enrolled in these courses
                 </p>
                 <div className="force-trigger-courses-card">
-                  {visibleCourses.map((c, i) => (
+                  {previewCourses.map((c, i) => (
                     <div key={i} className="force-trigger-course-item">
                       <span className="force-trigger-course-badge">{i + 1}</span>
                       <div className="force-trigger-course-info">
@@ -223,7 +221,25 @@ function ForceTriggerModal({
                       </div>
                     </div>
                   ))}
-                  {automation.courses.length > COURSE_PREVIEW_COUNT && (
+                  {overflowCourses.length > 0 && (
+                    <div
+                      className={`force-trigger-courses-collapsible${coursesExpanded ? ' force-trigger-courses-collapsible--open' : ''}`}
+                      aria-hidden={!coursesExpanded}
+                    >
+                      <div className="force-trigger-courses-collapsible-inner">
+                        {overflowCourses.map((c, i) => (
+                          <div key={i} className="force-trigger-course-item">
+                            <span className="force-trigger-course-badge">{COURSE_PREVIEW_COUNT + i + 1}</span>
+                            <div className="force-trigger-course-info">
+                              <span className="force-trigger-course-name">{c.name}</span>
+                              <span className="force-trigger-course-meta">{formatCourseMeta(c)}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {overflowCourses.length > 0 && (
                     <button
                       type="button"
                       className="force-trigger-toggle-courses"
