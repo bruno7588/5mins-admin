@@ -36,9 +36,11 @@ export type DueDateConfig =
   | { kind: 'none' }
   | { kind: 'relative'; daysAfterStart: number }
 
+export type RecurrenceUnit = 'months' | 'weeks'
+
 export type RecurrenceConfig =
   | { enabled: false }
-  | { enabled: true; intervalMonths: number }
+  | { enabled: true; interval: number; unit: RecurrenceUnit }
 
 export interface AutomationCourse {
   id: string
@@ -91,7 +93,7 @@ function mkCourses(
     name,
     enrollmentType: parseDelay(delay),
     dueDate: dueDays != null ? { kind: 'relative', daysAfterStart: dueDays } : { kind: 'none' },
-    recurrence: repeatMonths != null ? { enabled: true, intervalMonths: repeatMonths } : { enabled: false },
+    recurrence: repeatMonths != null ? { enabled: true, interval: repeatMonths, unit: 'months' } : { enabled: false },
   }))
 }
 
@@ -499,6 +501,46 @@ function Automations() {
   function editAutomation(id: string) {
     const automation = automations.find((a) => a.id === id)
     if (automation) setDetailsAutomation(automation)
+  }
+
+  function patchCourse(
+    automationId: string,
+    courseId: string,
+    patch: Partial<AutomationCourse>,
+  ) {
+    const apply = (a: AutomationRow): AutomationRow => ({
+      ...a,
+      courses: a.courses.map((c) => (c.id === courseId ? { ...c, ...patch } : c)),
+    })
+    setAutomations((rows) => rows.map((r) => (r.id === automationId ? apply(r) : r)))
+    setDetailsAutomation((current) =>
+      current && current.id === automationId ? apply(current) : current,
+    )
+  }
+
+  function removeCourse(automationId: string, courseId: string) {
+    const apply = (a: AutomationRow): AutomationRow => ({
+      ...a,
+      courses: a.courses.filter((c) => c.id !== courseId),
+    })
+    setAutomations((rows) => rows.map((r) => (r.id === automationId ? apply(r) : r)))
+    setDetailsAutomation((current) =>
+      current && current.id === automationId ? apply(current) : current,
+    )
+  }
+
+  function reorderCourses(automationId: string, fromIndex: number, toIndex: number) {
+    if (fromIndex === toIndex) return
+    const apply = (a: AutomationRow): AutomationRow => {
+      const next = a.courses.slice()
+      const [moved] = next.splice(fromIndex, 1)
+      next.splice(toIndex, 0, moved)
+      return { ...a, courses: next }
+    }
+    setAutomations((rows) => rows.map((r) => (r.id === automationId ? apply(r) : r)))
+    setDetailsAutomation((current) =>
+      current && current.id === automationId ? apply(current) : current,
+    )
   }
 
   function toggleActive(id: string) {
@@ -1121,6 +1163,9 @@ function Automations() {
       <AutomationDetailsModal
         automation={detailsAutomation}
         onClose={() => setDetailsAutomation(null)}
+        onCourseChange={patchCourse}
+        onCourseRemove={removeCourse}
+        onCoursesReorder={reorderCourses}
       />
 
       <ToastContainer toasts={toasts} />

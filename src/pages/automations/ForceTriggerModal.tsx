@@ -28,8 +28,10 @@ function formatCourseMeta(c: AutomationCourse): string {
 
   // Recurrence
   if (c.recurrence.enabled) {
-    const unit = c.recurrence.intervalMonths === 1 ? 'month' : 'months'
-    parts.push(`Repeats every ${c.recurrence.intervalMonths} ${unit}`)
+    const { interval, unit } = c.recurrence
+    const unitLabel =
+      unit === 'months' ? (interval === 1 ? 'month' : 'months') : interval === 1 ? 'week' : 'weeks'
+    parts.push(`Repeats every ${interval} ${unitLabel}`)
   } else {
     parts.push('Never repeats')
   }

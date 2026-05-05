@@ -1,0 +1,24 @@
+/* Frequency popover is wider to fit "Repeat every" + stepper + unit dropdown on one row */
+.frequency-popover {
+  min-width: 460px;
+}
+
+.frequency-popover__row {
+  flex-wrap: nowrap;
+  padding-left: var(--space-sm);
+  gap: var(--space-s);
+}
+
+.frequency-popover__label {
+  flex-shrink: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.frequency-popover__unit-dropdown {
+  flex-shrink: 0;
+  width: 120px;
+}

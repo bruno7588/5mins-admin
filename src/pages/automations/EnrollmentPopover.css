@@ -1,0 +1,143 @@
+.enrollment-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 20;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: var(--space-s);
+  background: var(--cards-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  filter: drop-shadow(-4px 0 24px rgba(32, 34, 42, 0.12));
+}
+
+/* Top-left caret pointing up to the trigger */
+.enrollment-popover__caret {
+  position: absolute;
+  top: -7px;
+  left: 16px;
+  width: 14px;
+  height: 8px;
+  background: var(--cards-background);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-right: none;
+  transform: rotate(45deg);
+  transform-origin: bottom left;
+}
+
+.enrollment-popover__group {
+  border-radius: var(--radius-s);
+  transition: background 120ms ease;
+}
+
+.enrollment-popover__group:hover {
+  background: var(--input-background);
+}
+
+.enrollment-popover__option {
+  all: unset;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-sm);
+  cursor: pointer;
+}
+
+.enrollment-popover__option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.enrollment-popover__option-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.enrollment-popover__option-desc {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* Stepper indented under the "After delay" row body */
+.enrollment-popover__stepper-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding-left: 36px; /* aligns with option-text: option pad-left 12 + radio 16 + gap 8 = 36 */
+  padding-top: var(--space-xs);
+  padding-bottom: var(--space-xs);
+}
+
+.enrollment-popover__stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-s) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+}
+
+.enrollment-popover__stepper-btn {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  transition: color 120ms ease;
+}
+
+.enrollment-popover__stepper-btn:hover:not(:disabled) {
+  color: var(--text-secondary);
+}
+
+.enrollment-popover__stepper-btn:disabled {
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.enrollment-popover__stepper-value {
+  width: 28px;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.enrollment-popover__stepper-value::-webkit-outer-spin-button,
+.enrollment-popover__stepper-value::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.enrollment-popover__unit {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}

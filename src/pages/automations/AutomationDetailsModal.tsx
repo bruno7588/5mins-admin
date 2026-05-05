@@ -1,44 +1,83 @@
-import { useEffect, useState } from 'react'
-import { Edit2, Trash } from 'iconsax-react'
+import { useEffect, useRef, useState } from 'react'
+import { ArrowDown2, Edit2, Trash } from 'iconsax-react'
 import CloseButton from '../../components/CloseButton/CloseButton'
 import Search from '../../components/Search/Search'
 import Dropdown from '../../components/Dropdown/Dropdown'
-import type { AutomationCourse, AutomationRow } from './Automations'
+import Tooltip from '../../components/Tooltip/Tooltip'
+import ToastContainer, { useToast } from '../../components/Toast/Toast'
+import EnrollmentPopover from './EnrollmentPopover'
+import DueDatePopover from './DueDatePopover'
+import FrequencyPopover from './FrequencyPopover'
+import type {
+  AutomationCourse,
+  AutomationRow,
+  DueDateConfig,
+  EnrollmentType,
+  RecurrenceConfig,
+} from './Automations'
 import './AutomationDetailsModal.css'
 
-function formatEnrollment(c: AutomationCourse): string {
-  if (c.enrollmentType.kind === 'immediate') return 'Immediate'
+function formatEnrollment(c: AutomationCourse): { title: string; description?: string } {
+  if (c.enrollmentType.kind === 'immediate') {
+    return { title: 'Immediate' }
+  }
   const unit = c.enrollmentType.days === 1 ? 'day' : 'days'
-  return `${c.enrollmentType.days} ${unit} after previous course`
+  return {
+    title: 'After delay',
+    description: `${c.enrollmentType.days} ${unit} after previous course enrolment`,
+  }
 }
 
-function formatDueDate(c: AutomationCourse): string {
-  if (c.dueDate.kind === 'none') return 'No due date'
+function formatDueDate(c: AutomationCourse): { title: string; description?: string } {
+  if (c.dueDate.kind === 'none') {
+    return { title: 'No due date' }
+  }
   const unit = c.dueDate.daysAfterStart === 1 ? 'day' : 'days'
-  return `${c.dueDate.daysAfterStart} ${unit} after start`
+  return { title: `${c.dueDate.daysAfterStart} ${unit} after start date` }
 }
 
-function formatFrequency(c: AutomationCourse): string {
-  if (!c.recurrence.enabled) return 'Never repeats'
-  const unit = c.recurrence.intervalMonths === 1 ? 'month' : 'months'
-  return `Every ${c.recurrence.intervalMonths} ${unit}`
+function formatFrequency(c: AutomationCourse): { title: string; description?: string } {
+  if (!c.recurrence.enabled) {
+    return { title: 'One time only' }
+  }
+  const { interval, unit } = c.recurrence
+  const unitLabel =
+    unit === 'months' ? (interval === 1 ? 'month' : 'months') : interval === 1 ? 'week' : 'weeks'
+  return {
+    title: 'Recurring',
+    description: `Every ${interval} ${unitLabel} after previous enrolment`,
+  }
 }
 
 interface AutomationDetailsModalProps {
   automation: AutomationRow | null
   onClose: () => void
+  onCourseChange?: (automationId: string, courseId: string, patch: Partial<AutomationCourse>) => void
+  onCourseRemove?: (automationId: string, courseId: string) => void
+  onCoursesReorder?: (automationId: string, fromIndex: number, toIndex: number) => void
 }
 
-function AutomationDetailsModal({ automation, onClose }: AutomationDetailsModalProps) {
+function AutomationDetailsModal({
+  automation,
+  onClose,
+  onCourseChange,
+  onCourseRemove,
+  onCoursesReorder,
+}: AutomationDetailsModalProps) {
   const [closing, setClosing] = useState(false)
   const [courseQuery, setCourseQuery] = useState('')
+  const [openPopover, setOpenPopover] = useState<{ courseId: string; column: 'enrollment' | 'due' | 'frequency' } | null>(null)
+  const [draggingIndex, setDraggingIndex] = useState<number | null>(null)
+  const draggingIndexRef = useRef<number | null>(null)
+  const { toasts, show: showToast } = useToast()
 
   useEffect(() => {
     if (automation) {
       setClosing(false)
       setCourseQuery('')
+      setOpenPopover(null)
     }
-  }, [automation])
+  }, [automation?.id])
 
   useEffect(() => {
     if (!automation) return
@@ -153,49 +192,287 @@ function AutomationDetailsModal({ automation, onClose }: AutomationDetailsModalP
                 <div className="automation-details-th automation-details-th--course">Course</div>
                 <div className="automation-details-th">Enrolment</div>
                 <div className="automation-details-th">Due date</div>
-                <div className="automation-details-th">Frequency</div>
+                <div className="automation-details-th automation-details-th--with-info">
+                  <span>Frequency</span>
+                  <Tooltip
+                    text="Automatically re-enrol learners on a recurring interval. Ideal for refresher or compliance training."
+                    position="Top"
+                    alignment="Center"
+                    icon={false}
+                  >
+                    <svg
+                      className="automation-details-th-info-icon"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path d="M7.75 2C4.57469 2 2 4.57469 2 7.75C2 10.9253 4.57469 13.5 7.75 13.5C10.9253 13.5 13.5 10.9253 13.5 7.75C13.5 4.57469 10.9253 2 7.75 2Z" stroke="currentColor" strokeMiterlimit="10" />
+                      <path d="M6.875 6.875H7.875V10.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M6.5 10.625H9.25" stroke="currentColor" strokeMiterlimit="10" strokeLinecap="round" />
+                      <path d="M7.75 4.0625C7.5893 4.0625 7.43221 4.11015 7.2986 4.19943C7.16498 4.28871 7.06084 4.4156 6.99935 4.56407C6.93785 4.71253 6.92176 4.8759 6.95311 5.03351C6.98446 5.19112 7.06185 5.33589 7.17548 5.44952C7.28911 5.56315 7.43388 5.64054 7.59149 5.67189C7.7491 5.70324 7.91247 5.68715 8.06093 5.62565C8.2094 5.56416 8.33629 5.46002 8.42557 5.3264C8.51485 5.19279 8.5625 5.0357 8.5625 4.875C8.5625 4.65951 8.4769 4.45285 8.32452 4.30048C8.17215 4.1481 7.96549 4.0625 7.75 4.0625Z" fill="currentColor" />
+                    </svg>
+                  </Tooltip>
+                </div>
               </div>
 
               {automation.courses.map((course, i) => (
-                <div key={course.id} className="automation-details-row">
-                  <button
-                    type="button"
-                    className="automation-details-row-drag"
-                    aria-label="Drag to reorder"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <circle cx="7" cy="5" r="1.5" fill="currentColor" />
-                      <circle cx="13" cy="5" r="1.5" fill="currentColor" />
-                      <circle cx="7" cy="10" r="1.5" fill="currentColor" />
-                      <circle cx="13" cy="10" r="1.5" fill="currentColor" />
-                      <circle cx="7" cy="15" r="1.5" fill="currentColor" />
-                      <circle cx="13" cy="15" r="1.5" fill="currentColor" />
-                    </svg>
-                  </button>
-                  <div className="automation-details-row-card">
-                    <div className="automation-details-td automation-details-td--course">
-                      <span className="automation-details-row-counter">{i + 1}</span>
-                      <div className="automation-details-row-thumb" aria-hidden="true" />
-                      <span className="automation-details-row-name">{course.name}</span>
-                    </div>
-                    <div className="automation-details-td">{formatEnrollment(course)}</div>
-                    <div className="automation-details-td">{formatDueDate(course)}</div>
-                    <div className="automation-details-td">{formatFrequency(course)}</div>
-                  </div>
-                  <button
-                    type="button"
-                    className="automation-details-row-remove"
-                    aria-label="Remove course"
-                  >
-                    <Trash size={20} color="currentColor" variant="Linear" />
-                  </button>
-                </div>
+                <CourseRow
+                  key={course.id}
+                  course={course}
+                  index={i}
+                  isEnrollmentOpen={openPopover?.courseId === course.id && openPopover.column === 'enrollment'}
+                  isDueOpen={openPopover?.courseId === course.id && openPopover.column === 'due'}
+                  isFrequencyOpen={openPopover?.courseId === course.id && openPopover.column === 'frequency'}
+                  isDragging={draggingIndex === i}
+                  onToggleColumn={(column) =>
+                    setOpenPopover((prev) =>
+                      prev?.courseId === course.id && prev.column === column
+                        ? null
+                        : { courseId: course.id, column },
+                    )
+                  }
+                  onClosePopover={() => setOpenPopover(null)}
+                  onChangeEnrollment={(next) =>
+                    onCourseChange?.(automation.id, course.id, { enrollmentType: next })
+                  }
+                  onChangeDueDate={(next) =>
+                    onCourseChange?.(automation.id, course.id, { dueDate: next })
+                  }
+                  onChangeFrequency={(next) =>
+                    onCourseChange?.(automation.id, course.id, { recurrence: next })
+                  }
+                  onRemove={() => {
+                    onCourseRemove?.(automation.id, course.id)
+                    showToast('success', 'Course removed')
+                  }}
+                  onDragStart={() => {
+                    draggingIndexRef.current = i
+                    setDraggingIndex(i)
+                    setOpenPopover(null)
+                  }}
+                  onDragEnter={() => {
+                    const from = draggingIndexRef.current
+                    if (from === null || from === i) return
+                    onCoursesReorder?.(automation.id, from, i)
+                    draggingIndexRef.current = i
+                    setDraggingIndex(i)
+                  }}
+                  onDragEnd={() => {
+                    draggingIndexRef.current = null
+                    setDraggingIndex(null)
+                  }}
+                />
               ))}
             </div>
             )}
           </div>
         </section>
       </div>
+
+      <ToastContainer toasts={toasts} />
+    </div>
+  )
+}
+
+interface CourseRowProps {
+  course: AutomationCourse
+  index: number
+  isEnrollmentOpen: boolean
+  isDueOpen: boolean
+  isFrequencyOpen: boolean
+  isDragging: boolean
+  onToggleColumn: (column: 'enrollment' | 'due' | 'frequency') => void
+  onClosePopover: () => void
+  onChangeEnrollment: (next: EnrollmentType) => void
+  onChangeDueDate: (next: DueDateConfig) => void
+  onChangeFrequency: (next: RecurrenceConfig) => void
+  onRemove: () => void
+  onDragStart: () => void
+  onDragEnter: () => void
+  onDragEnd: () => void
+}
+
+function CourseRow({
+  course,
+  index,
+  isEnrollmentOpen,
+  isDueOpen,
+  isFrequencyOpen,
+  isDragging,
+  onToggleColumn,
+  onClosePopover,
+  onChangeEnrollment,
+  onChangeDueDate,
+  onChangeFrequency,
+  onRemove,
+  onDragStart,
+  onDragEnter,
+  onDragEnd,
+}: CourseRowProps) {
+  const enrollmentRef = useRef<HTMLButtonElement>(null)
+  const dueRef = useRef<HTMLButtonElement>(null)
+  const frequencyRef = useRef<HTMLButtonElement>(null)
+  const enrollment = formatEnrollment(course)
+  const due = formatDueDate(course)
+  const frequency = formatFrequency(course)
+
+  const rowClass = [
+    'automation-details-row',
+    isDragging && 'automation-details-row--dragging',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  return (
+    <div
+      className={rowClass}
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.effectAllowed = 'move'
+        // Required for Firefox to initiate drag
+        e.dataTransfer.setData('text/plain', String(index))
+        onDragStart()
+      }}
+      onDragOver={(e) => {
+        e.preventDefault()
+        e.dataTransfer.dropEffect = 'move'
+      }}
+      onDragEnter={onDragEnter}
+      onDrop={(e) => e.preventDefault()}
+      onDragEnd={onDragEnd}
+    >
+      <button
+        type="button"
+        className="automation-details-row-drag"
+        aria-label="Drag to reorder"
+      >
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="7" cy="5" r="1.5" fill="currentColor" />
+          <circle cx="13" cy="5" r="1.5" fill="currentColor" />
+          <circle cx="7" cy="10" r="1.5" fill="currentColor" />
+          <circle cx="13" cy="10" r="1.5" fill="currentColor" />
+          <circle cx="7" cy="15" r="1.5" fill="currentColor" />
+          <circle cx="13" cy="15" r="1.5" fill="currentColor" />
+        </svg>
+      </button>
+      <div className="automation-details-row-card">
+        <div className="automation-details-td automation-details-td--course">
+          <span className="automation-details-row-counter">{index + 1}</span>
+          <img
+            className="automation-details-row-thumb"
+            src={`https://picsum.photos/seed/${encodeURIComponent(course.id)}/160/84`}
+            alt=""
+            aria-hidden="true"
+          />
+          <span className="automation-details-row-name">{course.name}</span>
+        </div>
+        <div className="automation-details-td automation-details-td--editable">
+          <button
+            ref={enrollmentRef}
+            type="button"
+            className={`automation-details-cell-trigger${isEnrollmentOpen ? ' automation-details-cell-trigger--open' : ''}`}
+            aria-haspopup="dialog"
+            aria-expanded={isEnrollmentOpen}
+            onClick={() => onToggleColumn('enrollment')}
+          >
+            <span className="automation-details-cell-trigger__body">
+              <span className="automation-details-cell-trigger__title">{enrollment.title}</span>
+              {enrollment.description && (
+                <span className="automation-details-cell-trigger__desc">{enrollment.description}</span>
+              )}
+            </span>
+            <ArrowDown2
+              size={20}
+              color="currentColor"
+              variant="Linear"
+              className="automation-details-cell-trigger__chevron"
+            />
+          </button>
+          {isEnrollmentOpen && (
+            <EnrollmentPopover
+              value={course.enrollmentType}
+              onChange={onChangeEnrollment}
+              onClose={onClosePopover}
+              anchorRef={enrollmentRef}
+            />
+          )}
+        </div>
+        <div className="automation-details-td automation-details-td--editable">
+          <button
+            ref={dueRef}
+            type="button"
+            className={`automation-details-cell-trigger${isDueOpen ? ' automation-details-cell-trigger--open' : ''}`}
+            aria-haspopup="dialog"
+            aria-expanded={isDueOpen}
+            onClick={() => onToggleColumn('due')}
+          >
+            <span className="automation-details-cell-trigger__body">
+              <span className="automation-details-cell-trigger__title">{due.title}</span>
+              {due.description && (
+                <span className="automation-details-cell-trigger__desc">{due.description}</span>
+              )}
+            </span>
+            <ArrowDown2
+              size={20}
+              color="currentColor"
+              variant="Linear"
+              className="automation-details-cell-trigger__chevron"
+            />
+          </button>
+          {isDueOpen && (
+            <DueDatePopover
+              value={course.dueDate}
+              onChange={onChangeDueDate}
+              onClose={onClosePopover}
+              anchorRef={dueRef}
+            />
+          )}
+        </div>
+        <div className="automation-details-td automation-details-td--editable">
+          <button
+            ref={frequencyRef}
+            type="button"
+            className={`automation-details-cell-trigger${isFrequencyOpen ? ' automation-details-cell-trigger--open' : ''}`}
+            aria-haspopup="dialog"
+            aria-expanded={isFrequencyOpen}
+            onClick={() => onToggleColumn('frequency')}
+          >
+            <span className="automation-details-cell-trigger__body">
+              <span className="automation-details-cell-trigger__title">{frequency.title}</span>
+              {frequency.description && (
+                <span className="automation-details-cell-trigger__desc">{frequency.description}</span>
+              )}
+            </span>
+            <ArrowDown2
+              size={20}
+              color="currentColor"
+              variant="Linear"
+              className="automation-details-cell-trigger__chevron"
+            />
+          </button>
+          {isFrequencyOpen && (
+            <FrequencyPopover
+              value={course.recurrence}
+              onChange={onChangeFrequency}
+              onClose={onClosePopover}
+              anchorRef={frequencyRef}
+            />
+          )}
+        </div>
+      </div>
+      <Tooltip text="Remove course" position="Top" alignment="Center" icon={false}>
+        <button
+          type="button"
+          className="automation-details-row-remove"
+          aria-label="Remove course"
+          onClick={onRemove}
+        >
+          <Trash size={20} color="currentColor" variant="Linear" />
+        </button>
+      </Tooltip>
     </div>
   )
 }

@@ -1,0 +1,83 @@
+.radio {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 30px;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms ease;
+}
+
+.radio:hover:not(.radio--disabled) {
+  background: var(--surface-page-hover, #EFF0F2);
+}
+
+.radio__ring {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid var(--neutral-800, #20222A);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.radio--selected .radio__ring {
+  border-color: #EDA30D;
+}
+
+.radio--selected .radio__ring::after {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #EDA30D;
+}
+
+.radio--disabled {
+  cursor: not-allowed;
+}
+
+.radio--disabled .radio__ring {
+  border-color: var(--text-disabled, #9EA4B3);
+}
+
+.radio--disabled.radio--selected .radio__ring,
+.radio--disabled.radio--selected .radio__ring::after {
+  border-color: var(--text-disabled, #9EA4B3);
+  background: var(--text-disabled, #9EA4B3);
+}
+
+.radio__input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: inherit;
+}
+
+.radio__input:focus-visible + .radio__ring {
+  outline: 2px solid #EDA30D;
+  outline-offset: 2px;
+}
+
+.radio-row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s, 8px);
+  cursor: pointer;
+}
+
+.radio-row__label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
