@@ -121,11 +121,8 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
                     </span>
                     <span className="course-reminders-row__text">before due date</span>
                     <span className="course-reminders-row__actions">
-                      {isPaused && (
-                        <span className="course-reminders-row__paused-label">Paused</span>
-                      )}
                       <Toggle
-                        checked={!isPaused}
+                        checked={enabled && !isPaused}
                         disabled={!enabled}
                         onChange={() => togglePause(r.id)}
                         aria-label={isPaused ? 'Resume reminder' : 'Pause reminder'}
