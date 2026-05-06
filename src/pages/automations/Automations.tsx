@@ -779,7 +779,7 @@ function Automations() {
                             }}
                           >
                             <Copy size={20} color="var(--text-secondary)" variant="Linear" />
-                            Duplicate automation
+                            Duplicate
                           </button>
                           <button
                             type="button"
