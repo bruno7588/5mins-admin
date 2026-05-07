@@ -95,6 +95,8 @@
   width: 100%;
   height: 480px;
   overflow-y: auto;
+  padding-inline: var(--space-m);
+  margin-inline: calc(-1 * var(--space-m));
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -271,7 +273,7 @@
 }
 
 .aim-generate-textarea:focus {
-  border-color: var(--border-hover);
+  border-color: var(--secondary-600);
 }
 
 .aim-generate-textarea:disabled {
@@ -279,27 +281,20 @@
   cursor: not-allowed;
 }
 
-/* Style chips row — chips themselves come from the DS Chip component (Figma: 12px gap) */
+/* Style chips row — chips themselves come from the DS Chip component */
 .aim-generate-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-sm);
+  gap: var(--space-s);
 }
 
-/* Result region — three states share top-aligned layout */
+/* Result region — placeholder/image stacked above the "Powered by" attribution */
 .aim-generate-result {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  min-height: 240px;
-}
-
-/* Loading — shimmer skeleton + status text */
-.aim-generate-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-s);
+  gap: var(--space-xs);
+  min-height: 240px;
 }
 
 .aim-generate-skeleton {
@@ -328,13 +323,63 @@
   }
 }
 
-.aim-generate-status {
+.aim-generate-attribution {
   margin: 0;
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.5;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.2;
   color: var(--text-tertiary);
+}
+
+/* Generating progress — sparkle row + gradient progress bar */
+.aim-generate-progress {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-s);
+  width: 100%;
+}
+
+.aim-generate-progress-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.aim-generate-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--border);
+  border-radius: var(--radius-ml);
+  overflow: hidden;
+}
+
+.aim-generate-progress-bar-fill {
+  height: 100%;
+  width: 0;
+  border-radius: var(--radius-ml);
+  background: linear-gradient(90deg, #00CEE6 0%, #4193E9 50%, #8158EC 100%);
+  animation: aim-progress-fill 3s ease-out forwards;
+}
+
+@keyframes aim-progress-fill {
+  0%   { width: 0; }
+  60%  { width: 70%; }
+  100% { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aim-generate-progress-bar-fill {
+    animation: none;
+    width: 50%;
+  }
 }
 
 /* Result image */
@@ -377,7 +422,8 @@
 }
 
 .aim-generate-actions--pair .aim-generate-btn {
-  flex: 1;
+  flex: 0 0 178px;
+  width: 178px;
 }
 
 /* AI Generate Image — Figma cyan→purple gradient, 8px radius, 16px label */
@@ -386,8 +432,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
-  height: 48px;
-  padding: var(--space-sm) var(--space-l);
+  padding: 10px var(--space-ml);
   border: 1px solid transparent;
   border-radius: var(--radius-s);
   background: linear-gradient(90deg, #00CEE6 0%, #4193E9 50%, #8158EC 100%);
@@ -396,6 +441,7 @@
   font-size: 16px;
   font-weight: 700;
   line-height: 1.5;
+  white-space: nowrap;
   cursor: pointer;
   transition: filter 150ms ease, background 150ms ease, color 150ms ease, border-color 150ms ease;
 }
@@ -417,19 +463,25 @@
   filter: none;
 }
 
-/* AI Outlined — "Generate again" post-result (per buttons.md AI outlined) */
+/* AI Outlined — "Generate again" — cyan border + gradient text + gradient sparkle (Figma 5190:6225) */
 .aim-generate-btn--secondary {
   background: transparent;
-  border-color: var(--blaze-quiz);
-  color: var(--blaze-quiz);
+  border-color: var(--primary-500);
+  color: var(--text-primary);
   font-size: 14px;
+}
+
+.aim-generate-btn-gradient-text {
+  background: linear-gradient(90deg, #00CEE6 0%, #4193E9 50%, #8158EC 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .aim-generate-btn--secondary:hover:not(:disabled) {
   filter: none;
-  background: rgba(129, 88, 236, 0.08);
-  border-color: #6B45D1;
-  color: #6B45D1;
+  background: rgba(0, 206, 230, 0.08);
+  border-color: var(--primary-600);
 }
 
 .aim-generate-btn--secondary:disabled {
@@ -438,7 +490,14 @@
   color: var(--neutral-300);
 }
 
-/* Primary Filled — "Use this image" confirm CTA (per buttons.md primary filled) */
+.aim-generate-btn--secondary:disabled .aim-generate-btn-gradient-text {
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  color: var(--neutral-300);
+}
+
+/* Primary Filled — "Save Image" (Figma 5190:6231 — primary-600 bg + white text) */
 .aim-generate-btn--primary {
   background: var(--primary-600);
   border-color: transparent;
@@ -449,6 +508,10 @@
 .aim-generate-btn--primary:hover:not(:disabled) {
   filter: none;
   background: var(--primary-700);
+}
+
+.aim-generate-btn--primary:active:not(:disabled) {
+  background: var(--primary-800);
 }
 
 .aim-generate-btn--primary:active:not(:disabled) {

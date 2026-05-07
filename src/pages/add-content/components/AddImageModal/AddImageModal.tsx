@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { MagicStar, SearchNormal1 } from 'iconsax-react'
+import { SearchNormal1 } from 'iconsax-react'
+import SparkleIcon from '../../../../components/icons/SparkleIcon'
 import Chip from '../../../../components/Chip/Chip'
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal'
 import FileUploader from '../../../../components/FileUploader/FileUploader'
@@ -25,14 +26,6 @@ const STYLE_PRESETS = [
 ] as const
 
 type StyleId = (typeof STYLE_PRESETS)[number]['id']
-
-const LOADING_STATUSES = [
-  'Generating…',
-  'Refining details…',
-  'Almost done…',
-] as const
-
-const LOADING_STATUS_INTERVAL_MS = 1000
 
 const ACCEPTED_IMAGE_EXTENSIONS = '.jpg,.jpeg,.png'
 
@@ -70,9 +63,7 @@ function AddImageModal({ open, onClose, onSelect }: AddImageModalProps) {
   const [generating, setGenerating] = useState(false)
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null)
   const [selectedStyle, setSelectedStyle] = useState<StyleId | null>(null)
-  const [loadingStatusIndex, setLoadingStatusIndex] = useState(0)
   const generationTimer = useRef<number | null>(null)
-  const statusTimer = useRef<number | null>(null)
 
   useEffect(() => {
     if (open) {
@@ -82,39 +73,14 @@ function AddImageModal({ open, onClose, onSelect }: AddImageModalProps) {
       setGenerating(false)
       setGeneratedUrl(null)
       setSelectedStyle(null)
-      setLoadingStatusIndex(0)
     }
     return () => {
       if (generationTimer.current !== null) {
         window.clearTimeout(generationTimer.current)
         generationTimer.current = null
       }
-      if (statusTimer.current !== null) {
-        window.clearInterval(statusTimer.current)
-        statusTimer.current = null
-      }
     }
   }, [open])
-
-  useEffect(() => {
-    if (!generating) {
-      if (statusTimer.current !== null) {
-        window.clearInterval(statusTimer.current)
-        statusTimer.current = null
-      }
-      return
-    }
-    setLoadingStatusIndex(0)
-    statusTimer.current = window.setInterval(() => {
-      setLoadingStatusIndex((i) => Math.min(i + 1, LOADING_STATUSES.length - 1))
-    }, LOADING_STATUS_INTERVAL_MS)
-    return () => {
-      if (statusTimer.current !== null) {
-        window.clearInterval(statusTimer.current)
-        statusTimer.current = null
-      }
-    }
-  }, [generating])
 
   const q = query.trim()
   const filteredFreepik = q
@@ -259,16 +225,11 @@ function AddImageModal({ open, onClose, onSelect }: AddImageModalProps) {
             {(generating || generatedUrl) && (
               <div className="aim-generate-result">
                 {generating ? (
-                  <div className="aim-generate-loading">
-                    <div
-                      className="aim-generate-skeleton"
-                      style={{ aspectRatio: GENERATED_ASPECT }}
-                      aria-hidden="true"
-                    />
-                    <p className="aim-generate-status" aria-live="polite">
-                      {LOADING_STATUSES[loadingStatusIndex]}
-                    </p>
-                  </div>
+                  <div
+                    className="aim-generate-skeleton"
+                    style={{ aspectRatio: GENERATED_ASPECT }}
+                    aria-hidden="true"
+                  />
                 ) : (
                   <button
                     type="button"
@@ -280,6 +241,7 @@ function AddImageModal({ open, onClose, onSelect }: AddImageModalProps) {
                     <img src={generatedUrl!} alt="Generated preview" />
                   </button>
                 )}
+                <p className="aim-generate-attribution">Powered by Nano Banana</p>
               </div>
             )}
 
@@ -288,21 +250,36 @@ function AddImageModal({ open, onClose, onSelect }: AddImageModalProps) {
                 generatedUrl && !generating ? ' aim-generate-actions--pair' : ''
               }`}
             >
-              {generatedUrl && !generating ? (
+              {generating ? (
+                <div className="aim-generate-progress" aria-live="polite">
+                  <div className="aim-generate-progress-info">
+                    <SparkleIcon size={20} color="#00CEE6" />
+                    <span>Generating your image…</span>
+                  </div>
+                  <div
+                    className="aim-generate-progress-bar"
+                    role="progressbar"
+                    aria-label="Generating image"
+                  >
+                    <div className="aim-generate-progress-bar-fill" />
+                  </div>
+                </div>
+              ) : generatedUrl ? (
                 <>
                   <button
                     type="button"
                     className="aim-generate-btn aim-generate-btn--secondary"
                     onClick={handleGenerate}
                   >
-                    Generate again
+                    <span className="aim-generate-btn-gradient-text">Generate Again</span>
+                    <SparkleIcon size={20} gradient />
                   </button>
                   <button
                     type="button"
                     className="aim-generate-btn aim-generate-btn--primary"
                     onClick={handleGeneratedPick}
                   >
-                    Use this image
+                    Save Image
                   </button>
                 </>
               ) : (
@@ -310,10 +287,10 @@ function AddImageModal({ open, onClose, onSelect }: AddImageModalProps) {
                   type="button"
                   className="aim-generate-btn"
                   onClick={handleGenerate}
-                  disabled={generating || prompt.trim().length === 0}
+                  disabled={prompt.trim().length === 0}
                 >
-                  {generating ? 'Generating…' : 'Generate Image'}
-                  <MagicStar size={24} color="currentColor" variant="Bold" />
+                  Generate Image
+                  <SparkleIcon size={20} />
                 </button>
               )}
             </div>
