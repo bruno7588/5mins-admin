@@ -60,7 +60,6 @@ function WorkflowsTab() {
       <CourseRemindersCard
         enabled={remindersEnabled}
         reminders={reminders}
-        lastSent="12 reminders sent this week"
         onToggle={() => setRemindersEnabled((v) => !v)}
         onChange={setReminders}
       />

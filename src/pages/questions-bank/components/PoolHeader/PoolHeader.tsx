@@ -1,7 +1,8 @@
-import { Add, InfoCircle, TickCircle } from 'iconsax-react'
+import { Add, TickCircle } from 'iconsax-react'
 import { getCoverageTier } from '../RatioBar/RatioBar'
 import DrawCountDropdown from '../DrawCountDropdown/DrawCountDropdown'
 import GenerateMoreButton from '../GenerateMoreButton/GenerateMoreButton'
+import InfoIcon from '../../../../components/icons/InfoIcon'
 import './PoolHeader.css'
 
 interface PoolHeaderProps {
@@ -74,7 +75,7 @@ function PoolHeader({ poolSize, drawCount, maxPoolSize, onDrawCountChange, onAdd
           {tier === 'good' || tier === 'strong' ? (
             <TickCircle size={16} color="currentColor" variant="Linear" />
           ) : (
-            <InfoCircle size={16} color="currentColor" variant="Linear" />
+            <InfoIcon size={16} color="currentColor" />
           )}
           <span>
             {VARIETY_LABEL[tier]}

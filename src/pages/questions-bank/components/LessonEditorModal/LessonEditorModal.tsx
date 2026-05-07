@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { ArrowDown2, Eye, InfoCircle } from 'iconsax-react'
+import { ArrowDown2, Eye } from 'iconsax-react'
 import type { ContentRow } from '../ContentTable/ContentTable'
 import QuizTab from '../QuizTab/QuizTab'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
+import InfoIcon from '../../../../components/icons/InfoIcon'
 import './LessonEditorModal.css'
 
 interface LessonEditorModalProps {
@@ -287,7 +288,7 @@ function LessonEditorModal({ lesson, isNew, onClose, onPublish, onQuizReviewed, 
               </div>
             </div>
             <div className="lesson-editor-info-banner">
-              <InfoCircle size={20} color="var(--text-secondary)" variant="Outline" />
+              <InfoIcon size={20} />
               <p className="lesson-editor-info-text">
                 This file will be converted to PDF in the background after you publish. The lesson will appear as "Processing" in your content library until conversion is complete.
               </p>

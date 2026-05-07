@@ -1,7 +1,7 @@
-import { InfoCircle } from 'iconsax-react'
 import Toggle from '../../../../components/Toggle/Toggle'
 import Dropdown from '../../../../components/Dropdown/Dropdown'
 import Badge from '../../../../components/Badge/Badge'
+import Tooltip from '../../../../components/Tooltip/Tooltip'
 
 interface Props {
   enabled: boolean
@@ -81,6 +81,12 @@ function WorkflowCard({
             readOnly={!enabled}
             className="workflow-card__inline-dropdown"
           />
+          <Tooltip
+            text="Only sent to managers who have at least one team member."
+            position="Top"
+            alignment="Center"
+            iconColor={enabled ? undefined : 'var(--text-disabled)'}
+          />
         </li>
       </ul>
 
@@ -89,21 +95,15 @@ function WorkflowCard({
         aria-hidden={!enabled}
       >
         <div className="workflow-card__collapsible-inner">
-          <footer className="workflow-card__footer">
-            <p className="workflow-card__info">
-              <InfoCircle size={16} color="currentColor" variant="Linear" />
-              <span>
-                Send to managers with at least 1 team member. Only send if courses are due in the next 30 days.
-              </span>
-            </p>
-            {lastSent && (
+          {lastSent && (
+            <footer className="workflow-card__footer">
               <Badge
                 type="informative"
                 label={`Last sent ${lastSent}`}
                 className="workflow-card__last-sent-badge"
               />
-            )}
-          </footer>
+            </footer>
+          )}
         </div>
       </div>
     </article>

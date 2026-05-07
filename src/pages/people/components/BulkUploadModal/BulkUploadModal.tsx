@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { ArrowDown2, ArrowLeft2, ArrowRight2, Danger, ImportCurve, InfoCircle, UserAdd, UserEdit, UserMinus } from 'iconsax-react'
+import { ArrowDown2, ArrowLeft2, ArrowRight2, Danger, ImportCurve, UserAdd, UserEdit, UserMinus } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import { FileUploader } from '../../../../components/FileUploader/FileUploader'
+import InfoIcon from '../../../../components/icons/InfoIcon'
 import './BulkUploadModal.css'
 
 interface UserField {
@@ -131,7 +132,7 @@ function CellWithWarning({ value, warning }: { value: string; warning?: CellWarn
         >
           {warning.kind === 'danger'
             ? <Danger size={16} color="var(--danger-500)" variant="Linear" />
-            : <InfoCircle size={16} color="var(--primary-500)" variant="Linear" />
+            : <InfoIcon size={16} color="var(--primary-500)" />
           }
           <span className="bulk-cell-warning-tooltip" style={tooltipStyle}>{warning.message}</span>
         </span>

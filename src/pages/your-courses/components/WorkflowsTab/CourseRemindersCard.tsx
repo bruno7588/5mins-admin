@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
-import { Add, Danger, Edit2, InfoCircle, Trash } from 'iconsax-react'
+import { Add, Danger, Edit2, Trash } from 'iconsax-react'
 import Toggle from '../../../../components/Toggle/Toggle'
-import Badge from '../../../../components/Badge/Badge'
 import Tooltip from '../../../../components/Tooltip/Tooltip'
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal'
 import ToastContainer, { useToast } from '../../../../components/Toast/Toast'
@@ -19,7 +18,6 @@ export interface Reminder {
 interface Props {
   enabled: boolean
   reminders: Reminder[]
-  lastSent?: string
   onToggle: () => void
   onChange: (reminders: Reminder[]) => void
 }
@@ -34,7 +32,7 @@ const newId = () => `r_${Date.now()}_${nextId++}`
 
 type ModalState = { mode: 'add' } | { mode: 'edit'; id: string } | null
 
-function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange }: Props) {
+function CourseRemindersCard({ enabled, reminders, onToggle, onChange }: Props) {
   const [modal, setModal] = useState<ModalState>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const { toasts, show: showToast } = useToast()
@@ -97,7 +95,7 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
         <div className="workflow-card__headline">
           <h3 className="workflow-card__title">Course reminders</h3>
           <p className="workflow-card__desc">
-            Send automatic reminders to learners before a course's due date. These defaults apply to every course.
+            Send automatic emails to learners before a course's due date. Sent at 9:00 AM UTC on the scheduled day.
           </p>
         </div>
         <Toggle checked={enabled} onChange={onToggle} />
@@ -190,29 +188,6 @@ function CourseRemindersCard({ enabled, reminders, lastSent, onToggle, onChange 
           </li>
         )}
       </ul>
-
-      <div
-        className={`workflow-card__collapsible${enabled ? ' workflow-card__collapsible--open' : ''}`}
-        aria-hidden={!enabled}
-      >
-        <div className="workflow-card__collapsible-inner">
-          <footer className="workflow-card__footer">
-            <p className="workflow-card__info">
-              <InfoCircle size={16} color="currentColor" variant="Linear" />
-              <span>
-                Reminders are sent by email at 9:00 AM UTC on the scheduled day. Applies to every course.
-              </span>
-            </p>
-            {lastSent && (
-              <Badge
-                type="informative"
-                label={lastSent}
-                className="workflow-card__last-sent-badge"
-              />
-            )}
-          </footer>
-        </div>
-      </div>
 
       <EditReminderModal
         open={modal !== null}

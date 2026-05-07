@@ -1,5 +1,5 @@
 import { useState, useEffect, type ReactNode } from 'react'
-import { InfoCircle } from 'iconsax-react'
+import InfoIcon from '../icons/InfoIcon'
 import './Tooltip.css'
 
 type TooltipPosition = 'Top' | 'Bottom' | 'Left' | 'Right'
@@ -10,6 +10,7 @@ interface TooltipProps {
   position?: TooltipPosition
   alignment?: TooltipAlignment
   icon?: boolean
+  iconColor?: string
   disabled?: boolean
   children?: ReactNode
   className?: string
@@ -20,6 +21,7 @@ function Tooltip({
   position = 'Top',
   alignment = 'Center',
   icon = true,
+  iconColor,
   disabled = false,
   children,
   className = '',
@@ -69,7 +71,7 @@ function Tooltip({
       onFocus={() => setVisible(true)}
       onBlur={() => setVisible(false)}
     >
-      <InfoCircle size={20} color="var(--text-secondary, #bfc2cc)" variant="Linear" />
+      <InfoIcon size={20} color={iconColor} />
     </button>
   ) : (
     <div
