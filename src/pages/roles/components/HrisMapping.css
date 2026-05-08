@@ -1,0 +1,309 @@
+/* ===== HRIS Mapping Tab ===== */
+
+.hris-banner-wrap {
+  margin-bottom: var(--space-m);
+}
+
+.hris-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-m);
+  flex-wrap: wrap;
+}
+
+/* Content switcher — matches Figma node 7475:143480 (People file) */
+.hris-switcher {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-sm, 12px);
+  background: var(--input-background);
+}
+
+.hris-switcher__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-s, 8px);
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+  white-space: nowrap;
+}
+
+.hris-switcher__item--with-icon {
+  padding-left: 12px;
+}
+
+.hris-switcher__item:hover:not(.hris-switcher__item--active) {
+  background: var(--neutral-50);
+  color: var(--text-primary);
+}
+
+.hris-switcher__item--active {
+  background: var(--selected, #FFBB38);
+  color: var(--neutral-800, #20222A);
+  font-weight: 700;
+}
+
+/* ===== Table column widths ===== */
+.hris-table .people-table-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--neutral-25, #F9F9FA);
+}
+
+.hris-col--title {
+  width: 320px;
+  flex-shrink: 1;
+  min-width: 240px;
+}
+
+.hris-col--count {
+  width: 100px;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.hris-col--role {
+  width: 240px;
+  flex-shrink: 0;
+}
+
+.hris-col--status {
+  width: 130px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.hris-col--actions {
+  width: 90px;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  margin-left: var(--space-s);
+}
+
+.hris-icon-btn-placeholder {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+}
+
+.hris-role-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hris-role-cell__name {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+.hris-role-cell__source {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.hris-role-cell__missing {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+/* ===== Mapping Panel (drawer) ===== */
+
+.hris-panel-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-m);
+  background: var(--input-background, var(--neutral-50));
+  border-radius: var(--radius-s);
+  margin-bottom: var(--space-l);
+}
+
+.hris-panel-summary__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-m);
+}
+
+.hris-panel-summary__label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.hris-panel-summary__value {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.hris-panel-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-s);
+  padding: var(--space-sm) var(--space-m);
+  background: rgba(255, 187, 56, 0.12);
+  color: var(--text-warning);
+  border-radius: var(--radius-s);
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: var(--space-l);
+}
+
+.hris-panel-search-wrapper {
+  margin-bottom: var(--space-m);
+}
+
+.hris-panel-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: 10px var(--space-sm);
+  background: var(--neutral-0, #FFFFFF);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  transition: border-color 0.15s ease;
+}
+
+.hris-panel-search:focus-within {
+  border-color: var(--secondary-600);
+}
+
+.hris-panel-search__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.hris-panel-search__input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.hris-panel-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+}
+
+.hris-panel-options__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.hris-panel-options__group-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.hris-panel-options__count {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  padding: 0 8px;
+  height: 20px;
+  background: var(--neutral-50);
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.hris-panel-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-sm) var(--space-m);
+  background: var(--neutral-0, #FFFFFF);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.hris-panel-option:hover {
+  background: var(--cards-background-hover);
+}
+
+.hris-panel-option--selected {
+  border-color: var(--secondary-600);
+  background: rgba(255, 187, 56, 0.16);
+}
+
+.hris-panel-option--selected:hover {
+  background: rgba(255, 187, 56, 0.24);
+}
+
+.hris-panel-option__name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.hris-panel-option__category {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  background: var(--neutral-50);
+  padding: 2px var(--space-s);
+  border-radius: var(--radius-full);
+}
+
+.hris-panel-option__check {
+  flex-shrink: 0;
+}
+
+.hris-panel-options__empty {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-style: italic;
+  padding: var(--space-s) 0;
+}
+
+.hris-panel-options__hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  font-size: 12px;
+  color: var(--text-tertiary);
+  padding: var(--space-s) 0;
+  font-style: italic;
+}
+

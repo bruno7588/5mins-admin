@@ -22,11 +22,11 @@ const DEFAULT_LABELS: Record<BadgeType, string> = {
 }
 
 const ICON_MAP: Partial<Record<BadgeType, ReactNode>> = {
-  success: <TickCircle size={16} variant="Linear" />,
-  warning: <InfoCircle size={16} variant="Linear" />,
-  error: <Danger size={16} variant="Linear" />,
-  'in-progress': <TaskSquare size={16} variant="Linear" />,
-  informative: <InfoCircle size={16} variant="Linear" />,
+  success: <TickCircle size={16} variant="Linear" color="currentColor" />,
+  warning: <InfoCircle size={16} variant="Linear" color="currentColor" />,
+  error: <Danger size={16} variant="Linear" color="currentColor" />,
+  'in-progress': <TaskSquare size={16} variant="Linear" color="currentColor" />,
+  informative: <InfoCircle size={16} variant="Linear" color="currentColor" />,
 }
 
 interface BadgeProps {

@@ -13,6 +13,7 @@
 
 .badge--icon {
   gap: 4px;
+  padding-left: 8px;
 }
 
 .badge__icon {

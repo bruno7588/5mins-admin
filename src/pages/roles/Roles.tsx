@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import ToastContainer, { useToast } from '../../components/Toast/Toast'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
@@ -6,8 +6,19 @@ import { Danger, InfoCircle } from 'iconsax-react'
 import FiveMinsRolesTab from './components/FiveMinsRolesTab'
 import CompanyRolesTab from './components/CompanyRolesTab'
 import RolePanel, { type PanelMode } from './components/RolePanel'
+import HrisMappingTab from './components/HrisMappingTab'
+import HrisMappingPanel from './components/HrisMappingPanel'
 import type { FiveMinsRole, CompanyRole, Skill } from './data/mockRoles'
-import { initialCompanyRoles } from './data/mockRoles'
+import { fiveMinsRoles, initialCompanyRoles } from './data/mockRoles'
+import {
+  type HrisRoleMapping,
+  type MappedRoleRef,
+  buildInitialMappings,
+  markBroken,
+  mockHrisJobTitles,
+  resolveRoleName,
+  resyncTitles,
+} from './data/mockHrisMappings'
 import '../people/People.css'
 import './Roles.css'
 
@@ -41,7 +52,9 @@ function downloadLearnersCsv(roleName: string, learners: { name: string; email: 
   URL.revokeObjectURL(url)
 }
 
-type Tab = 'library' | 'company'
+type Tab = 'library' | 'company' | 'hris-mapping'
+
+const REMOVE_CONFIRM_THRESHOLD = 5
 
 function Roles() {
   const [activeTab, setActiveTab] = useState<Tab>('library')
@@ -51,15 +64,87 @@ function Roles() {
   const [deleteRole, setDeleteRole] = useState<CompanyRole | null>(null)
   const [deleteConfirmInput, setDeleteConfirmInput] = useState('')
 
+  const initialMappings = useMemo(
+    () => buildInitialMappings(initialCompanyRoles, fiveMinsRoles),
+    [],
+  )
+  const [hrisMappings, setHrisMappings] = useState<HrisRoleMapping[]>(initialMappings)
+  const [hrisPanelMapping, setHrisPanelMapping] = useState<HrisRoleMapping | null>(null)
+  const [hrisRemoveTarget, setHrisRemoveTarget] = useState<HrisRoleMapping | null>(null)
+  const [newTitlesNotice, setNewTitlesNotice] = useState<{ count: number; employeeCount: number } | null>(null)
+
   const nextId = () => Math.max(0, ...companyRoles.map(r => r.id)) + 1
 
   const handleDeleteConfirm = () => {
     if (deleteRole) {
-      setCompanyRoles(prev => prev.filter(r => r.id !== deleteRole.id))
+      const nextCompanyRoles = companyRoles.filter(r => r.id !== deleteRole.id)
+      setCompanyRoles(nextCompanyRoles)
+      setHrisMappings(prev => markBroken(prev, nextCompanyRoles, fiveMinsRoles))
       showToast('success', `"${deleteRole.name}" deleted`)
       setDeleteRole(null)
       setDeleteConfirmInput('')
       setPanelMode(null)
+    }
+  }
+
+  /* ─── HRIS Mapping handlers ───────────────────────────── */
+
+  const handleHrisSave = (next: MappedRoleRef) => {
+    if (!hrisPanelMapping) return
+    setHrisMappings(prev =>
+      markBroken(
+        prev.map(m =>
+          m.hrisJobTitle === hrisPanelMapping.hrisJobTitle
+            ? { ...m, role: next, status: 'mapped' }
+            : m,
+        ),
+        companyRoles,
+        fiveMinsRoles,
+      ),
+    )
+    const roleName = resolveRoleName(next, companyRoles, fiveMinsRoles) ?? 'role'
+    showToast('success', `"${hrisPanelMapping.hrisJobTitle}" mapped to ${roleName}`)
+    setHrisPanelMapping(null)
+  }
+
+  const handleHrisRemoveRequest = (mapping: HrisRoleMapping) => {
+    if (mapping.employeeCount >= REMOVE_CONFIRM_THRESHOLD) {
+      setHrisRemoveTarget(mapping)
+    } else {
+      removeMappingNow(mapping)
+    }
+  }
+
+  const removeMappingNow = (mapping: HrisRoleMapping) => {
+    setHrisMappings(prev =>
+      prev.map(m =>
+        m.hrisJobTitle === mapping.hrisJobTitle
+          ? { ...m, role: null, status: 'unmapped' }
+          : m,
+      ),
+    )
+    showToast('success', `Mapping for "${mapping.hrisJobTitle}" removed`)
+    setHrisRemoveTarget(null)
+    setHrisPanelMapping(null)
+  }
+
+  const handleHrisSimulateResync = () => {
+    const incoming = [
+      ...mockHrisJobTitles,
+      { title: 'Talent Acquisition Partner', employeeCount: 4 },
+      { title: 'Junior Customer Success Manager', employeeCount: 3 },
+    ]
+    const result = resyncTitles(hrisMappings, incoming, companyRoles, fiveMinsRoles)
+    setHrisMappings(result.mappings)
+    if (result.newTitles.length > 0) {
+      const employeeCount = result.newTitles.reduce((sum, t) => sum + t.employeeCount, 0)
+      setNewTitlesNotice({ count: result.newTitles.length, employeeCount })
+      showToast(
+        'success',
+        `Re-sync complete — ${result.newTitles.length} new title${result.newTitles.length !== 1 ? 's' : ''} discovered`,
+      )
+    } else {
+      showToast('success', 'Re-sync complete — no new titles')
     }
   }
 
@@ -134,13 +219,22 @@ function Roles() {
             >
               Company Roles
             </button>
+            <button
+              role="tab"
+              aria-selected={activeTab === 'hris-mapping'}
+              className={`roles-header__tab${activeTab === 'hris-mapping' ? ' roles-header__tab--active' : ''}`}
+              onClick={() => setActiveTab('hris-mapping')}
+            >
+              HRIS Mapping
+            </button>
           </div>
         </header>
 
         <div className="roles-content">
-          {activeTab === 'library' ? (
+          {activeTab === 'library' && (
             <FiveMinsRolesTab onCopy={handleCopyRole} onCreateRole={() => setPanelMode({ type: 'create' })} />
-          ) : (
+          )}
+          {activeTab === 'company' && (
             <CompanyRolesTab
               roles={companyRoles}
               onCreateRole={() => setPanelMode({ type: 'create' })}
@@ -157,6 +251,21 @@ function Roles() {
               onBrowseLibrary={() => setActiveTab('library')}
             />
           )}
+          {activeTab === 'hris-mapping' && (
+            <HrisMappingTab
+              mappings={hrisMappings}
+              tenantRoles={companyRoles}
+              publicRoles={fiveMinsRoles}
+              newTitlesNotice={
+                newTitlesNotice
+                  ? { ...newTitlesNotice, onDismiss: () => setNewTitlesNotice(null) }
+                  : null
+              }
+              onEditMapping={setHrisPanelMapping}
+              onRemoveMapping={handleHrisRemoveRequest}
+              onSimulateResync={handleHrisSimulateResync}
+            />
+          )}
         </div>
       </main>
 
@@ -168,6 +277,50 @@ function Roles() {
           onSave={handlePanelSave}
         />
       )}
+
+      {hrisPanelMapping && (
+        <HrisMappingPanel
+          mapping={hrisPanelMapping}
+          tenantRoles={companyRoles}
+          publicRoles={fiveMinsRoles}
+          onClose={() => setHrisPanelMapping(null)}
+          onSave={handleHrisSave}
+        />
+      )}
+
+      {/* HRIS mapping removal confirmation (high-impact only) */}
+      <ConfirmModal
+        open={!!hrisRemoveTarget}
+        onClose={() => setHrisRemoveTarget(null)}
+      >
+        {hrisRemoveTarget && (
+          <>
+            <div className="confirm-modal-header confirm-modal-header--center">
+              <InfoCircle size={72} color="var(--text-warning)" variant="Linear" />
+              <h3 className="confirm-modal-title">Remove HRIS mapping?</h3>
+              <p className="confirm-modal-body">
+                "{hrisRemoveTarget.hrisJobTitle}" affects {hrisRemoveTarget.employeeCount} employee
+                {hrisRemoveTarget.employeeCount !== 1 ? 's' : ''}. Existing users will keep their current
+                role. Future syncs for this title will not assign a role.
+              </p>
+            </div>
+            <div className="confirm-modal-actions confirm-modal-actions--center">
+              <button
+                className="confirm-modal-btn confirm-modal-btn--outlined-neutral"
+                onClick={() => setHrisRemoveTarget(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="confirm-modal-btn confirm-modal-btn--danger"
+                onClick={() => removeMappingNow(hrisRemoveTarget)}
+              >
+                Remove Mapping
+              </button>
+            </div>
+          </>
+        )}
+      </ConfirmModal>
 
       {/* Delete Confirmation Dialog */}
       <ConfirmModal

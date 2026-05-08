@@ -38,6 +38,7 @@ interface PersonRow {
   startDate: string
   region: string
   status: 'Registered' | 'Invited'
+  hrisJobTitle?: string
 }
 
 type DeactivateStatus = 'terminated' | 'long-leave'

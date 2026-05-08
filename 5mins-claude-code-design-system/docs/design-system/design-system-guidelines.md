@@ -77,12 +77,14 @@ Quiz type and interactive learning element colors:
 |----------|-------|-----|-------|
 | Success | `--success-500` | #18A957 | Completion, positive, confirmation |
 | Success light | `--success-100` | #E8F6EE | Badge backgrounds |
+| Success text | `--text-success` | #18A957 | Success text, completed labels, positive validation |
 | Warning | `--warning-500` | #FFA538 | Caution, in-progress, attention |
 | Warning light | `--warning-100` | #FFEDD7 | Badge backgrounds |
 | Warning text | `--text-warning` | #E2A610 | Warning text color |
 | Danger | `--danger-500` | #DF1642 | Errors, destructive, critical |
 | Danger light | `--danger-100` | #FCE8EC | Badge backgrounds |
 | Danger secondary | `--danger-400` | #E95C7B | "New" badge solid fill |
+| Error text | `--text-error` | #DF1642 | Error messages, failed validation, destructive labels |
 
 ### 2.5 Neutral Colors
 
@@ -135,12 +137,14 @@ Used in overlays, modals, and similar UI surfaces:
   /* Semantic */
   --success-100: #E8F6EE;
   --success-500: #18A957;
+  --text-success: #18A957;
   --warning-100: #FFEDD7;
   --warning-500: #FFA538;
   --text-warning: #E2A610;
   --danger-100: #FCE8EC;
   --danger-400: #E95C7B;
   --danger-500: #DF1642;
+  --text-error: #DF1642;
 
   /* Neutrals */
   --neutral-900: #0F1014;
