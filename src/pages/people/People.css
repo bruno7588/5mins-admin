@@ -398,6 +398,13 @@
   flex-shrink: 1;
 }
 
+.people-role-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s);
+  min-width: 0;
+}
+
 .people-table-cell--team {
   width: 170px;
   min-width: 100px;

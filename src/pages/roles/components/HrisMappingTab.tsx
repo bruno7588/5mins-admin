@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { SearchNormal1, Edit2, Trash, ArrowLeft2, ArrowRight2, Refresh2, Danger } from 'iconsax-react'
+import { SearchNormal1, Edit2, Trash, ArrowLeft2, ArrowRight2, Refresh2, Danger, Eye } from 'iconsax-react'
 import Badge from '../../../components/Badge/Badge'
 import Alert from '../../../components/Alert/Alert'
 import type { CompanyRole, FiveMinsRole } from '../data/mockRoles'
@@ -25,6 +25,7 @@ interface Props {
   newTitlesNotice: NewTitlesNotice | null
   onEditMapping: (mapping: HrisRoleMapping) => void
   onRemoveMapping: (mapping: HrisRoleMapping) => void
+  onPreviewOnboarding: (mapping: HrisRoleMapping) => void
   onSimulateResync: () => void
 }
 
@@ -41,6 +42,7 @@ function HrisMappingTab({
   newTitlesNotice,
   onEditMapping,
   onRemoveMapping,
+  onPreviewOnboarding,
   onSimulateResync,
 }: Props) {
   const [search, setSearch] = useState('')
@@ -240,6 +242,12 @@ function HrisMappingTab({
                   <Badge type={badge.type} label={badge.label} icon />
                 </div>
                 <div className="people-table-cell hris-col--actions">
+                  <span className="roles-icon-btn-wrapper">
+                    <button className="roles-icon-btn" onClick={() => onPreviewOnboarding(mapping)}>
+                      <Eye size={18} color="var(--text-tertiary)" />
+                    </button>
+                    <span className="roles-icon-tooltip">Preview onboarding</span>
+                  </span>
                   <span className="roles-icon-btn-wrapper">
                     <button className="roles-icon-btn" onClick={() => onEditMapping(mapping)}>
                       <Edit2 size={18} color="var(--text-tertiary)" />

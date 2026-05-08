@@ -15,11 +15,13 @@ import {
   ArrowDown2,
   ArrowUp2,
   RowVertical,
+  Lock,
 } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import Checkbox from '../../components/Checkbox/Checkbox'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import ToastContainer, { useToast } from '../../components/Toast/Toast'
+import Tooltip from '../../components/Tooltip/Tooltip'
 import InviteModal from './components/InviteModal/InviteModal'
 import BulkUploadModal from './components/BulkUploadModal/BulkUploadModal'
 import EditColumnsPopover from './components/EditColumnsPopover/EditColumnsPopover'
@@ -68,9 +70,9 @@ type ModalState =
 const initialPeople: PersonRow[] = [
   { id: 1, name: 'Anthonny Wallace', email: 'anthonny@example.com', avatar: 'AW', role: 'Customer Support Specialist', team: 'Customer Support Team', startDate: 'Jan 13, 2025', region: 'Southeast Asia', status: 'Registered' },
   { id: 2, name: 'Brenda Kwasaki', email: 'brenda@email.com', avatar: 'BK', role: 'Operations Manager', team: 'Financial Services', startDate: 'Jan 13, 2025', region: '–', status: 'Invited' },
-  { id: 3, name: 'Carlos Mendes', email: 'carlos@example.com', avatar: 'CM', role: 'Software Engineer', team: 'Product Engineering', startDate: 'Feb 1, 2025', region: 'Europe', status: 'Registered' },
+  { id: 3, name: 'Carlos Mendes', email: 'carlos@example.com', avatar: 'CM', role: 'Software Engineer', team: 'Product Engineering', startDate: 'Feb 1, 2025', region: 'Europe', status: 'Registered', hrisJobTitle: 'Software Engineer' },
   { id: 4, name: 'Diana Ross', email: 'diana.ross@company.com', avatar: 'DR', role: 'Marketing Lead', team: 'Growth Team', startDate: 'Mar 5, 2025', region: 'North America', status: 'Registered' },
-  { id: 5, name: 'Erik Johansson', email: 'erik.j@email.com', avatar: 'EJ', role: 'Data Analyst', team: 'Business Intelligence', startDate: 'Dec 10, 2024', region: 'Europe', status: 'Invited' },
+  { id: 5, name: 'Erik Johansson', email: 'erik.j@email.com', avatar: 'EJ', role: 'Data Analyst', team: 'Business Intelligence', startDate: 'Dec 10, 2024', region: 'Europe', status: 'Invited', hrisJobTitle: 'Senior Software Engineer' },
 ]
 
 const initialDeactivated: DeactivatedPerson[] = [
@@ -557,7 +559,22 @@ function People() {
                     <span className="people-email">{person.email}</span>
                   </div>
                 </div>
-                {visibleKeys.includes('role') && <div className="people-table-cell people-table-cell--role">{person.role}</div>}
+                {visibleKeys.includes('role') && (
+                  <div className="people-table-cell people-table-cell--role">
+                    <span className="people-role-cell">
+                      {person.role}
+                      {person.hrisJobTitle && (
+                        <Tooltip
+                          text={`Role managed by HRIS (${person.hrisJobTitle}). Only admins can change it.`}
+                          position="Top"
+                          icon={false}
+                        >
+                          <Lock size={14} variant="Bold" color="var(--text-tertiary)" />
+                        </Tooltip>
+                      )}
+                    </span>
+                  </div>
+                )}
                 {visibleKeys.includes('team') && <div className="people-table-cell people-table-cell--team">{person.team}</div>}
                 {visibleKeys.includes('startDate') && (
                   <div className="people-table-cell people-table-cell--date">

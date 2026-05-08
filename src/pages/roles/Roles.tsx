@@ -8,6 +8,7 @@ import CompanyRolesTab from './components/CompanyRolesTab'
 import RolePanel, { type PanelMode } from './components/RolePanel'
 import HrisMappingTab from './components/HrisMappingTab'
 import HrisMappingPanel from './components/HrisMappingPanel'
+import OnboardingPreviewPanel from './components/OnboardingPreviewPanel'
 import type { FiveMinsRole, CompanyRole, Skill } from './data/mockRoles'
 import { fiveMinsRoles, initialCompanyRoles } from './data/mockRoles'
 import {
@@ -70,6 +71,7 @@ function Roles() {
   )
   const [hrisMappings, setHrisMappings] = useState<HrisRoleMapping[]>(initialMappings)
   const [hrisPanelMapping, setHrisPanelMapping] = useState<HrisRoleMapping | null>(null)
+  const [hrisPreviewMapping, setHrisPreviewMapping] = useState<HrisRoleMapping | null>(null)
   const [hrisRemoveTarget, setHrisRemoveTarget] = useState<HrisRoleMapping | null>(null)
   const [newTitlesNotice, setNewTitlesNotice] = useState<{ count: number; employeeCount: number } | null>(null)
 
@@ -263,6 +265,7 @@ function Roles() {
               }
               onEditMapping={setHrisPanelMapping}
               onRemoveMapping={handleHrisRemoveRequest}
+              onPreviewOnboarding={setHrisPreviewMapping}
               onSimulateResync={handleHrisSimulateResync}
             />
           )}
@@ -285,6 +288,15 @@ function Roles() {
           publicRoles={fiveMinsRoles}
           onClose={() => setHrisPanelMapping(null)}
           onSave={handleHrisSave}
+        />
+      )}
+
+      {hrisPreviewMapping && (
+        <OnboardingPreviewPanel
+          mapping={hrisPreviewMapping}
+          tenantRoles={companyRoles}
+          publicRoles={fiveMinsRoles}
+          onClose={() => setHrisPreviewMapping(null)}
         />
       )}
 

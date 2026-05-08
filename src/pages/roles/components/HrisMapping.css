@@ -88,7 +88,7 @@
 }
 
 .hris-col--actions {
-  width: 90px;
+  width: 130px;
   flex-shrink: 0;
   justify-content: flex-end;
   gap: var(--space-xs);
@@ -307,3 +307,161 @@
   font-style: italic;
 }
 
+
+/* ===== Onboarding Preview Drawer ===== */
+
+.hris-preview-meta {
+  margin-bottom: var(--space-l);
+}
+
+.hris-preview-meta__pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.hris-preview-meta__pill--skipped {
+  background: rgba(24, 169, 87, 0.16);
+  color: var(--text-success);
+}
+
+.hris-preview-meta__pill--manual {
+  background: rgba(255, 165, 56, 0.16);
+  color: var(--text-warning);
+}
+
+.hris-preview-screen {
+  background: var(--neutral-25, #F9F9FA);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: var(--space-xl);
+}
+
+.hris-preview-screen__skipped,
+.hris-preview-screen__manual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-m);
+  text-align: center;
+}
+
+.hris-preview-screen__avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--secondary-500);
+  color: var(--neutral-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 22px;
+}
+
+.hris-preview-screen__heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.hris-preview-screen__subhead {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 320px;
+}
+
+.hris-preview-screen__role-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-m);
+  background: var(--neutral-0, #FFFFFF);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  width: 100%;
+  max-width: 360px;
+}
+
+.hris-preview-screen__role-card-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.hris-preview-screen__role-card-label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.hris-preview-screen__role-card-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hris-preview-screen__role-card-source {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.hris-preview-screen__cta {
+  margin-top: var(--space-s);
+  align-self: stretch;
+  max-width: 360px;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-s);
+}
+
+.hris-preview-screen__footnote {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin: 0;
+  font-style: italic;
+}
+
+.hris-preview-screen__role-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  width: 100%;
+  max-width: 360px;
+}
+
+.hris-preview-screen__role-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-s);
+  padding: var(--space-sm) var(--space-m);
+  background: var(--neutral-0, #FFFFFF);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.hris-preview-screen__role-option:hover:not(.hris-preview-screen__role-option--selected) {
+  background: var(--cards-background-hover);
+}
+
+.hris-preview-screen__role-option--selected {
+  border-color: var(--secondary-600);
+  background: rgba(255, 187, 56, 0.16);
+  font-weight: 500;
+}
