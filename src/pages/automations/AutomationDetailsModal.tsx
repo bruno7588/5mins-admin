@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowDown2, Edit2, Trash } from 'iconsax-react'
 import CloseButton from '../../components/CloseButton/CloseButton'
 import Search from '../../components/Search/Search'
@@ -20,6 +20,7 @@ import type {
 } from './Automations'
 import {
   COHORT_VALUES,
+  MOCK_COURSE_CATALOG,
   REGION_VALUES,
   ROLE_VALUES,
   getAttributeValues,
@@ -68,6 +69,7 @@ interface AutomationDetailsModalProps {
   onTriggerChange?: (automationId: string, trigger: AutomationTrigger) => void
   onFiltersChange?: (automationId: string, filters: AutomationFilters) => void
   onCourseChange?: (automationId: string, courseId: string, patch: Partial<AutomationCourse>) => void
+  onCourseAdd?: (automationId: string, courseName: string) => void
   onCourseRemove?: (automationId: string, courseId: string) => void
   onCoursesReorder?: (automationId: string, fromIndex: number, toIndex: number) => void
 }
@@ -104,11 +106,13 @@ function AutomationDetailsModal({
   onTriggerChange,
   onFiltersChange,
   onCourseChange,
+  onCourseAdd,
   onCourseRemove,
   onCoursesReorder,
 }: AutomationDetailsModalProps) {
   const [closing, setClosing] = useState(false)
   const [courseQuery, setCourseQuery] = useState('')
+  const [searchFocused, setSearchFocused] = useState(false)
   const [openPopover, setOpenPopover] = useState<{ courseId: string; column: 'enrollment' | 'due' | 'frequency' } | null>(null)
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null)
   const draggingIndexRef = useRef<number | null>(null)
@@ -121,11 +125,22 @@ function AutomationDetailsModal({
     if (automation) {
       setClosing(false)
       setCourseQuery('')
+      setSearchFocused(false)
       setOpenPopover(null)
       setAddedFilterKinds(new Set())
       setFilterMenuOpen(false)
     }
   }, [automation?.id])
+
+  const courseSuggestions = useMemo(() => {
+    const q = courseQuery.trim().toLowerCase()
+    if (!q || !automation) return []
+    const alreadyAdded = new Set(automation.courses.map((c) => c.name))
+    return MOCK_COURSE_CATALOG
+      .filter((name) => !alreadyAdded.has(name))
+      .filter((name) => name.toLowerCase().includes(q))
+      .slice(0, 8)
+  }, [courseQuery, automation])
 
   useEffect(() => {
     if (!filterMenuOpen) return
@@ -419,7 +434,38 @@ function AutomationDetailsModal({
                   value={courseQuery}
                   placeholder="Search for courses"
                   onChange={setCourseQuery}
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setSearchFocused(false)}
                 />
+                {searchFocused && courseQuery.trim() !== '' && (
+                  <div
+                    className="automation-details-search-suggestions"
+                    role="listbox"
+                  >
+                    {courseSuggestions.length > 0 ? (
+                      courseSuggestions.map((name) => (
+                        <button
+                          key={name}
+                          type="button"
+                          role="option"
+                          className="automation-details-search-suggestion"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            onCourseAdd?.(automation.id, name)
+                            setCourseQuery('')
+                            showToast('success', 'Course added')
+                          }}
+                        >
+                          {name}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="automation-details-search-empty">
+                        No courses found
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

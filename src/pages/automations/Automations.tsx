@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react'
 import {
   UserCirlceAdd,
   Medal,
-  Refresh,
+  RefreshCircle,
   More,
   Edit2,
   Copy,
@@ -117,6 +117,76 @@ export function getAttributeValues(attribute: TrackedAttribute): readonly { valu
 export function getAttributeValueLabel(attribute: TrackedAttribute, value: string): string {
   return getAttributeValues(attribute).find((v) => v.value === value)?.label ?? value
 }
+
+// Mock catalog of courses for the search/autocomplete in the details modal.
+// Real implementation would come from the courses API.
+export const MOCK_COURSE_CATALOG: string[] = [
+  'Allergen Awareness',
+  'Allyship in Practice',
+  'Anti-Harassment Foundations',
+  'Asynchronous Communication',
+  'Bystander Intervention',
+  'Cleaning & Sanitisation Protocols',
+  'Closing Techniques',
+  'Cloud Storage Hygiene',
+  'Coaching Fundamentals',
+  'Code of Conduct 2024 Update',
+  'Code of Conduct Essentials',
+  'Cold Chain Management',
+  'Competitive Landscape',
+  'CRM Hygiene',
+  'Cross-Border Data Transfers',
+  'Cross-Contamination Prevention',
+  'Customer Personas',
+  'Data Privacy & GDPR Basics',
+  'Data Subject Rights',
+  'Device Security',
+  'Discovery Calls',
+  'Diversity, Equity & Inclusion',
+  'Emergency Evacuation Procedures',
+  'Escalation Procedures',
+  'Executive Communication',
+  'Extinguisher Use',
+  'Feature Deep Dives',
+  'Federal Anti-Harassment Standards',
+  'Financial Acumen for Directors',
+  'Fire Drill Procedures',
+  'First Aid Essentials',
+  'Food Storage & Labelling',
+  'GDPR Fundamentals',
+  'Giving Effective Feedback',
+  'HACCP Refresher',
+  'Handling Difficult Customers',
+  'Handling Personal Data',
+  'Health & Safety: The Workplace (UK)',
+  'Health & Safety: Working From Home (UK)',
+  'Home Office Ergonomics',
+  'Incident Response Basics',
+  'Inclusive Language',
+  'Information Security 101',
+  'Leadership Foundations',
+  'Objection Handling',
+  'Password & MFA Best Practices',
+  'Personal Hygiene Standards',
+  'Phishing & Social Engineering',
+  'Pricing & Plans',
+  'Product Lineup',
+  'Product Overview',
+  'Recognising Harassment',
+  'Reporting Incidents',
+  'Reporting Procedures',
+  'Roadmap Highlights',
+  'Secure Remote Work',
+  'Service Mindset',
+  'Setting 30/60/90 Goals',
+  'Strategic Decision Making',
+  'Time Management at Home',
+  'Tone & Empathy',
+  'US Workplace Compliance Overview',
+  'Unconscious Bias',
+  'Welcome to the Company',
+  'Workplace Health & Safety',
+]
 
 export interface User {
   id: string
@@ -688,6 +758,26 @@ function Automations() {
     )
   }
 
+  function addCourse(automationId: string, courseName: string) {
+    const apply = (a: AutomationRow): AutomationRow => ({
+      ...a,
+      courses: [
+        ...a.courses,
+        {
+          id: `${automationId}-c-${Date.now()}`,
+          name: courseName,
+          enrollmentType: { kind: 'immediate' },
+          dueDate: { kind: 'none' },
+          recurrence: { enabled: false },
+        },
+      ],
+    })
+    setAutomations((rows) => rows.map((r) => (r.id === automationId ? apply(r) : r)))
+    setDetailsAutomation((current) =>
+      current && current.id === automationId ? apply(current) : current,
+    )
+  }
+
   function patchTrigger(automationId: string, trigger: AutomationTrigger) {
     const apply = (a: AutomationRow): AutomationRow => ({ ...a, trigger })
     setAutomations((rows) => rows.map((r) => (r.id === automationId ? apply(r) : r)))
@@ -832,9 +922,7 @@ function Automations() {
                 <span className="automations-template-body">
                   <span className="automations-template-title">New Employee Automation</span>
                   <span className="automations-template-desc">
-                    Enrol new employees in onboarding courses automatically.
-                    <br />
-                    Requires HRIS integration.
+                    Enrol new employees in onboarding courses automatically. Requires HRIS integration.
                   </span>
                 </span>
               </button>
@@ -846,9 +934,7 @@ function Automations() {
                 <span className="automations-template-body">
                   <span className="automations-template-title">Existing Employee Automation</span>
                   <span className="automations-template-desc">
-                    Create and automate training programs for both new and existing users.
-                    <br />
-                    Perfect for compliance training.
+                    Create and automate training programs for both new and existing users. Perfect for compliance training.
                   </span>
                 </span>
               </button>
@@ -876,14 +962,12 @@ function Automations() {
                 }
               >
                 <span className="automations-template-icon">
-                  <Refresh size={48} color="var(--lesson-quiz)" variant="Linear" />
+                  <RefreshCircle size={48} color="var(--lesson-quiz)" variant="Linear" />
                 </span>
                 <span className="automations-template-body">
-                  <span className="automations-template-title">Attribute Change Automation</span>
+                  <span className="automations-template-title">Update Employee Automation</span>
                   <span className="automations-template-desc">
-                    Enrol users in courses when their role, cohort, or region changes.
-                    <br />
-                    Triggers every time the attribute changes to the target value.
+                    Enrol users when their role, cohort, or region changes. Perfect for promotions and transfers.
                   </span>
                 </span>
               </button>
@@ -1406,6 +1490,7 @@ function Automations() {
         onTriggerChange={patchTrigger}
         onFiltersChange={patchFilters}
         onCourseChange={patchCourse}
+        onCourseAdd={addCourse}
         onCourseRemove={removeCourse}
         onCoursesReorder={reorderCourses}
       />
