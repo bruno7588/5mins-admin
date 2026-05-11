@@ -133,13 +133,12 @@ function AutomationDetailsModal({
   }, [automation?.id])
 
   const courseSuggestions = useMemo(() => {
-    const q = courseQuery.trim().toLowerCase()
-    if (!q || !automation) return []
+    if (!automation) return []
     const alreadyAdded = new Set(automation.courses.map((c) => c.name))
+    const q = courseQuery.trim().toLowerCase()
     return MOCK_COURSE_CATALOG
       .filter((name) => !alreadyAdded.has(name))
-      .filter((name) => name.toLowerCase().includes(q))
-      .slice(0, 8)
+      .filter((name) => (q ? name.toLowerCase().includes(q) : true))
   }, [courseQuery, automation])
 
   useEffect(() => {
@@ -456,7 +455,7 @@ function AutomationDetailsModal({
                   onFocus={() => setSearchFocused(true)}
                   onBlur={() => setSearchFocused(false)}
                 />
-                {searchFocused && courseQuery.trim() !== '' && (
+                {searchFocused && (
                   <div
                     className="automation-details-search-suggestions"
                     role="listbox"
