@@ -140,7 +140,7 @@
 
 .roles-category-chips {
   display: flex;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   flex-wrap: wrap;
 }
 
@@ -156,6 +156,13 @@
   transition: all 150ms ease;
   line-height: 1.5;
   white-space: nowrap;
+}
+
+.roles-chip--with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 12px;
 }
 
 .roles-chip:hover {

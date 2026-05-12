@@ -72,6 +72,7 @@ function Roles() {
   const [hrisPanelMapping, setHrisPanelMapping] = useState<HrisRoleMapping | null>(null)
   const [hrisRemoveTarget, setHrisRemoveTarget] = useState<HrisRoleMapping | null>(null)
   const [newTitlesNotice, setNewTitlesNotice] = useState<{ count: number; employeeCount: number } | null>(null)
+  const [hrisSyncActivated, setHrisSyncActivated] = useState(false)
 
   const nextId = () => Math.max(0, ...companyRoles.map(r => r.id)) + 1
 
@@ -126,6 +127,11 @@ function Roles() {
     showToast('success', `Mapping for "${mapping.hrisJobTitle}" removed`)
     setHrisRemoveTarget(null)
     setHrisPanelMapping(null)
+  }
+
+  const handleHrisActivateSync = () => {
+    setHrisSyncActivated(true)
+    showToast('success', 'HRIS sync activated — role mappings are now live')
   }
 
   const handleHrisSimulateResync = () => {
@@ -278,6 +284,8 @@ function Roles() {
               onEditMapping={setHrisPanelMapping}
               onRemoveMapping={handleHrisRemoveRequest}
               onSimulateResync={handleHrisSimulateResync}
+              syncActivated={hrisSyncActivated}
+              onActivateSync={handleHrisActivateSync}
             />
           )}
         </div>

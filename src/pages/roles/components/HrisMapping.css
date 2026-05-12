@@ -4,55 +4,61 @@
   margin-bottom: var(--space-m);
 }
 
-.hris-toolbar-left {
+.hris-search-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-m);
   flex-wrap: wrap;
+  margin-top: var(--space-m);
+  margin-bottom: var(--space-m);
 }
 
-/* Content switcher — matches Figma node 7475:143480 (People file) */
-.hris-switcher {
-  display: inline-flex;
-  align-items: stretch;
-  gap: 4px;
-  padding: 4px;
-  border-radius: var(--radius-sm, 12px);
-  background: var(--input-background);
-}
-
-.hris-switcher__item {
+.hris-sync-active-pill {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: var(--radius-s, 8px);
-  background: transparent;
+  gap: var(--space-s);
+  padding: 10px 20px;
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 700;
+  color: var(--success-500);
+  background: var(--success-100);
+  border: 1px solid var(--success-500);
+  border-radius: var(--radius-s);
   line-height: 1.5;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
   white-space: nowrap;
 }
 
-.hris-switcher__item--with-icon {
-  padding-left: 12px;
+.hris-sync-active-pill__dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success-500);
+  flex-shrink: 0;
 }
 
-.hris-switcher__item:hover:not(.hris-switcher__item--active) {
-  background: var(--neutral-50);
-  color: var(--text-primary);
+.hris-sync-active-pill__dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--success-500);
+  opacity: 0.6;
+  animation: hris-sync-pulse 1.6s ease-out infinite;
 }
 
-.hris-switcher__item--active {
-  background: var(--selected, #FFBB38);
-  color: var(--neutral-800, #20222A);
-  font-weight: 700;
+@keyframes hris-sync-pulse {
+  0% { transform: scale(1); opacity: 0.55; }
+  80% { transform: scale(2.6); opacity: 0; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hris-sync-active-pill__dot::after {
+    animation: none;
+  }
 }
 
 /* ===== Table column widths ===== */
