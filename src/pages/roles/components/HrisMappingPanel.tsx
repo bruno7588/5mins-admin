@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
-import { SearchNormal1, House2, Global, TickCircle, InfoCircle } from 'iconsax-react'
-import Badge from '../../../components/Badge/Badge'
+import { InfoCircle } from 'iconsax-react'
+import Search from '../../../components/Search/Search'
 import type { CompanyRole, FiveMinsRole } from '../data/mockRoles'
 import {
   type HrisRoleMapping,
@@ -20,6 +20,9 @@ function HrisMappingPanel({ mapping, tenantRoles, publicRoles, onClose, onSave }
   const [closing, setClosing] = useState(false)
   const [pending, setPending] = useState<MappedRoleRef | null>(mapping.role)
   const [search, setSearch] = useState('')
+  const [activeTab, setActiveTab] = useState<'tenant' | 'fivemins'>(
+    mapping.role?.kind === 'fivemins' ? 'fivemins' : 'tenant',
+  )
 
   const handleClose = () => {
     setClosing(true)
@@ -65,9 +68,20 @@ function HrisMappingPanel({ mapping, tenantRoles, publicRoles, onClose, onSave }
         <div className="roles-panel-section-header">
           <div className="roles-panel-section-header__headline">
             <div className="roles-panel-section-header__title-group">
-              <h2 className="roles-panel-section-header__title">Map HRIS title to role</h2>
-              <p className="roles-panel-section-header__description">
-                Choose the 5Mins role to assign whenever this HRIS job title syncs.
+              <h2 className="roles-panel-section-header__title">{mapping.hrisJobTitle}</h2>
+              <p className="roles-panel-section-header__description hris-panel-subtitle">
+                <span>
+                  {mapping.employeeCount} employee{mapping.employeeCount !== 1 ? 's' : ''}
+                </span>
+                <span aria-hidden="true">·</span>
+                {mapping.status === 'mapped' && currentRoleName ? (
+                  <>
+                    <span>Currently mapped to</span>
+                    <span className="roles-ai-role-badge__name">{currentRoleName}</span>
+                  </>
+                ) : (
+                  <span>Not mapped yet</span>
+                )}
               </p>
             </div>
             <button className="roles-panel-close" onClick={handleClose}>
@@ -80,105 +94,97 @@ function HrisMappingPanel({ mapping, tenantRoles, publicRoles, onClose, onSave }
         </div>
 
         <div className="roles-panel-body">
-          <div className="hris-panel-summary">
-            <div className="hris-panel-summary__row">
-              <span className="hris-panel-summary__label">HRIS job title</span>
-              <span className="hris-panel-summary__value">{mapping.hrisJobTitle}</span>
-            </div>
-            <div className="hris-panel-summary__row">
-              <span className="hris-panel-summary__label">Employees affected</span>
-              <span className="hris-panel-summary__value">{mapping.employeeCount}</span>
-            </div>
-            <div className="hris-panel-summary__row">
-              <span className="hris-panel-summary__label">Current status</span>
-              <span className="hris-panel-summary__value">
-                {mapping.status === 'mapped' && (
-                  <Badge type="success" label={`Mapped → ${currentRoleName ?? 'Unknown'}`} icon />
-                )}
-                {mapping.status === 'unmapped' && (
-                  <Badge type="warning" label="Unmapped" icon />
-                )}
-              </span>
-            </div>
+          <div className="hris-panel-tabs" role="tablist" aria-label="Role source">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'tenant'}
+              className={`hris-panel-tab${activeTab === 'tenant' ? ' hris-panel-tab--active' : ''}`}
+              onClick={() => setActiveTab('tenant')}
+            >
+              <span>Company Roles</span>
+              <span className="hris-panel-options__count">{filteredTenant.length}</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'fivemins'}
+              className={`hris-panel-tab${activeTab === 'fivemins' ? ' hris-panel-tab--active' : ''}`}
+              onClick={() => setActiveTab('fivemins')}
+            >
+              <span>5Mins Roles</span>
+              <span className="hris-panel-options__count">{filteredPublic.length}</span>
+            </button>
           </div>
 
           <div className="hris-panel-search-wrapper">
-            <p className="roles-panel-label">Search and select a role</p>
-            <div className="hris-panel-search">
-              <SearchNormal1 size={18} variant="Outline" color="var(--text-tertiary)" />
-              <input
-                className="hris-panel-search__input"
-                placeholder="Search roles…"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                autoFocus
-              />
-              {search && (
-                <button className="roles-search__clear" onClick={() => setSearch('')} aria-label="Clear search">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-              )}
-            </div>
+            <Search
+              size="M"
+              value={search}
+              placeholder="Search roles…"
+              onChange={setSearch}
+              ariaLabel="Search roles"
+            />
           </div>
 
           <div className="hris-panel-options">
-            <div className="hris-panel-options__group">
-              <div className="hris-panel-options__group-header">
-                <House2 size={16} color="var(--text-secondary)" variant="Linear" />
-                <span>Company roles</span>
-                <span className="hris-panel-options__count">{filteredTenant.length}</span>
+            <p className="roles-panel-label hris-panel-options__label">Select role</p>
+            {activeTab === 'tenant' && (
+              <div className="hris-panel-options__group">
+                {filteredTenant.length === 0 ? (
+                  <p className="hris-panel-options__empty">No matching company roles.</p>
+                ) : (
+                  filteredTenant.map(r => {
+                    const selected = isSelected('tenant', r.id)
+                    return (
+                      <button
+                        key={`tenant-${r.id}`}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        className={`hris-panel-option${selected ? ' hris-panel-option--selected' : ''}`}
+                        onClick={() => setPending({ kind: 'tenant', id: r.id })}
+                      >
+                        <span className={`hris-panel-option__radio${selected ? ' hris-panel-option__radio--selected' : ''}`} aria-hidden="true" />
+                        <span className="hris-panel-option__name">{r.name}</span>
+                        {r.leadership && <span className="roles-leader-badge">Leadership</span>}
+                      </button>
+                    )
+                  })
+                )}
               </div>
-              {filteredTenant.length === 0 ? (
-                <p className="hris-panel-options__empty">No matching company roles.</p>
-              ) : (
-                filteredTenant.map(r => (
-                  <button
-                    key={`tenant-${r.id}`}
-                    className={`hris-panel-option${isSelected('tenant', r.id) ? ' hris-panel-option--selected' : ''}`}
-                    onClick={() => setPending({ kind: 'tenant', id: r.id })}
-                  >
-                    <span className="hris-panel-option__name">{r.name}</span>
-                    {r.leadership && <span className="roles-leader-badge">Leadership</span>}
-                    {isSelected('tenant', r.id) && (
-                      <TickCircle size={18} color="var(--success-500)" variant="Bold" className="hris-panel-option__check" />
-                    )}
-                  </button>
-                ))
-              )}
-            </div>
+            )}
 
-            <div className="hris-panel-options__group">
-              <div className="hris-panel-options__group-header">
-                <Global size={16} color="var(--text-secondary)" variant="Linear" />
-                <span>5Mins library</span>
-                <span className="hris-panel-options__count">{filteredPublic.length}</span>
+            {activeTab === 'fivemins' && (
+              <div className="hris-panel-options__group">
+                {filteredPublic.length === 0 ? (
+                  <p className="hris-panel-options__empty">No matching 5Mins roles.</p>
+                ) : (
+                  filteredPublic.slice(0, 50).map(r => {
+                    const selected = isSelected('fivemins', r.id)
+                    return (
+                      <button
+                        key={`fivemins-${r.id}`}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        className={`hris-panel-option${selected ? ' hris-panel-option--selected' : ''}`}
+                        onClick={() => setPending({ kind: 'fivemins', id: r.id })}
+                      >
+                        <span className={`hris-panel-option__radio${selected ? ' hris-panel-option__radio--selected' : ''}`} aria-hidden="true" />
+                        <span className="hris-panel-option__name">{r.name}</span>
+                      </button>
+                    )
+                  })
+                )}
+                {!search && filteredPublic.length > 50 && (
+                  <p className="hris-panel-options__hint">
+                    <InfoCircle size={14} color="var(--text-tertiary)" variant="Linear" />
+                    Showing first 50 of {filteredPublic.length} — refine your search to see more.
+                  </p>
+                )}
               </div>
-              {filteredPublic.length === 0 ? (
-                <p className="hris-panel-options__empty">No matching 5Mins roles.</p>
-              ) : (
-                filteredPublic.slice(0, 50).map(r => (
-                  <button
-                    key={`fivemins-${r.id}`}
-                    className={`hris-panel-option${isSelected('fivemins', r.id) ? ' hris-panel-option--selected' : ''}`}
-                    onClick={() => setPending({ kind: 'fivemins', id: r.id })}
-                  >
-                    <span className="hris-panel-option__name">{r.name}</span>
-                    <span className="hris-panel-option__category">{r.category}</span>
-                    {isSelected('fivemins', r.id) && (
-                      <TickCircle size={18} color="var(--success-500)" variant="Bold" className="hris-panel-option__check" />
-                    )}
-                  </button>
-                ))
-              )}
-              {!search && filteredPublic.length > 50 && (
-                <p className="hris-panel-options__hint">
-                  <InfoCircle size={14} color="var(--text-tertiary)" variant="Linear" />
-                  Showing first 50 of {filteredPublic.length} — refine your search to see more.
-                </p>
-              )}
-            </div>
+            )}
           </div>
         </div>
 
@@ -191,7 +197,7 @@ function HrisMappingPanel({ mapping, tenantRoles, publicRoles, onClose, onSave }
                 disabled={!pending || !dirty}
                 onClick={handleSave}
               >
-                Map Role
+                {mapping.status === 'mapped' ? 'Save Mapping' : 'Map Role'}
               </button>
             </div>
           </div>

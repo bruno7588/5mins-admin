@@ -144,6 +144,19 @@
   flex-wrap: wrap;
 }
 
+/* DS Alert override for the role-edit warning — 14px per Figma (DS default is 16px) */
+.roles-panel-edit-alert.alert--alert {
+  font-size: 14px;
+  font-weight: 500;
+  gap: var(--space-s);
+  padding: 8px 12px;
+}
+
+.roles-panel-edit-alert .alert__message {
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .roles-chip {
   padding: var(--space-s) var(--space-m);
   border-radius: 24px;
@@ -1685,25 +1698,6 @@
   flex-wrap: wrap;
   gap: var(--space-xs);
   padding-top: var(--space-xs);
-}
-
-/* ===== Warning Banner ===== */
-.roles-panel-warning {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-s);
-  padding: var(--space-sm);
-  background: var(--danger-100);
-  border-radius: var(--radius-s);
-  border-left: 3px solid var(--danger-500);
-  font-size: 13px;
-  color: var(--text-primary);
-  line-height: 1.5;
-}
-
-.roles-panel-warning svg {
-  flex-shrink: 0;
-  margin-top: 1px;
 }
 
 /* ===== Delete Role ===== */

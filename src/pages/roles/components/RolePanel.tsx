@@ -3,6 +3,7 @@ import { SearchNormal1, Danger, ArrowLeft, DocumentUpload, DocumentText } from '
 import ConfirmModal from '../../../components/ConfirmModal/ConfirmModal'
 import Checkbox from '../../../components/Checkbox/Checkbox'
 import InputField from '../../../components/InputField/InputField'
+import Alert from '../../../components/Alert/Alert'
 import { skillCatalogue, simulateAISuggestion, type Skill, type CompanyRole, type FiveMinsRole } from '../data/mockRoles'
 import { getSkillIllustration } from '../../../assets/skill-icons'
 
@@ -352,10 +353,12 @@ function RolePanel({ mode, existingRoleNames = [], onClose, onSave, onDelete }: 
           {isEdit && (
             <>
               {mode.role.employeeCount > 0 && (
-                <div className="roles-panel-warning">
-                  <Danger size={16} color="var(--danger-500)" variant="Bold" />
-                  <span>{mode.role.employeeCount} learner{mode.role.employeeCount !== 1 ? 's' : ''} have this role. Changing skills will update their recommendations.</span>
-                </div>
+                <Alert
+                  type="Alert"
+                  customIcon={<Danger size={24} variant="Bold" color="currentColor" className="alert__icon" />}
+                  message={`${mode.role.employeeCount} learner${mode.role.employeeCount !== 1 ? 's' : ''} have this role. Changing skills will update their recommendations.`}
+                  className="roles-panel-edit-alert"
+                />
               )}
 
               <InputField

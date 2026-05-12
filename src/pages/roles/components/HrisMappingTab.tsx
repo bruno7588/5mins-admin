@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { SearchNormal1, Edit2, Trash, ArrowLeft2, ArrowRight2, Refresh2, Danger, TickCircle } from 'iconsax-react'
+import { useEffect, useMemo, useState } from 'react'
+import { SearchNormal1, Edit2, Trash, ArrowLeft2, ArrowRight2, Refresh, Danger, TickCircle } from 'iconsax-react'
 import Badge from '../../../components/Badge/Badge'
 import Alert from '../../../components/Alert/Alert'
 import type { CompanyRole, FiveMinsRole } from '../data/mockRoles'
@@ -10,24 +10,19 @@ import {
 } from '../data/mockHrisMappings'
 import './HrisMapping.css'
 
-type FilterTab = 'all' | 'mapped' | 'unmapped'
-
-interface NewTitlesNotice {
-  count: number
-  employeeCount: number
-  onDismiss: () => void
-}
+export type FilterTab = 'all' | 'mapped' | 'unmapped'
 
 interface Props {
   mappings: HrisRoleMapping[]
   tenantRoles: CompanyRole[]
   publicRoles: FiveMinsRole[]
-  newTitlesNotice: NewTitlesNotice | null
   onEditMapping: (mapping: HrisRoleMapping) => void
   onRemoveMapping: (mapping: HrisRoleMapping) => void
   onSimulateResync: () => void
   syncActivated: boolean
   onActivateSync: () => void
+  filterTab: FilterTab
+  onFilterTabChange: (tab: FilterTab) => void
 }
 
 const STATUS_BADGE: Record<MappingStatus, { type: 'success' | 'warning'; label: string }> = {
@@ -39,15 +34,15 @@ function HrisMappingTab({
   mappings,
   tenantRoles,
   publicRoles,
-  newTitlesNotice,
   onEditMapping,
   onRemoveMapping,
   onSimulateResync,
   syncActivated,
   onActivateSync,
+  filterTab,
+  onFilterTabChange,
 }: Props) {
   const [search, setSearch] = useState('')
-  const [filterTab, setFilterTab] = useState<FilterTab>('all')
   const [page, setPage] = useState(1)
   const perPage = 10
 
@@ -60,6 +55,13 @@ function HrisMappingTab({
     }
     return { all: mappings.length, mapped, unmapped }
   }, [mappings])
+
+  const unmappedEmployeeCount = useMemo(
+    () => mappings
+      .filter(m => m.status !== 'mapped')
+      .reduce((sum, m) => sum + m.employeeCount, 0),
+    [mappings],
+  )
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -77,8 +79,10 @@ function HrisMappingTab({
   const pageStart = filtered.length === 0 ? 0 : (safePage - 1) * perPage + 1
   const pageEnd = Math.min(safePage * perPage, filtered.length)
 
+  useEffect(() => { setPage(1) }, [filterTab])
+
   const handleSearch = (val: string) => { setSearch(val); setPage(1) }
-  const handleFilterTab = (tab: FilterTab) => { setFilterTab(tab); setPage(1) }
+  const handleFilterTab = (tab: FilterTab) => { onFilterTabChange(tab) }
 
   if (mappings.length === 0) {
     return (
@@ -100,37 +104,59 @@ function HrisMappingTab({
         <div className="roles-empty-state__cta">
           <button className="roles-btn-primary-with-icon" onClick={onSimulateResync}>
             Run Dry Run
-            <Refresh2 size={20} color="var(--neutral-25)" />
+            <Refresh size={20} color="var(--neutral-25)" />
           </button>
         </div>
       </div>
     )
   }
 
+  const allMapped = counts.unmapped === 0
+  const stepperSteps = [
+    { label: 'Connect HRIS', status: 'done' as const, Icon: null },
+    { label: 'Dry Run', status: 'done' as const, Icon: null },
+    { label: 'Review Mappings', status: (allMapped ? 'done' : 'current') as 'done' | 'current', Icon: Edit2 },
+    { label: 'Activate Sync', status: (allMapped ? 'current' : 'pending') as 'current' | 'pending', Icon: Refresh },
+  ]
+
   return (
     <>
       {!syncActivated && (
+        <ol className="hris-stepper" aria-label="HRIS activation progress">
+          {stepperSteps.map((step, idx) => {
+            const Icon = step.Icon
+            return (
+              <li
+                key={step.label}
+                className={`hris-stepper__step hris-stepper__step--${step.status}`}
+                aria-current={step.status === 'current' ? 'step' : undefined}
+              >
+                <span className="hris-stepper__marker" aria-hidden="true">
+                  {step.status === 'done' ? (
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                      <path d="M3.5 8.5l3 3 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ) : Icon ? (
+                    <Icon size={12} variant="Linear" color="currentColor" />
+                  ) : (
+                    idx + 1
+                  )}
+                </span>
+                <span className="hris-stepper__label">{step.label}</span>
+                {idx < stepperSteps.length - 1 && <span className="hris-stepper__line" aria-hidden="true" />}
+              </li>
+            )
+          })}
+        </ol>
+      )}
+
+      {counts.unmapped > 0 && (
         <div className="hris-banner-wrap">
           <Alert
             type="Alert"
-            icon
-            message="Connection in Dry Run — review the unmapped titles below, then activate sync to apply role mappings to new hires."
-          />
-        </div>
-      )}
-
-      {newTitlesNotice && (
-        <div className="hris-banner-wrap">
-          <Alert
-            type="Callout"
-            icon
-            message={
-              `${newTitlesNotice.count} new job title${newTitlesNotice.count !== 1 ? 's' : ''} discovered — ` +
-              `${newTitlesNotice.employeeCount} employee${newTitlesNotice.employeeCount !== 1 ? 's' : ''} need role mapping.`
-            }
-            button
-            buttonLabel="Dismiss"
-            onButtonClick={newTitlesNotice.onDismiss}
+            title={`${counts.unmapped} HRIS job title${counts.unmapped !== 1 ? 's' : ''} couldn't be auto-matched`}
+            message={`${unmappedEmployeeCount} employee${unmappedEmployeeCount !== 1 ? 's' : ''} will pick their role during onboarding unless mapped`}
+            className="hris-dry-run-alert"
           />
         </div>
       )}
@@ -184,14 +210,24 @@ function HrisMappingTab({
           )}
         </div>
         {!syncActivated ? (
-          <button className="roles-btn-primary" onClick={onActivateSync}>
+          <button className="roles-btn-primary-with-icon" onClick={onActivateSync}>
             Activate Sync
+            <Refresh size={20} color="var(--neutral-25)" />
           </button>
         ) : (
-          <span className="hris-sync-active-pill" role="status" aria-label="HRIS sync active">
-            <span className="hris-sync-active-pill__dot" aria-hidden="true" />
-            Sync Active
-          </span>
+          <div className="hris-sync-active-group">
+            <button
+              type="button"
+              className="hris-simulate-resync-link"
+              onClick={onSimulateResync}
+            >
+              Simulate Re-sync
+            </button>
+            <span className="hris-sync-active-pill" role="status" aria-label="HRIS sync active">
+              <span className="hris-sync-active-pill__dot" aria-hidden="true" />
+              Sync Active
+            </span>
+          </div>
         )}
       </div>
 
@@ -201,27 +237,23 @@ function HrisMappingTab({
             <span className="roles-empty__zero">0</span>
           </div>
           <p className="roles-empty__text">
-            {filterTab === 'unmapped'
-              ? 'No titles need review!'
-              : filterTab === 'mapped'
-                ? 'No mapped titles yet'
-                : 'No results found!'}
+            {search.trim()
+              ? 'No results found!'
+              : filterTab === 'unmapped'
+                ? 'No titles need review!'
+                : filterTab === 'mapped'
+                  ? 'No mapped titles yet'
+                  : 'No results found!'}
           </p>
           <p className="roles-empty__subtext">
-            {filterTab === 'unmapped'
-              ? 'Every HRIS job title is mapped to a role.'
-              : filterTab === 'mapped'
-                ? 'Map a role to get started.'
-                : 'Try a different search term.'}
+            {search.trim()
+              ? 'Try a different search term.'
+              : filterTab === 'unmapped'
+                ? 'Every HRIS job title is mapped to a role.'
+                : filterTab === 'mapped'
+                  ? 'Map a role to get started.'
+                  : 'Try a different search term.'}
           </p>
-          {(search || filterTab !== 'all') && (
-            <button
-              className="roles-btn-outlined-primary"
-              onClick={() => { handleSearch(''); handleFilterTab('all') }}
-            >
-              Clear filters
-            </button>
-          )}
         </div>
       ) : (
         <div className="people-table hris-table">

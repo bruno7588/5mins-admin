@@ -1,3 +1,4 @@
+import { type ReactNode } from 'react'
 import { InfoCircle } from 'iconsax-react'
 import './Alert.css'
 
@@ -6,6 +7,7 @@ export type AlertType = 'Callout' | 'Alert'
 interface AlertProps {
   type?: AlertType
   icon?: boolean
+  customIcon?: ReactNode
   illustration?: boolean
   title?: string
   message?: string
@@ -13,12 +15,14 @@ interface AlertProps {
   button?: boolean
   buttonLabel?: string
   onButtonClick?: () => void
+  onClose?: () => void
   className?: string
 }
 
 function Alert({
   type = 'Callout',
   icon = false,
+  customIcon,
   illustration = false,
   title,
   message,
@@ -26,10 +30,14 @@ function Alert({
   button = false,
   buttonLabel,
   onButtonClick,
+  onClose,
   className = '',
 }: AlertProps) {
   const isAlert = type === 'Alert'
-  const hasBody = !isAlert && (!!title || (bullets && bullets.length > 0))
+  const hasBullets = !isAlert && bullets && bullets.length > 0
+  const hasTitleAndMessage = !!title && !!message
+  const hasBody = hasTitleAndMessage || (!isAlert && (!!title || hasBullets))
+  const showIcon = icon || !!customIcon
 
   return (
     <div
@@ -37,13 +45,15 @@ function Alert({
         hasBody ? ' alert--with-body' : ''
       } ${className}`.trim()}
     >
-      {icon && (
-        <InfoCircle
-          size={isAlert ? 24 : 20}
-          variant="Outline"
-          color="currentColor"
-          className="alert__icon"
-        />
+      {showIcon && (
+        customIcon ?? (
+          <InfoCircle
+            size={isAlert ? 24 : 20}
+            variant="Outline"
+            color="currentColor"
+            className="alert__icon"
+          />
+        )
       )}
       {!icon && illustration && isAlert && (
         <span className="alert__bell" aria-hidden="true">
@@ -54,14 +64,15 @@ function Alert({
       {hasBody ? (
         <div className="alert__body">
           {title && <p className="alert__title">{title}</p>}
-          {bullets && bullets.length > 0 && (
+          {hasTitleAndMessage && <p className="alert__message">{message}</p>}
+          {hasBullets && (
             <ul className="alert__bullets">
-              {bullets.map((b, i) => (
+              {bullets!.map((b, i) => (
                 <li key={i}>{b}</li>
               ))}
             </ul>
           )}
-          {button && (
+          {button && !isAlert && (
             <button
               type="button"
               className="alert__btn alert__btn--outlined"
@@ -75,7 +86,7 @@ function Alert({
         message && <p className="alert__message">{message}</p>
       )}
 
-      {button && !hasBody && (
+      {button && (!hasBody || isAlert) && (
         <button
           type="button"
           className={`alert__btn ${
@@ -84,6 +95,19 @@ function Alert({
           onClick={onButtonClick}
         >
           {buttonLabel}
+        </button>
+      )}
+
+      {onClose && (
+        <button
+          type="button"
+          className="alert__close"
+          onClick={onClose}
+          aria-label="Dismiss"
+        >
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </button>
       )}
     </div>

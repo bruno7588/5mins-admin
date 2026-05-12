@@ -162,12 +162,7 @@ function CreateFlashcardsFromFileModal({ open, onClose, onGenerate }: CreateFlas
               checked={includeImages}
               onChange={() => setIncludeImages((v) => !v)}
               className={`cffm-include-images${includeImages ? '' : ' cffm-include-images--off'}`}
-              label={
-                <>
-                  <span className="cffm-include-images-label">Generate images </span>
-                  <span className="cffm-include-images-helper">(Nano Banana 2)</span>
-                </>
-              }
+              label="Generate images"
             />
 
             <button

@@ -6,7 +6,7 @@ import { Danger, InfoCircle } from 'iconsax-react'
 import FiveMinsRolesTab from './components/FiveMinsRolesTab'
 import CompanyRolesTab from './components/CompanyRolesTab'
 import RolePanel, { type PanelMode } from './components/RolePanel'
-import HrisMappingTab from './components/HrisMappingTab'
+import HrisMappingTab, { type FilterTab as HrisFilterTab } from './components/HrisMappingTab'
 import HrisMappingPanel from './components/HrisMappingPanel'
 import type { FiveMinsRole, CompanyRole, Skill } from './data/mockRoles'
 import { fiveMinsRoles, initialCompanyRoles } from './data/mockRoles'
@@ -71,8 +71,9 @@ function Roles() {
   const [hrisMappings, setHrisMappings] = useState<HrisRoleMapping[]>(initialMappings)
   const [hrisPanelMapping, setHrisPanelMapping] = useState<HrisRoleMapping | null>(null)
   const [hrisRemoveTarget, setHrisRemoveTarget] = useState<HrisRoleMapping | null>(null)
-  const [newTitlesNotice, setNewTitlesNotice] = useState<{ count: number; employeeCount: number } | null>(null)
   const [hrisSyncActivated, setHrisSyncActivated] = useState(false)
+  const [hrisActivateConfirmOpen, setHrisActivateConfirmOpen] = useState(false)
+  const [hrisFilterTab, setHrisFilterTab] = useState<HrisFilterTab>('all')
 
   const nextId = () => Math.max(0, ...companyRoles.map(r => r.id)) + 1
 
@@ -129,8 +130,29 @@ function Roles() {
     setHrisPanelMapping(null)
   }
 
-  const handleHrisActivateSync = () => {
+  const unmappedCount = useMemo(
+    () => hrisMappings.filter(m => m.status !== 'mapped').length,
+    [hrisMappings],
+  )
+
+  const unmappedEmployeeCount = useMemo(
+    () => hrisMappings
+      .filter(m => m.status !== 'mapped')
+      .reduce((sum, m) => sum + m.employeeCount, 0),
+    [hrisMappings],
+  )
+
+  const handleHrisActivateRequest = () => {
+    if (unmappedCount > 0) {
+      setHrisActivateConfirmOpen(true)
+    } else {
+      activateHrisSyncNow()
+    }
+  }
+
+  const activateHrisSyncNow = () => {
     setHrisSyncActivated(true)
+    setHrisActivateConfirmOpen(false)
     showToast('success', 'HRIS sync activated — role mappings are now live')
   }
 
@@ -142,18 +164,6 @@ function Roles() {
     ]
     const result = resyncTitles(hrisMappings, incoming, companyRoles, fiveMinsRoles)
     setHrisMappings(result.mappings)
-
-    const unmappedTitleSet = new Set(
-      result.mappings.filter(m => m.status !== 'mapped').map(m => m.hrisJobTitle),
-    )
-    const unmappedNew = result.newTitles.filter(t => unmappedTitleSet.has(t.title))
-    const employeeCount = unmappedNew.reduce((sum, t) => sum + t.employeeCount, 0)
-
-    if (unmappedNew.length > 0) {
-      setNewTitlesNotice({ count: unmappedNew.length, employeeCount })
-    } else {
-      setNewTitlesNotice(null)
-    }
 
     const parts: string[] = []
     if (result.newTitles.length > 0) {
@@ -276,16 +286,13 @@ function Roles() {
               mappings={hrisMappings}
               tenantRoles={companyRoles}
               publicRoles={fiveMinsRoles}
-              newTitlesNotice={
-                newTitlesNotice
-                  ? { ...newTitlesNotice, onDismiss: () => setNewTitlesNotice(null) }
-                  : null
-              }
               onEditMapping={setHrisPanelMapping}
               onRemoveMapping={handleHrisRemoveRequest}
               onSimulateResync={handleHrisSimulateResync}
               syncActivated={hrisSyncActivated}
-              onActivateSync={handleHrisActivateSync}
+              onActivateSync={handleHrisActivateRequest}
+              filterTab={hrisFilterTab}
+              onFilterTabChange={setHrisFilterTab}
             />
           )}
         </div>
@@ -309,6 +316,38 @@ function Roles() {
           onSave={handleHrisSave}
         />
       )}
+
+      {/* Activate Sync confirmation — only when unmapped titles remain */}
+      <ConfirmModal
+        open={hrisActivateConfirmOpen}
+        onClose={() => setHrisActivateConfirmOpen(false)}
+      >
+        <div className="confirm-modal-header confirm-modal-header--center">
+          <Danger size={72} color="var(--text-warning)" variant="Linear" />
+          <h3 className="confirm-modal-title">Activate sync with unmapped titles?</h3>
+          <p className="confirm-modal-body">
+            {unmappedEmployeeCount} employee{unmappedEmployeeCount !== 1 ? 's' : ''} will pick
+            their role during onboarding unless mapped.
+          </p>
+        </div>
+        <div className="confirm-modal-actions confirm-modal-actions--center">
+          <button
+            className="confirm-modal-btn confirm-modal-btn--outlined-neutral"
+            onClick={() => {
+              setHrisFilterTab('unmapped')
+              setHrisActivateConfirmOpen(false)
+            }}
+          >
+            Map Roles
+          </button>
+          <button
+            className="confirm-modal-btn confirm-modal-btn--primary"
+            onClick={activateHrisSyncNow}
+          >
+            Activate Sync
+          </button>
+        </div>
+      </ConfirmModal>
 
       {/* HRIS mapping removal confirmation (high-impact only) */}
       <ConfirmModal
