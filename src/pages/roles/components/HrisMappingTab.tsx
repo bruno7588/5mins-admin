@@ -113,40 +113,33 @@ function HrisMappingTab({
 
   const allMapped = counts.unmapped === 0
   const stepperSteps = [
-    { label: 'Connect HRIS', status: 'done' as const, Icon: null },
-    { label: 'Dry Run', status: 'done' as const, Icon: null },
-    { label: 'Review Mappings', status: (allMapped ? 'done' : 'current') as 'done' | 'current', Icon: Edit2 },
-    { label: 'Activate Sync', status: (allMapped ? 'current' : 'pending') as 'current' | 'pending', Icon: Refresh },
+    { label: 'Connect HRIS', status: 'done' as const },
+    { label: 'Dry Run', status: 'done' as const },
+    { label: 'Review Mappings', status: (allMapped ? 'done' : 'current') as 'done' | 'current' },
+    { label: 'Activate Sync', status: (allMapped ? 'current' : 'pending') as 'current' | 'pending' },
   ]
 
   return (
     <>
       {!syncActivated && (
         <ol className="hris-stepper" aria-label="HRIS activation progress">
-          {stepperSteps.map((step, idx) => {
-            const Icon = step.Icon
-            return (
-              <li
-                key={step.label}
-                className={`hris-stepper__step hris-stepper__step--${step.status}`}
-                aria-current={step.status === 'current' ? 'step' : undefined}
-              >
-                <span className="hris-stepper__marker" aria-hidden="true">
-                  {step.status === 'done' ? (
-                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                      <path d="M3.5 8.5l3 3 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  ) : Icon ? (
-                    <Icon size={12} variant="Linear" color="currentColor" />
-                  ) : (
-                    idx + 1
-                  )}
-                </span>
-                <span className="hris-stepper__label">{step.label}</span>
-                {idx < stepperSteps.length - 1 && <span className="hris-stepper__line" aria-hidden="true" />}
-              </li>
-            )
-          })}
+          {stepperSteps.map((step, idx) => (
+            <li
+              key={step.label}
+              className={`hris-stepper__step hris-stepper__step--${step.status}`}
+              aria-current={step.status === 'current' ? 'step' : undefined}
+            >
+              <span className="hris-stepper__marker" aria-hidden="true">
+                {step.status !== 'pending' && (
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                    <path d="M3.5 8.5l3 3 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </span>
+              <span className="hris-stepper__label">{step.label}</span>
+              {idx < stepperSteps.length - 1 && <span className="hris-stepper__line" aria-hidden="true" />}
+            </li>
+          ))}
         </ol>
       )}
 
