@@ -147,6 +147,7 @@ function HrisMappingTab({
         <div className="hris-banner-wrap">
           <Alert
             type="Alert"
+            illustration
             title={`${counts.unmapped} HRIS job title${counts.unmapped !== 1 ? 's' : ''} couldn't be auto-matched`}
             message={`${unmappedEmployeeCount} employee${unmappedEmployeeCount !== 1 ? 's' : ''} will pick their role during onboarding unless mapped`}
             className="hris-dry-run-alert"
