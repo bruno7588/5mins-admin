@@ -131,11 +131,12 @@ function HrisMappingTab({
         <div className="roles-category-chips" role="group" aria-label="Mapping filter">
           <button
             type="button"
-            aria-pressed={filterTab === 'all'}
-            className={`roles-chip${filterTab === 'all' ? ' roles-chip--active' : ''}`}
-            onClick={() => handleFilterTab('all')}
+            aria-pressed={filterTab === 'unmapped'}
+            className={`roles-chip roles-chip--with-icon${filterTab === 'unmapped' ? ' roles-chip--active' : ''}`}
+            onClick={() => handleFilterTab('unmapped')}
           >
-            All
+            <Danger size={18} variant="Linear" color="currentColor" />
+            Unmapped ({counts.unmapped})
           </button>
           <button
             type="button"
@@ -148,12 +149,11 @@ function HrisMappingTab({
           </button>
           <button
             type="button"
-            aria-pressed={filterTab === 'unmapped'}
-            className={`roles-chip roles-chip--with-icon${filterTab === 'unmapped' ? ' roles-chip--active' : ''}`}
-            onClick={() => handleFilterTab('unmapped')}
+            aria-pressed={filterTab === 'all'}
+            className={`roles-chip${filterTab === 'all' ? ' roles-chip--active' : ''}`}
+            onClick={() => handleFilterTab('all')}
           >
-            <Danger size={18} variant="Linear" color="currentColor" />
-            Unmapped ({counts.unmapped})
+            All ({counts.all})
           </button>
         </div>
       </div>

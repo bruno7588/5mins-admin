@@ -80,7 +80,7 @@ function Roles() {
   const [hrisMappings, setHrisMappings] = useState<HrisRoleMapping[]>(initialMappings)
   const [hrisPanelMapping, setHrisPanelMapping] = useState<HrisRoleMapping | null>(null)
   const [hrisRemoveTarget, setHrisRemoveTarget] = useState<HrisRoleMapping | null>(null)
-  const [hrisFilterTab, setHrisFilterTab] = useState<HrisFilterTab>('all')
+  const [hrisFilterTab, setHrisFilterTab] = useState<HrisFilterTab>('unmapped')
 
   const nextId = () => Math.max(0, ...companyRoles.map(r => r.id)) + 1
 
