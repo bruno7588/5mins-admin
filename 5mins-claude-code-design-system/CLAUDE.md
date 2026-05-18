@@ -14,7 +14,7 @@ When building any UI component, feature, or screen, you MUST read the relevant d
 2. **Then read the specific component doc** for detailed implementation (React TypeScript code, full CSS, usage examples):
    - `docs/design-system/buttons.md` — Button variants, semantic types, sizes, states
    - `docs/design-system/badges.md` — Status badges, pill indicators, quiz badges
-   - `docs/design-system/chips.md` — Chip / filter-tag component — all variants (default, hover, selected, disabled), optional left icon (user) and right icon (close/X), design tokens, React implementation | Any filter chip, selection pill, dismissible tag, or small pill-shaped interactive label
+   - `docs/design-system/chips-and-tabs.md` - Chip component (filter pills, dismissible tags, selection chips with optional left/right icons) and Tabs component (underlined horizontal switcher with optional counter pills); all variants, states, design tokens, React implementation, plus a Chips vs Tabs decision table | Any filter chip, selection pill, dismissible tag, tab bar, section switcher, or small pill-shaped interactive label
    - `docs/design-system/headers.md` — Page Headers and Section Headers
    - `docs/design-system/overlays.md` — Dialog, Modal, and Side Drawer
    - `docs/design-system/lesson-cards.md` — Lesson/course card component
