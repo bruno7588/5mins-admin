@@ -12,7 +12,7 @@ import {
   ShieldSecurity,
   Setting2,
   FlashCircle,
-  Calendar,
+  Messages2,
   Add,
   Mobile,
   Danger,
@@ -196,12 +196,12 @@ const team: TeamMember[] = [
 
 export const learnerSideItems: { label: string; icon: typeof Home2; path?: string }[] = [
   { label: 'For You', icon: Home2 },
-  { label: 'Your Workspace', icon: Profile2User },
+  { label: 'Your Workspace', icon: Profile2User, path: '/workspace' },
   { label: 'Knowledge Hub', icon: MonitorMobbile },
   { label: 'Search', icon: SearchNormal1 },
   { label: 'My Team', icon: Award, path: '/my-team' },
   { label: 'My Progress', icon: Medal },
-  { label: 'Calendar', icon: Calendar, path: '/calendar' },
+  { label: 'Feed', icon: Messages2 },
   { label: 'Profile', icon: UserSquare },
 ]
 
@@ -345,7 +345,7 @@ function MyTeam() {
   return (
     <div className="mt-app">
       <header className="mt-topnav">
-        <button type="button" className="mt-topnav__logo" aria-label="Home" onClick={() => navigate('/my-team')}>
+        <button type="button" className="mt-topnav__logo" aria-label="Home" onClick={() => navigate('/workspace')}>
           <Logo size={22} />
         </button>
         <div className="mt-topnav__right">

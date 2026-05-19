@@ -1,0 +1,44 @@
+import { Clock, PlayCircle } from 'iconsax-react'
+import type { WorkspaceCourse } from '../../pages/workspace/mockItems'
+import './WorkspaceCourseCard.css'
+
+const SEGMENTS = 8
+
+function WorkspaceCourseCard({ course }: { course: WorkspaceCourse }) {
+  const filledSegments = Math.max(0, Math.min(SEGMENTS, Math.round((course.progress / 100) * SEGMENTS)))
+  const isComplete = course.progress >= 100
+  return (
+    <article className="ws-course-card">
+      {course.isNew ? <span className="ws-course-card__newbadge">New</span> : null}
+      <div className="ws-course-card__media" style={{ background: course.thumbnailGradient }}>
+        {course.dueLabel ? <span className="ws-course-card__duepill">{course.dueLabel}</span> : null}
+        <div className="ws-course-card__progress" role="progressbar" aria-valuenow={course.progress} aria-valuemin={0} aria-valuemax={100}>
+          {Array.from({ length: SEGMENTS }).map((_, i) => {
+            const filled = i < filledSegments
+            const cls = filled
+              ? isComplete
+                ? 'ws-course-card__segment ws-course-card__segment--complete'
+                : 'ws-course-card__segment ws-course-card__segment--filled'
+              : 'ws-course-card__segment'
+            return <span key={i} className={cls} />
+          })}
+        </div>
+      </div>
+      <div className="ws-course-card__body">
+        <h3 className="ws-course-card__title">{course.title}</h3>
+        <div className="ws-course-card__meta">
+          <span className="ws-course-card__metaitem">
+            <PlayCircle size={16} color="var(--text-secondary)" variant="Linear" />
+            <span>{course.lessonCount} lessons</span>
+          </span>
+          <span className="ws-course-card__metaitem">
+            <Clock size={16} color="var(--text-secondary)" variant="Linear" />
+            <span>{course.durationMinutes} min</span>
+          </span>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+export default WorkspaceCourseCard

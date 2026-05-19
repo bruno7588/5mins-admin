@@ -18,7 +18,7 @@ import ScormYourContent from './pages/scorm-content/YourContent'
 import ScormCreateCourse from './pages/scorm-content/CreateCourse'
 
 import MyTeam from './pages/my-team/MyTeam'
-import Calendar from './pages/calendar/Calendar'
+import Workspace from './pages/workspace/Workspace'
 
 function App() {
   return (
@@ -45,7 +45,7 @@ function App() {
         }
       />
       <Route path="/my-team" element={<MyTeam />} />
-      <Route path="/calendar" element={<Calendar />} />
+      <Route path="/workspace" element={<Workspace />} />
 
       {/* All other pages — with TopNav */}
       <Route

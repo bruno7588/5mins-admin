@@ -1,0 +1,92 @@
+.ws-body {
+  padding-bottom: 64px;
+}
+
+.ws-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 24px;
+}
+
+.ws-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ws-section__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ws-section__headline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ws-section__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.ws-section__subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.ws-section__cta {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--button-background, #00cee6);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ws-section__cta:hover {
+  color: var(--text-button-hover, #33e2f7);
+}
+
+/* Horizontal carousel — used by courses + categories */
+.ws-carousel {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  /* Reserve room for "New" overhang badge that sits above the card */
+  padding: 16px 4px 8px;
+  margin: -16px -4px -8px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+
+.ws-carousel > * {
+  scroll-snap-align: start;
+}
+
+/* Events scroller — one wide card per viewport, snap-to-card */
+.ws-events {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 4px 0;
+  scrollbar-width: thin;
+}
+
+.ws-events > .cal-card {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+}

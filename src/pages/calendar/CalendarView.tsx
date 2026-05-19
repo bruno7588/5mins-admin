@@ -1,23 +1,19 @@
 import { useMemo, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
 import {
-  Add,
   ArrowDown2,
   ArrowLeft2,
   ArrowRight2,
   Calendar as CalendarIcon,
   Clock,
   CloseCircle,
-  FlashCircle,
   Location,
-  Mobile,
   PlayCircle,
-  Setting2,
-  ShieldSecurity,
   TickCircle,
   VideoSquare,
 } from 'iconsax-react'
 import Badge from '../../components/Badge/Badge'
+import { pastItems, upcomingItems, type CalendarItem } from './mockItems'
+import './CalendarView.css'
 
 function CourseTypeIcon({ size = 20 }: { size?: number }) {
   return (
@@ -27,14 +23,10 @@ function CourseTypeIcon({ size = 20 }: { size?: number }) {
     </svg>
   )
 }
-import { Logo, learnerSideItems } from '../my-team/MyTeam'
-import { pastItems, upcomingItems, type CalendarItem } from './mockItems'
-import '../my-team/MyTeam.css'
-import './Calendar.css'
 
 const TODAY = new Date('2026-05-19T00:00:00')
 
-type Tab = 'upcoming' | 'past'
+export type CalendarTab = 'upcoming' | 'past'
 
 function pad(n: number): string {
   return n < 10 ? `0${n}` : `${n}`
@@ -77,7 +69,7 @@ function formatWeekdayShort(d: Date): string {
   return d.toLocaleDateString('en-US', { weekday: 'short' })
 }
 
-function formatItemDate(item: CalendarItem): string {
+export function formatItemDate(item: CalendarItem): string {
   const start = new Date(item.startsAt)
   const end = new Date(item.endsAt)
   if (!isSameDay(start, end)) {
@@ -86,7 +78,7 @@ function formatItemDate(item: CalendarItem): string {
   return `${formatWeekdayShort(start)}, ${start.getDate()} ${formatMonthShort(start)}`
 }
 
-function formatItemTime(item: CalendarItem): string {
+export function formatItemTime(item: CalendarItem): string {
   const start = new Date(item.startsAt)
   const end = new Date(item.endsAt)
   return `${formatTime(start)} – ${formatTime(end)} ${item.timezone}`
@@ -118,7 +110,7 @@ function groupByDate(items: CalendarItem[], direction: 'asc' | 'desc'): DateGrou
   return groups
 }
 
-function AttendeeStack({ attendees, overflow }: { attendees: CalendarItem['attendees']; overflow?: number }) {
+export function AttendeeStack({ attendees, overflow }: { attendees: CalendarItem['attendees']; overflow?: number }) {
   return (
     <div className="cal-card__avatars" aria-label={`${attendees.length}${overflow ? '+' : ''} attendees`}>
       {attendees.slice(0, 4).map((a, i) => (
@@ -131,7 +123,7 @@ function AttendeeStack({ attendees, overflow }: { attendees: CalendarItem['atten
   )
 }
 
-function ActionButton({ tab, state }: { tab: Tab; state: CalendarItem['attendance'] }) {
+function ActionButton({ tab, state }: { tab: CalendarTab; state: CalendarItem['attendance'] }) {
   if (tab === 'upcoming') {
     return (
       <button type="button" className="btn-primary cal-card__action--split">
@@ -163,7 +155,7 @@ function ActionButton({ tab, state }: { tab: Tab; state: CalendarItem['attendanc
   )
 }
 
-function CourseCard({ item, tab }: { item: CalendarItem; tab: Tab }) {
+export function CourseCard({ item, tab }: { item: CalendarItem; tab: CalendarTab }) {
   const isOverdue = tab === 'past' && (item.progress ?? 0) < 100
   return (
     <article className="cal-card cal-card--course">
@@ -204,8 +196,17 @@ function CourseCard({ item, tab }: { item: CalendarItem; tab: Tab }) {
   )
 }
 
-function EventCard({ item, tab }: { item: CalendarItem; tab: Tab }) {
+export function EventCard({
+  item,
+  tab,
+  showCountdown = false,
+}: {
+  item: CalendarItem
+  tab: CalendarTab
+  showCountdown?: boolean
+}) {
   const LocationIcon = item.locationKind === 'virtual' ? VideoSquare : Location
+  const daysUntil = showCountdown ? daysFromToday(new Date(item.startsAt)) : null
   return (
     <article className="cal-card">
       <div className="cal-card__media" style={{ background: item.thumbnailGradient }}>
@@ -237,7 +238,18 @@ function EventCard({ item, tab }: { item: CalendarItem; tab: Tab }) {
             </span>
           ) : null}
         </div>
-        <AttendeeStack attendees={item.attendees} overflow={item.overflowCount} />
+        <div className="cal-card__bottomrow">
+          {daysUntil != null && daysUntil >= 0 ? (
+            <Badge
+              type="warning"
+              icon
+              customIcon={<CalendarIcon size={16} color="currentColor" variant="Linear" />}
+              label={countdownLabel(daysUntil)}
+              className="cal-card__countdown"
+            />
+          ) : null}
+          <AttendeeStack attendees={item.attendees} overflow={item.overflowCount} />
+        </div>
       </div>
       <div className="cal-card__actionwrap">
         <ActionButton tab={tab} state={item.attendance} />
@@ -246,7 +258,20 @@ function EventCard({ item, tab }: { item: CalendarItem; tab: Tab }) {
   )
 }
 
-function ItemCard({ item, tab }: { item: CalendarItem; tab: Tab }) {
+function daysFromToday(date: Date): number {
+  const today = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate())
+  const target = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+  const ms = target.getTime() - today.getTime()
+  return Math.round(ms / (1000 * 60 * 60 * 24))
+}
+
+function countdownLabel(days: number): string {
+  if (days === 0) return 'Starts today'
+  if (days === 1) return 'Starts tomorrow'
+  return `Starts in ${days} days`
+}
+
+function ItemCard({ item, tab }: { item: CalendarItem; tab: CalendarTab }) {
   if (item.type === 'course') return <CourseCard item={item} tab={tab} />
   return <EventCard item={item} tab={tab} />
 }
@@ -271,7 +296,6 @@ function MiniCalendar({ activeMonth, dayMap }: { activeMonth: Date; dayMap: Map<
   const monthLabel = activeMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
   const firstOfMonth = new Date(activeMonth.getFullYear(), activeMonth.getMonth(), 1)
   const daysInMonth = new Date(activeMonth.getFullYear(), activeMonth.getMonth() + 1, 0).getDate()
-  // Monday-first week: getDay() 0=Sun..6=Sat → shift so Mon=0..Sun=6
   const startWeekday = (firstOfMonth.getDay() + 6) % 7
   const totalCells = 42
   const cells: { date: Date; outside: boolean }[] = []
@@ -348,10 +372,8 @@ function MiniCalendar({ activeMonth, dayMap }: { activeMonth: Date; dayMap: Map<
   )
 }
 
-function Calendar() {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [tab, setTab] = useState<Tab>('upcoming')
+function CalendarView() {
+  const [tab, setTab] = useState<CalendarTab>('upcoming')
 
   const groups = useMemo(() => {
     if (tab === 'upcoming') return groupByDate(upcomingItems, 'asc')
@@ -363,140 +385,62 @@ function Calendar() {
   }, [tab])
 
   return (
-    <div className="mt-app">
-      <header className="mt-topnav">
-        <button type="button" className="mt-topnav__logo" aria-label="Home" onClick={() => navigate('/my-team')}>
-          <Logo size={22} />
+    <div className="cal-view">
+      <div className="mt-cp__switcher cal-view__filter" role="tablist" aria-label="Calendar filter">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'upcoming'}
+          className={`mt-cp__switcher-item${tab === 'upcoming' ? ' mt-cp__switcher-item--active' : ''}`}
+          onClick={() => setTab('upcoming')}
+        >
+          Upcoming
         </button>
-        <div className="mt-topnav__right">
-          <button type="button" className="mt-topnav__textbtn">
-            <span>Get App</span>
-            <Mobile size={20} color="var(--text-secondary)" variant="Linear" />
-          </button>
-          <button type="button" className="mt-topnav__outlinebtn">
-            <span>Create</span>
-            <Add size={20} color="var(--text-primary)" variant="Linear" />
-          </button>
-          <div className="mt-topnav__icons">
-            <button type="button" className="mt-topnav__iconbtn" aria-label="Notifications">
-              <FlashCircle size={24} color="var(--text-primary)" variant="Linear" />
-            </button>
-          </div>
-        </div>
-      </header>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'past'}
+          className={`mt-cp__switcher-item${tab === 'past' ? ' mt-cp__switcher-item--active' : ''}`}
+          onClick={() => setTab('past')}
+        >
+          Previous
+        </button>
+      </div>
 
-      <div className="mt-main">
-        <aside className="mt-side">
-          <nav className="mt-side__menu">
-            {learnerSideItems.map(({ label, icon: Icon, path }) => {
-              const isActive = !!path && location.pathname === path
+      <div className="cal-shell">
+        <div className="cal-center">
+          {groups.length === 0 ? (
+            <div className="cal-empty">
+              <p>Nothing here yet.</p>
+            </div>
+          ) : (
+            groups.map((group) => {
+              const label = dateSectionLabel(group.date)
+              const key = dateKey(group.date)
               return (
-                <button
-                  key={label}
-                  type="button"
-                  className={`mt-side__item${isActive ? ' mt-side__item--active' : ''}`}
-                  onClick={path ? () => navigate(path) : undefined}
-                >
-                  <Icon size={24} color={isActive ? 'var(--secondary-500)' : 'var(--text-secondary)'} variant="Bold" />
-                  <span>{label}</span>
-                </button>
-              )
-            })}
-            <button
-              type="button"
-              className="mt-side__item"
-              onClick={() => navigate('/content-library')}
-            >
-              <ShieldSecurity size={24} color="var(--text-secondary)" variant="Bold" />
-              <span>Admin</span>
-            </button>
-          </nav>
-
-          <div className="mt-side__profile">
-            <div className="mt-side__profile-info">
-              <p className="mt-side__profile-name">Anthonny Wallace</p>
-              <p className="mt-side__profile-email">anthonny@email.com</p>
-            </div>
-            <Setting2 size={16} color="var(--text-secondary)" variant="Linear" />
-          </div>
-
-          <div className="mt-side__powered">
-            <span>Powered by</span>
-            <Logo size={12} />
-          </div>
-        </aside>
-
-        <section className="mt-body cal-body">
-          <header className="mt-pageheader">
-            <div className="mt-pageheader__row">
-              <div className="mt-pageheader__headline">
-                <h1 className="mt-pageheader__title">Calendar</h1>
-                <p className="mt-pageheader__subtitle">Your courses and events, all in one place</p>
-              </div>
-            </div>
-
-            <div className="mt-pageheader__divider" />
-
-            <nav className="mt-tabs" role="tablist" aria-label="Calendar view">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === 'upcoming'}
-                className={`mt-tab${tab === 'upcoming' ? ' mt-tab--active' : ''}`}
-                onClick={() => setTab('upcoming')}
-              >
-                <span>Upcoming</span>
-                {tab === 'upcoming' && <span className="mt-tab__indicator" aria-hidden="true" />}
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === 'past'}
-                className={`mt-tab${tab === 'past' ? ' mt-tab--active' : ''}`}
-                onClick={() => setTab('past')}
-              >
-                <span>Previous</span>
-                {tab === 'past' && <span className="mt-tab__indicator" aria-hidden="true" />}
-              </button>
-            </nav>
-          </header>
-
-          <div className="cal-shell">
-            <div className="cal-center">
-              {groups.length === 0 ? (
-                <div className="cal-empty">
-                  <p>Nothing here yet.</p>
+                <div key={key} id={`cal-day-${key}`} className="cal-row">
+                  <header className="cal-row__header">
+                    <span className="cal-row__dot" aria-hidden="true" />
+                    <span className="cal-row__date">{label.primary}</span>
+                    <span className="cal-row__weekday">{label.weekday}</span>
+                  </header>
+                  <div className="cal-row__cards">
+                    {group.items.map((item) => (
+                      <ItemCard key={item.id} item={item} tab={tab} />
+                    ))}
+                  </div>
                 </div>
-              ) : (
-                groups.map((group) => {
-                  const label = dateSectionLabel(group.date)
-                  const key = dateKey(group.date)
-                  return (
-                    <div key={key} id={`cal-day-${key}`} className="cal-row">
-                      <header className="cal-row__header">
-                        <span className="cal-row__dot" aria-hidden="true" />
-                        <span className="cal-row__date">{label.primary}</span>
-                        <span className="cal-row__weekday">{label.weekday}</span>
-                      </header>
-                      <div className="cal-row__cards">
-                        {group.items.map((item) => (
-                          <ItemCard key={item.id} item={item} tab={tab} />
-                        ))}
-                      </div>
-                    </div>
-                  )
-                })
-              )}
-            </div>
+              )
+            })
+          )}
+        </div>
 
-            <aside className="cal-rightrail">
-              <MiniCalendar activeMonth={TODAY} dayMap={dayMap} />
-            </aside>
-          </div>
-        </section>
+        <aside className="cal-rightrail">
+          <MiniCalendar activeMonth={TODAY} dayMap={dayMap} />
+        </aside>
       </div>
     </div>
   )
 }
 
-export default Calendar
+export default CalendarView

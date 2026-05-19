@@ -1,12 +1,18 @@
-.cal-body {
-  padding-bottom: 64px;
+.cal-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cal-view__filter {
+  align-self: flex-start;
 }
 
 .cal-shell {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
   gap: 32px;
-  margin-top: 24px;
+  margin-top: 8px;
 }
 
 .cal-center {
@@ -150,6 +156,20 @@
 /* ── Overdue badge (inline, doesn't stretch the flex parent) ─ */
 .cal-card__overdue {
   align-self: flex-start;
+}
+
+/* ── Bottom row: countdown badge + attendee stack on event cards ─ */
+.cal-card__bottomrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cal-card__countdown {
+  padding: 6px 12px;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 /* ── Attendee stack (Figma node 10113:207839) ──────────────── */
