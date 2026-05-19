@@ -12,18 +12,19 @@ import '../my-team/MyTeam.css'
 import './Workspace.css'
 
 import { upcomingItems } from '../calendar/mockItems'
-import CalendarView, { EventCard } from '../calendar/CalendarView'
+import CalendarView, { EventCard, type CalendarTab } from '../calendar/CalendarView'
 import WorkspaceCourseCard from '../../components/WorkspaceCourseCard/WorkspaceCourseCard'
 import CategoryCard from '../../components/CategoryCard/CategoryCard'
 import Carousel from '../../components/Carousel/Carousel'
 import { workspaceCourses, workspaceCategories } from './mockItems'
 
-type WorkspaceTab = 'courses' | 'calendar'
+type WorkspaceTab = 'learn' | 'calendar'
 
 function Workspace() {
   const navigate = useNavigate()
   const location = useLocation()
-  const [tab, setTab] = useState<WorkspaceTab>('courses')
+  const [tab, setTab] = useState<WorkspaceTab>('learn')
+  const [calendarFilter, setCalendarFilter] = useState<CalendarTab>('upcoming')
 
   const upcomingEvents = upcomingItems
     .filter((item) => item.type === 'event')
@@ -104,31 +105,55 @@ function Workspace() {
 
             <div className="mt-pageheader__divider" />
 
-            <nav className="mt-tabs" role="tablist" aria-label="Workspace view">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === 'courses'}
-                className={`mt-tab${tab === 'courses' ? ' mt-tab--active' : ''}`}
-                onClick={() => setTab('courses')}
-              >
-                <span>Courses</span>
-                {tab === 'courses' && <span className="mt-tab__indicator" aria-hidden="true" />}
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === 'calendar'}
-                className={`mt-tab${tab === 'calendar' ? ' mt-tab--active' : ''}`}
-                onClick={() => setTab('calendar')}
-              >
-                <span>Calendar</span>
-                {tab === 'calendar' && <span className="mt-tab__indicator" aria-hidden="true" />}
-              </button>
-            </nav>
+            <div className="ws-tabrow">
+              <nav className="mt-tabs" role="tablist" aria-label="Workspace view">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === 'learn'}
+                  className={`mt-tab${tab === 'learn' ? ' mt-tab--active' : ''}`}
+                  onClick={() => setTab('learn')}
+                >
+                  <span>Learn</span>
+                  {tab === 'learn' && <span className="mt-tab__indicator" aria-hidden="true" />}
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === 'calendar'}
+                  className={`mt-tab${tab === 'calendar' ? ' mt-tab--active' : ''}`}
+                  onClick={() => setTab('calendar')}
+                >
+                  <span>Calendar</span>
+                  {tab === 'calendar' && <span className="mt-tab__indicator" aria-hidden="true" />}
+                </button>
+              </nav>
+              {tab === 'calendar' ? (
+                <div className="mt-cp__switcher" role="tablist" aria-label="Calendar filter">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={calendarFilter === 'upcoming'}
+                    className={`mt-cp__switcher-item${calendarFilter === 'upcoming' ? ' mt-cp__switcher-item--active' : ''}`}
+                    onClick={() => setCalendarFilter('upcoming')}
+                  >
+                    Upcoming
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={calendarFilter === 'past'}
+                    className={`mt-cp__switcher-item${calendarFilter === 'past' ? ' mt-cp__switcher-item--active' : ''}`}
+                    onClick={() => setCalendarFilter('past')}
+                  >
+                    Previous
+                  </button>
+                </div>
+              ) : null}
+            </div>
           </header>
 
-          {tab === 'courses' ? (
+          {tab === 'learn' ? (
             <div className="ws-sections">
               <section className="ws-section">
                 <header className="ws-section__header">
@@ -182,7 +207,7 @@ function Workspace() {
               </section>
             </div>
           ) : (
-            <CalendarView />
+            <CalendarView filter={calendarFilter} />
           )}
         </section>
       </div>

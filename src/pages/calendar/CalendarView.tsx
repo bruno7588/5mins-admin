@@ -372,8 +372,8 @@ function MiniCalendar({ activeMonth, dayMap }: { activeMonth: Date; dayMap: Map<
   )
 }
 
-function CalendarView() {
-  const [tab, setTab] = useState<CalendarTab>('upcoming')
+function CalendarView({ filter = 'upcoming' }: { filter?: CalendarTab }) {
+  const tab = filter
 
   const groups = useMemo(() => {
     if (tab === 'upcoming') return groupByDate(upcomingItems, 'asc')
@@ -386,27 +386,6 @@ function CalendarView() {
 
   return (
     <div className="cal-view">
-      <div className="mt-cp__switcher cal-view__filter" role="tablist" aria-label="Calendar filter">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={tab === 'upcoming'}
-          className={`mt-cp__switcher-item${tab === 'upcoming' ? ' mt-cp__switcher-item--active' : ''}`}
-          onClick={() => setTab('upcoming')}
-        >
-          Upcoming
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={tab === 'past'}
-          className={`mt-cp__switcher-item${tab === 'past' ? ' mt-cp__switcher-item--active' : ''}`}
-          onClick={() => setTab('past')}
-        >
-          Previous
-        </button>
-      </div>
-
       <div className="cal-shell">
         <div className="cal-center">
           {groups.length === 0 ? (

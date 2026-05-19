@@ -2,6 +2,15 @@
   padding-bottom: 64px;
 }
 
+/* Tab row — page tabs left, optional content switcher right (Calendar tab) */
+.ws-tabrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .ws-sections {
   display: flex;
   flex-direction: column;
@@ -85,4 +94,10 @@
 .ws-events-track > .cal-card {
   flex: 0 0 100%;
   scroll-snap-align: start;
+}
+
+/* Hide the type tag overlay on event thumbnails in this section only —
+   the section title already communicates "Events". */
+.ws-events-track .cal-card__typetag {
+  display: none;
 }
