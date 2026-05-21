@@ -1,10 +1,568 @@
 .content-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-m);
   padding: var(--space-l) 0;
   max-width: 900px;
   margin: 0 auto;
+}
+
+/* ── Course empty state (per Figma 8565:12932) ──────────────── */
+.course-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-m);
+  padding: var(--space-xxl) var(--space-l);
+  background: var(--input-background);
+  border: 1px dashed var(--border-hover);
+  border-radius: var(--radius-ml);
+  width: 100%;
+}
+
+.course-empty-state__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+}
+
+.course-empty-state__info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-s);
+  text-align: center;
+}
+
+.course-empty-state__title {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.course-empty-state__body {
+  margin: 0;
+  max-width: 600px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.course-empty-state__cta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-m);
+}
+
+.course-empty-state__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 10px var(--space-ml);
+  border-radius: var(--radius-s);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.course-empty-state__btn:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+}
+
+.course-empty-state__btn--outlined {
+  background: transparent;
+  color: var(--primary-600);
+  border: 1px solid var(--primary-600);
+}
+
+.course-empty-state__btn--outlined:hover {
+  background: var(--primary-100);
+  color: var(--primary-700);
+  border-color: var(--primary-700);
+}
+
+.course-empty-state__btn--filled {
+  background: var(--primary-600);
+  color: var(--neutral-0);
+  border: none;
+}
+
+.course-empty-state__btn--filled:hover {
+  background: var(--primary-700);
+}
+
+/* ── Curriculum section card ────────────────────────────────── */
+.curriculum-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-m);
+  background: var(--cards-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.curriculum-section__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  min-height: 32px;
+}
+
+.curriculum-section__drag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  cursor: grab;
+  flex-shrink: 0;
+}
+
+.curriculum-section__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  transition: transform 150ms ease, background 150ms ease;
+}
+
+.curriculum-section__chevron:hover {
+  background: var(--cards-background-hover);
+}
+
+.curriculum-section__chevron--collapsed {
+  transform: rotate(-90deg);
+}
+
+.curriculum-section__chevron:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+}
+
+.curriculum-section__title {
+  flex: 1;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+  cursor: text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.curriculum-section__count {
+  flex-shrink: 0;
+}
+
+/* Inline rename within section header */
+.curriculum-section__rename {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.curriculum-section__rename-input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-s) var(--space-sm);
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--cards-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  outline: none;
+}
+
+.curriculum-section__rename-input:focus {
+  border-color: var(--secondary-500);
+}
+
+.curriculum-section__rename-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.curriculum-section__rename-btn:hover {
+  background: var(--cards-background-hover);
+}
+
+.curriculum-section__rename-btn:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+}
+
+/* Body */
+.curriculum-section__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.curriculum-section__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.curriculum-section__empty {
+  margin: 0;
+  padding: var(--space-m) var(--space-s);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+  text-align: left;
+}
+
+.curriculum-section__add-lesson {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) 0;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.curriculum-section__add-lesson:hover {
+  color: var(--primary-700);
+}
+
+.curriculum-section__add-lesson:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+}
+
+/* ── Kebab (3-dot) menu ─────────────────────────────────────── */
+.kebab {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.kebab__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.kebab__trigger:hover {
+  background: var(--cards-background-hover);
+}
+
+.kebab__trigger:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+}
+
+.kebab__menu {
+  position: absolute;
+  top: calc(100% + var(--space-xs));
+  right: 0;
+  z-index: 20;
+  min-width: 180px;
+  padding: var(--space-xs);
+  background: var(--cards-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: -1px -1px 4px rgba(32, 34, 42, 0.06), 1px 1px 4px rgba(32, 34, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kebab__item {
+  display: flex;
+  align-items: center;
+  padding: var(--space-s) var(--space-sm);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-xs);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: background 150ms ease;
+}
+
+.kebab__item:hover {
+  background: var(--cards-background-hover);
+}
+
+.kebab__item:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: -2px;
+}
+
+.kebab__item--danger {
+  color: var(--text-error);
+}
+
+.kebab__item--danger:hover {
+  background: var(--danger-100);
+}
+
+/* ── Add section CTA + inline creation ──────────────────────── */
+.curriculum-add-section {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) 0;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.curriculum-add-section:hover {
+  color: var(--primary-700);
+}
+
+.curriculum-add-section:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+}
+
+.curriculum-add-section--editing {
+  display: flex;
+  align-self: stretch;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-s);
+  background: var(--cards-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: default;
+}
+
+.curriculum-add-section__input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-s) var(--space-sm);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--cards-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  outline: none;
+}
+
+.curriculum-add-section__input:focus {
+  border-color: var(--secondary-500);
+}
+
+.curriculum-add-section__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.curriculum-add-section__btn:hover {
+  background: var(--cards-background-hover);
+}
+
+.curriculum-add-section__btn:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+}
+
+/* ── Dialog (per design-system/overlays.md) ─────────────────── */
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--neutral-900);
+  opacity: 0.64;
+  z-index: 1000;
+  animation: overlay-fade-in 200ms ease-out;
+}
+
+@keyframes overlay-fade-in {
+  from { opacity: 0; }
+  to { opacity: 0.64; }
+}
+
+.dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 345px;
+  max-width: calc(100vw - 48px);
+  padding: var(--space-l);                  /* 24px uniform */
+  background: var(--cards-background);      /* light, project convention */
+  border-radius: var(--radius-sm);          /* 12px */
+  box-shadow: -4px 0px 24px 0px rgba(32, 34, 42, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-ml);                     /* 20px between body and CTA */
+  text-align: center;
+  z-index: 1001;
+  animation: dialog-enter 200ms ease-out;
+}
+
+@keyframes dialog-enter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.dialog__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background: var(--danger-100);
+  border-radius: var(--radius-full);
+}
+
+.dialog__info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);                     /* 4px between title and description */
+}
+
+.dialog__title {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.dialog__description {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.dialog__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-m);                      /* 16px */
+  width: 100%;
+}
+
+.dialog__btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) var(--space-l);  /* 12px 24px */
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.5;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.dialog__btn:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+}
+
+/* Error type — outlined uses neutral border (per spec) */
+.dialog__btn--outlined-error {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--text-primary);
+}
+
+.dialog__btn--outlined-error:hover {
+  background: var(--cards-background-hover);
+}
+
+.dialog__btn--filled-error {
+  background: var(--danger-500);
+  color: var(--neutral-0);
+  border: none;
+}
+
+.dialog__btn--filled-error:hover {
+  background: var(--danger-600);
 }
 
 /* Wrapper container: drag handle + card + trash */
@@ -143,7 +701,7 @@
   justify-content: center;
   flex-shrink: 0;
   padding: 4px;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-full);
   transition: background 150ms ease;
 }
 

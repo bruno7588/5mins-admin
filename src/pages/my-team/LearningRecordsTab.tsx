@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ArrowLeft2, ArrowRight2, Add, ArrowDown2, More, Danger, DocumentUpload } from 'iconsax-react'
+import { ArrowLeft2, ArrowRight2, Add, ArrowDown2, Danger, DocumentUpload } from 'iconsax-react'
+import MoreIcon from '../../components/icons/MoreIcon'
 import Checkbox from '../../components/Checkbox/Checkbox'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import ToastContainer, { useToast } from '../../components/Toast/Toast'
@@ -509,7 +510,7 @@ function LearningRecordsTab() {
                     )}
                   </div>
                   <div className="lr__cell lr__cell--ext-more">
-                    <More size={24} color="var(--text-tertiary)" variant="Linear" />
+                    <MoreIcon size={24} color="var(--text-tertiary)" />
                   </div>
                 </div>
               )

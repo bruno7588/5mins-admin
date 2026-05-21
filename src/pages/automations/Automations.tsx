@@ -3,7 +3,6 @@ import {
   UserCirlceAdd,
   Medal,
   RefreshCircle,
-  More,
   Edit2,
   Copy,
   Trash,
@@ -20,6 +19,7 @@ import {
   ArrowRight2,
 } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
+import MoreIcon from '../../components/icons/MoreIcon'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import ForceTriggerModal from './ForceTriggerModal'
 import AutomationDetailsModal, { type AutomationDetailsMode } from './AutomationDetailsModal'
@@ -1052,7 +1052,7 @@ function Automations() {
                           setOpenMenuId(openMenuId === row.id ? null : row.id)
                         }
                       >
-                        <More size={20} color="var(--text-secondary)" variant="Linear" />
+                        <MoreIcon size={20} color="var(--text-secondary)" />
                       </button>
                       {openMenuId === row.id && (
                         <div className="automations-action-menu" role="menu">

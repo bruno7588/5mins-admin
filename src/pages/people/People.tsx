@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import {
   SearchNormal1,
-  More,
   Add,
   ProfileAdd,
   DocumentText,
@@ -18,6 +17,7 @@ import {
   Lock,
 } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
+import MoreIcon from '../../components/icons/MoreIcon'
 import Checkbox from '../../components/Checkbox/Checkbox'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import ToastContainer, { useToast } from '../../components/Toast/Toast'
@@ -602,7 +602,7 @@ function People() {
                       aria-label="More actions"
                       onClick={() => setOpenMenuId(openMenuId === person.id ? null : person.id)}
                     >
-                      <More size={24} color="var(--text-tertiary)" variant="Linear" />
+                      <MoreIcon size={24} color="var(--text-tertiary)" />
                     </button>
                     {openMenuId === person.id && (
                       <div className="people-action-menu">
@@ -718,7 +718,7 @@ function People() {
                         aria-label="More actions"
                         onClick={() => setOpenMenuId(openMenuId === person.id ? null : person.id)}
                       >
-                        <More size={24} color="var(--text-tertiary)" variant="Linear" />
+                        <MoreIcon size={24} color="var(--text-tertiary)" />
                       </button>
                       {openMenuId === person.id && (
                         <div className="people-action-menu">

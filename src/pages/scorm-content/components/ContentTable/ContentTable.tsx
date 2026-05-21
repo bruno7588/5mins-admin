@@ -9,12 +9,12 @@ import {
   EyeSlash,
   Edit2,
   Trash,
-  More,
   ArrowLeft2,
   ArrowRight2,
 } from 'iconsax-react'
 import AddScormModal from '../AddScormModal/AddScormModal'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
+import MoreIcon from '../../../../components/icons/MoreIcon'
 import './ContentTable.css'
 
 interface ContentRow {
@@ -294,7 +294,7 @@ function ContentTable({ variant = 'lessons' }: ContentTableProps) {
                       aria-label="More options"
                       onClick={() => setMenuOpenId(menuOpenId === row.id ? null : row.id)}
                     >
-                      <More size={20} color="var(--neutral-400)" variant="Linear" />
+                      <MoreIcon size={20} color="var(--neutral-400)" />
                     </button>
                     {menuOpenId === row.id && (
                       <div className="content-table-menu">
