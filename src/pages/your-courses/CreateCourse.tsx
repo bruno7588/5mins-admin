@@ -24,6 +24,17 @@ function CreateCourse() {
   const [assessmentModal, setAssessmentModal] = useState<{ type: AssessmentType } | null>(null)
   const [libraryDrawerOpen, setLibraryDrawerOpen] = useState(false)
   const [addedLibraryIds, setAddedLibraryIds] = useState<Set<number>>(new Set())
+  const [targetSectionId, setTargetSectionId] = useState<string | null>(null)
+
+  const openLibraryDrawer = (sectionId?: string) => {
+    setTargetSectionId(sectionId ?? null)
+    setLibraryDrawerOpen(true)
+  }
+
+  const closeLibraryDrawer = () => {
+    setLibraryDrawerOpen(false)
+    setTargetSectionId(null)
+  }
 
   const handleAddScorm = (file: ScormFile) => {
     const newItem: ContentItem = {
@@ -97,7 +108,8 @@ function CreateCourse() {
           <ContentList
             extraItems={scormItems}
             onDeleteExtra={handleRemoveScorm}
-            onAddContent={() => setLibraryDrawerOpen(true)}
+            onAddContent={openLibraryDrawer}
+            targetSectionId={targetSectionId}
           />
         </main>
         {!assessmentModal && (
@@ -106,7 +118,7 @@ function CreateCourse() {
             onAddScorm={handleAddScorm}
             onRemoveScorm={handleRemoveScorm}
             onAssessmentClick={(type) => setAssessmentModal({ type })}
-            onLibraryClick={() => setLibraryDrawerOpen(true)}
+            onLibraryClick={() => openLibraryDrawer()}
           />
         )}
         {assessmentModal && (
@@ -121,7 +133,7 @@ function CreateCourse() {
                 onRemoveScorm={handleRemoveScorm}
                 collapsed
                 onAssessmentClick={(type) => setAssessmentModal({ type })}
-                onLibraryClick={() => setLibraryDrawerOpen(true)}
+                onLibraryClick={() => openLibraryDrawer()}
               />
             }
           />
@@ -129,7 +141,7 @@ function CreateCourse() {
       </div>
       <LibraryDrawer
         open={libraryDrawerOpen}
-        onClose={() => setLibraryDrawerOpen(false)}
+        onClose={closeLibraryDrawer}
         addedIds={addedLibraryIds}
         onAdd={handleAddLibraryLesson}
         onRemove={handleRemoveLibraryLesson}

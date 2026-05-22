@@ -107,6 +107,9 @@ interface CurriculumSectionProps {
   onRename: (newName: string) => void
   onDelete: () => void
   onAddLesson?: () => void
+  destinationActive?: boolean
+  onBodyDragOver?: (e: React.DragEvent) => void
+  onBodyDrop?: () => void
   children: ReactNode
 }
 
@@ -127,6 +130,9 @@ function CurriculumSection({
   onRename,
   onDelete,
   onAddLesson,
+  destinationActive = false,
+  onBodyDragOver,
+  onBodyDrop,
   children,
 }: CurriculumSectionProps) {
   const [renaming, setRenaming] = useState(startInRenameMode)
@@ -247,6 +253,7 @@ function CurriculumSection({
     isDragging && 'curriculum-section--dragging',
     dropAbove && 'curriculum-section--drop-above',
     dropBelow && 'curriculum-section--drop-below',
+    destinationActive && 'curriculum-section--drop-destination',
   ].filter(Boolean).join(' ')
 
   return (
@@ -325,12 +332,15 @@ function CurriculumSection({
         )}
       </header>
 
-      <div ref={bodyRef} className="curriculum-section__body">
+      <div
+        ref={bodyRef}
+        className="curriculum-section__body"
+        onDragOver={onBodyDragOver}
+        onDrop={onBodyDrop}
+      >
         {itemCount === 0 ? (
           <div className="curriculum-section__empty">
-            <p className="curriculum-section__empty-text">
-              No content on this section
-            </p>
+            <p className="curriculum-section__empty-text">No content on this section</p>
           </div>
         ) : (
           <div className="curriculum-section__items">{children}</div>
