@@ -12,6 +12,12 @@
   flex-direction: column;
   gap: var(--space-xs);
   min-height: 56px;
+  border-radius: var(--radius-sm);
+  transition: background-color 150ms ease;
+}
+
+.content-list__loose--drop-active {
+  background-color: rgba(255, 187, 56, 0.15);
 }
 
 /* ── Course empty state (per Figma 8565:12932) ──────────────── */
@@ -145,11 +151,19 @@
   opacity: 0.4;
 }
 
-/* Section reorder — dragging section shows subtle highlight, list rearranges live */
+/* Section reorder — live reorder, no decorative indicator */
 .curriculum-section--drop-above,
-.curriculum-section--drop-below,
+.curriculum-section--drop-below {
+  /* no-op */
+}
+
+/* Cross-container drop destination — section will receive an item from another container */
 .curriculum-section--drop-destination {
-  /* no decorative indicator — live reorder communicates position */
+  background-color: rgba(255, 187, 56, 0.15);
+  transition: background-color 150ms ease;
+}
+.curriculum-section--drop-destination .curriculum-section__header {
+  background-color: transparent;
 }
 
 .curriculum-section__drag {
@@ -749,10 +763,26 @@
   outline-offset: 2px;
 }
 
-/* Drag and drop — live-reorder pattern: the list itself shows the drop position */
+/* Drag and drop
+   - same-container: live reorder (no decorative indicator)
+   - cross-container: insertion line + destination tint (per DnD color rule: var(--selected)) */
 .content-item-container--dragging {
   background: var(--cards-background-hover);
 }
+
+.content-item-container--drop-above::before,
+.content-item-container--drop-below::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--selected);
+  border-radius: 1px;
+  pointer-events: none;
+}
+.content-item-container--drop-above::before { top: -2px; }
+.content-item-container--drop-below::after { bottom: -2px; }
 
 /* Empty state (kept for reference) */
 .content-list-empty {

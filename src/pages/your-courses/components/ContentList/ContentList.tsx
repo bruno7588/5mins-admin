@@ -152,8 +152,12 @@ function ContentList({ extraItems = [], onDeleteExtra, onAddContent, targetSecti
   // Ordered keys for items that live outside any section
   const [looseOrder, setLooseOrder] = useState<string[]>([])
 
-  // Item drag state — live-reorder: dragKey identifies the dragged item; sections/looseOrder are mutated on dragover
+  // Item drag state — same-container reorders mutate live; cross-container moves track a drop target and commit on drop
   const [dragKey, setDragKey] = useState<string | null>(null)
+  const [dropTarget, setDropTarget] = useState<{ itemKey: string; position: 'above' | 'below' } | null>(null)
+  const [containerDropTarget, setContainerDropTarget] = useState<
+    { kind: 'section'; id: string } | { kind: 'loose' } | null
+  >(null)
 
   // Section drag state
   const [sectionDragId, setSectionDragId] = useState<string | null>(null)
@@ -300,111 +304,125 @@ function ContentList({ extraItems = [], onDeleteExtra, onAddContent, targetSecti
     return [...list.slice(0, at), key, ...list.slice(at)]
   }
 
-  // Move dragKey to a new position next to anchor. Mutates sections + looseOrder atomically.
-  const moveDragKeyNextTo = (anchorKey: string, position: 'above' | 'below') => {
-    if (!dragKey || dragKey === anchorKey) return
+  const handleDragOver = (overKey: string) => (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!dragKey || dragKey === overKey) return
     const from = findContainer(dragKey)
-    const over = findContainer(anchorKey)
+    const over = findContainer(overKey)
     if (!from || !over) return
-    const key = dragKey
+
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    const midY = rect.top + rect.height / 2
+    const position: 'above' | 'below' = e.clientY < midY ? 'above' : 'below'
 
     if (sameContainer(from, over)) {
+      // Same container — live reorder. Element stays under same DOM parent so HTML5 drag keeps working.
+      const key = dragKey
       if (from.kind === 'section') {
         setSections((prev) =>
           prev.map((s) => {
             if (s.id !== from.id) return s
             if (!s.itemKeys.includes(key)) return s
             const without = s.itemKeys.filter((k) => k !== key)
-            if (!without.includes(anchorKey)) return s
-            return { ...s, itemKeys: insertAt(without, anchorKey, position, key) }
+            if (!without.includes(overKey)) return s
+            return { ...s, itemKeys: insertAt(without, overKey, position, key) }
           }),
         )
       } else {
         setLooseOrder((prev) => {
           if (!prev.includes(key)) return prev
           const without = prev.filter((k) => k !== key)
-          if (!without.includes(anchorKey)) return prev
-          return insertAt(without, anchorKey, position, key)
+          if (!without.includes(overKey)) return prev
+          return insertAt(without, overKey, position, key)
         })
       }
+      setDropTarget(null)
+      setContainerDropTarget(null)
     } else {
-      // Cross-container: remove from source, insert into destination
-      if (from.kind === 'section') {
-        setSections((prev) =>
-          prev.map((s) =>
-            s.id === from.id ? { ...s, itemKeys: s.itemKeys.filter((k) => k !== key) } : s,
-          ),
-        )
-      } else {
-        setLooseOrder((prev) => prev.filter((k) => k !== key))
-      }
-      if (over.kind === 'section') {
-        setSections((prev) =>
-          prev.map((s) =>
-            s.id === over.id
-              ? { ...s, itemKeys: insertAt(s.itemKeys, anchorKey, position, key) }
-              : s,
-          ),
-        )
-      } else {
-        setLooseOrder((prev) => insertAt(prev, anchorKey, position, key))
-      }
+      // Cross container — defer to drop. Mutating now would unmount the dragged DOM node and cancel the HTML5 drag.
+      setDropTarget({ itemKey: overKey, position })
+      setContainerDropTarget(null)
     }
-  }
-
-  const moveDragKeyToContainer = (container: Container) => {
-    if (!dragKey) return
-    const from = findContainer(dragKey)
-    if (!from || sameContainer(from, container)) return
-    const key = dragKey
-
-    if (from.kind === 'section') {
-      setSections((prev) =>
-        prev.map((s) =>
-          s.id === from.id ? { ...s, itemKeys: s.itemKeys.filter((k) => k !== key) } : s,
-        ),
-      )
-    } else {
-      setLooseOrder((prev) => prev.filter((k) => k !== key))
-    }
-    if (container.kind === 'section') {
-      setSections((prev) =>
-        prev.map((s) =>
-          s.id === container.id ? { ...s, itemKeys: [...s.itemKeys, key] } : s,
-        ),
-      )
-    } else {
-      setLooseOrder((prev) => [...prev, key])
-    }
-  }
-
-  const handleDragOver = (overKey: string) => (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (!dragKey || dragKey === overKey) return
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    const midY = rect.top + rect.height / 2
-    const position: 'above' | 'below' = e.clientY < midY ? 'above' : 'below'
-    moveDragKeyNextTo(overKey, position)
   }
 
   const handleDragEnd = () => {
     setDragKey(null)
+    setDropTarget(null)
+    setContainerDropTarget(null)
   }
 
-  const handleContainerDragOver = (container: Container) => (e: React.DragEvent) => {
+  const handleContainerDragOver = (container: { kind: 'section'; id: string } | { kind: 'loose' }) => (
+    e: React.DragEvent,
+  ) => {
     if (!dragKey) return
     e.preventDefault()
-    moveDragKeyToContainer(container)
+    const from = findContainer(dragKey)
+    if (!from || sameContainer(from, container)) return
+    // Cross-container empty-area target — defer to drop.
+    setContainerDropTarget(container)
+    setDropTarget(null)
   }
 
-  const handleContainerDrop = (_container: Container) => () => {
-    // State already reflects the dragged-over position; drop just clears drag state.
+  const commitCrossContainerMove = () => {
+    if (!dragKey) return
+    const from = findContainer(dragKey)
+    if (!from) return
+    const key = dragKey
+
+    if (dropTarget) {
+      const over = findContainer(dropTarget.itemKey)
+      if (!over || sameContainer(from, over)) return
+      // Remove from source
+      if (from.kind === 'section') {
+        setSections((prev) =>
+          prev.map((s) => (s.id === from.id ? { ...s, itemKeys: s.itemKeys.filter((k) => k !== key) } : s)),
+        )
+      } else {
+        setLooseOrder((prev) => prev.filter((k) => k !== key))
+      }
+      // Insert into destination
+      if (over.kind === 'section') {
+        setSections((prev) =>
+          prev.map((s) =>
+            s.id === over.id
+              ? { ...s, itemKeys: insertAt(s.itemKeys, dropTarget.itemKey, dropTarget.position, key) }
+              : s,
+          ),
+        )
+      } else {
+        setLooseOrder((prev) => insertAt(prev, dropTarget.itemKey, dropTarget.position, key))
+      }
+      return
+    }
+
+    if (containerDropTarget) {
+      const dest = containerDropTarget
+      if (sameContainer(from, dest)) return
+      if (from.kind === 'section') {
+        setSections((prev) =>
+          prev.map((s) => (s.id === from.id ? { ...s, itemKeys: s.itemKeys.filter((k) => k !== key) } : s)),
+        )
+      } else {
+        setLooseOrder((prev) => prev.filter((k) => k !== key))
+      }
+      if (dest.kind === 'section') {
+        setSections((prev) =>
+          prev.map((s) => (s.id === dest.id ? { ...s, itemKeys: [...s.itemKeys, key] } : s)),
+        )
+      } else {
+        setLooseOrder((prev) => [...prev, key])
+      }
+    }
+  }
+
+  const handleContainerDrop = (_container: { kind: 'section'; id: string } | { kind: 'loose' }) => () => {
+    commitCrossContainerMove()
     handleDragEnd()
   }
 
   const handleDrop = () => {
-    // State already reflects the dragged-over position; drop just clears drag state.
+    commitCrossContainerMove()
     handleDragEnd()
   }
 
@@ -519,9 +537,13 @@ function ContentList({ extraItems = [], onDeleteExtra, onAddContent, targetSecti
           onDrop={handleSectionDrop}
           onToggleCollapse={() => toggleCollapse(section.id)}
           onRename={(name) => renameSection(section.id, name)}
-          onDelete={() => setConfirmDelete(section)}
+          onDelete={() =>
+            section.itemKeys.length === 0 ? deleteSection(section) : setConfirmDelete(section)
+          }
           onAddLesson={onAddContent ? () => onAddContent(section.id) : undefined}
-          destinationActive={false}
+          destinationActive={
+            containerDropTarget?.kind === 'section' && containerDropTarget.id === section.id
+          }
           onBodyDragOver={handleContainerDragOver({ kind: 'section', id: section.id })}
           onBodyDrop={handleContainerDrop({ kind: 'section', id: section.id })}
         >
@@ -534,8 +556,8 @@ function ContentList({ extraItems = [], onDeleteExtra, onAddContent, targetSecti
                 item={item}
                 onDelete={() => deleteItem(key)}
                 isDragging={dragKey === key}
-                dropAbove={false}
-                dropBelow={false}
+                dropAbove={dropTarget?.itemKey === key && dropTarget.position === 'above'}
+                dropBelow={dropTarget?.itemKey === key && dropTarget.position === 'below'}
                 onDragStart={handleDragStart(key)}
                 onDragOver={handleDragOver(key)}
                 onDragEnd={handleDragEnd}
@@ -549,7 +571,9 @@ function ContentList({ extraItems = [], onDeleteExtra, onAddContent, targetSecti
       {(looseOrder.length > 0 ||
         (dragKey && sections.length > 0 && findContainer(dragKey)?.kind === 'section')) && (
         <div
-          className="content-list__loose"
+          className={`content-list__loose${
+            containerDropTarget?.kind === 'loose' ? ' content-list__loose--drop-active' : ''
+          }`}
           onDragOver={handleContainerDragOver({ kind: 'loose' })}
           onDrop={handleContainerDrop({ kind: 'loose' })}
         >
@@ -562,8 +586,8 @@ function ContentList({ extraItems = [], onDeleteExtra, onAddContent, targetSecti
                 item={item}
                 onDelete={() => deleteItem(key)}
                 isDragging={dragKey === key}
-                dropAbove={false}
-                dropBelow={false}
+                dropAbove={dropTarget?.itemKey === key && dropTarget.position === 'above'}
+                dropBelow={dropTarget?.itemKey === key && dropTarget.position === 'below'}
                 onDragStart={handleDragStart(key)}
                 onDragOver={handleDragOver(key)}
                 onDragEnd={handleDragEnd}
