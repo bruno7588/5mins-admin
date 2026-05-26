@@ -79,20 +79,18 @@ function KebabMenu({ items, ariaLabel = 'More actions' }: { items: KebabItem[]; 
   )
 }
 
-function DragHandle() {
-  return (
-    <div className="curriculum-section__drag" aria-label="Drag to reorder section">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-        <circle cx="7" cy="5" r="1.5" fill="var(--neutral-300)" />
-        <circle cx="13" cy="5" r="1.5" fill="var(--neutral-300)" />
-        <circle cx="7" cy="10" r="1.5" fill="var(--neutral-300)" />
-        <circle cx="13" cy="10" r="1.5" fill="var(--neutral-300)" />
-        <circle cx="7" cy="15" r="1.5" fill="var(--neutral-300)" />
-        <circle cx="13" cy="15" r="1.5" fill="var(--neutral-300)" />
-      </svg>
-    </div>
-  )
-}
+const DragHandle = ({ innerRef }: { innerRef?: React.Ref<HTMLDivElement> }) => (
+  <div ref={innerRef} className="curriculum-section__drag" aria-label="Drag to reorder section">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <circle cx="7" cy="5" r="1.5" fill="var(--neutral-300)" />
+      <circle cx="13" cy="5" r="1.5" fill="var(--neutral-300)" />
+      <circle cx="7" cy="10" r="1.5" fill="var(--neutral-300)" />
+      <circle cx="13" cy="10" r="1.5" fill="var(--neutral-300)" />
+      <circle cx="7" cy="15" r="1.5" fill="var(--neutral-300)" />
+      <circle cx="13" cy="15" r="1.5" fill="var(--neutral-300)" />
+    </svg>
+  </div>
+)
 
 interface CurriculumSectionProps {
   section: Section
@@ -144,7 +142,19 @@ function CurriculumSection({
   const inputRef = useRef<HTMLInputElement>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
   const summaryRef = useRef<HTMLParagraphElement>(null)
+  const dragRef = useRef<HTMLDivElement>(null)
+  const infoRef = useRef<HTMLDivElement>(null)
   const initialMountRef = useRef(true)
+
+  // Header alignment tweens between center (expanded) and top-with-title (collapsed).
+  // Header uses align-items: flex-start in CSS; we fake centering via paddingTop on the
+  // 20px drag handle and the title-only info column.
+  //  - Expanded: aligned to 32px chevron row → drag +6, info +4
+  //  - Collapsed: drag centered against 24px title row → drag +2, info +0
+  const DRAG_PAD_EXPANDED = 6
+  const DRAG_PAD_COLLAPSED = 2
+  const INFO_PAD_EXPANDED = 4
+  const INFO_PAD_COLLAPSED = 0
 
   useEffect(() => {
     if (renaming) {
@@ -153,10 +163,12 @@ function CurriculumSection({
     }
   }, [renaming])
 
-  // GSAP expand/collapse — body height + opacity, subtitle fade
+  // GSAP expand/collapse — body height + opacity, subtitle fade, header alignment
   useEffect(() => {
     const body = bodyRef.current
     const sub = summaryRef.current
+    const drag = dragRef.current
+    const info = infoRef.current
     if (!body) return
 
     if (initialMountRef.current) {
@@ -170,8 +182,12 @@ function CurriculumSection({
           overflow: 'hidden',
         })
         if (sub) gsap.set(sub, { height: 'auto', marginTop: 4, opacity: 1 })
-      } else if (sub) {
-        gsap.set(sub, { height: 0, marginTop: 0, opacity: 0, overflow: 'hidden' })
+        if (drag) gsap.set(drag, { paddingTop: DRAG_PAD_COLLAPSED })
+        if (info) gsap.set(info, { paddingTop: INFO_PAD_COLLAPSED })
+      } else {
+        if (sub) gsap.set(sub, { height: 0, marginTop: 0, opacity: 0, overflow: 'hidden' })
+        if (drag) gsap.set(drag, { paddingTop: DRAG_PAD_EXPANDED })
+        if (info) gsap.set(info, { paddingTop: INFO_PAD_EXPANDED })
       }
       initialMountRef.current = false
       return
@@ -179,6 +195,8 @@ function CurriculumSection({
 
     gsap.killTweensOf(body)
     if (sub) gsap.killTweensOf(sub)
+    if (drag) gsap.killTweensOf(drag)
+    if (info) gsap.killTweensOf(info)
 
     const duration = 0.3
     const ease = 'power2.inOut'
@@ -206,6 +224,8 @@ function CurriculumSection({
           },
         })
       }
+      if (drag) gsap.to(drag, { paddingTop: DRAG_PAD_COLLAPSED, duration, ease })
+      if (info) gsap.to(info, { paddingTop: INFO_PAD_COLLAPSED, duration, ease })
     } else {
       gsap.to(body, {
         height: 'auto',
@@ -229,6 +249,8 @@ function CurriculumSection({
           overflow: 'hidden',
         })
       }
+      if (drag) gsap.to(drag, { paddingTop: DRAG_PAD_EXPANDED, duration, ease })
+      if (info) gsap.to(info, { paddingTop: INFO_PAD_EXPANDED, duration, ease })
     }
   }, [section.collapsed])
 
@@ -271,7 +293,7 @@ function CurriculumSection({
       onDrop={onDrop}
     >
       <header className="curriculum-section__header">
-        {!hideDragHandle && <DragHandle />}
+        {!hideDragHandle && <DragHandle innerRef={dragRef} />}
         {renaming ? (
           <>
             <input
@@ -303,7 +325,7 @@ function CurriculumSection({
           </>
         ) : (
           <>
-            <div className="curriculum-section__info">
+            <div ref={infoRef} className="curriculum-section__info">
               <h3
                 id={`section-${section.id}-title`}
                 className="curriculum-section__title"

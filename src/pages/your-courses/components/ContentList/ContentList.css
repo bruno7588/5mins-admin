@@ -130,6 +130,8 @@
 }
 
 .curriculum-section__header {
+  /* align-items stays flex-start; GSAP tweens paddingTop on drag handle and info column
+     to fake center-alignment in the expanded state and animate the shift on toggle. */
   display: flex;
   align-items: flex-start;
   gap: var(--space-s);
@@ -139,10 +141,6 @@
   border-bottom: 1px solid var(--border);
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   transition: border-radius 150ms ease, border-color 150ms ease;
-}
-
-.curriculum-section__header .curriculum-section__drag {
-  padding-top: var(--space-xs);
 }
 
 .curriculum-section--collapsed .curriculum-section__header {
