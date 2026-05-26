@@ -1,0 +1,15 @@
+.add-content-popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 50;
+  width: 240px;
+  background: var(--cards-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 12px rgba(15, 16, 20, 0.08);
+  padding: var(--space-s);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}

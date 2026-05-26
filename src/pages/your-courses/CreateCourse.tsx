@@ -34,6 +34,16 @@ function CreateCourse() {
     setActiveDrawer('library')
   }
 
+  const openScormDrawerFor = (sectionId: string) => {
+    setTargetSectionId(sectionId)
+    setActiveDrawer('scorm')
+  }
+
+  const openAssessmentFor = (type: AssessmentType, sectionId: string) => {
+    setTargetSectionId(sectionId)
+    setAssessmentModal({ type })
+  }
+
   const closeDrawer = () => {
     setActiveDrawer(null)
     setTargetSectionId(null)
@@ -112,6 +122,9 @@ function CreateCourse() {
             extraItems={scormItems}
             onDeleteExtra={handleRemoveScorm}
             onAddContent={openLibraryDrawer}
+            onAddLibrary={openLibraryDrawer}
+            onAddScorm={openScormDrawerFor}
+            onAddAssessment={openAssessmentFor}
             targetSectionId={targetSectionId}
           />
         </main>

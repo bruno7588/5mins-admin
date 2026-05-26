@@ -3,6 +3,7 @@ import { Add, Danger, Edit2, Trash } from 'iconsax-react'
 import ToastContainer, { useToast } from '../../../../components/Toast/Toast'
 import Tooltip from '../../../../components/Tooltip/Tooltip'
 import CurriculumSection from './CurriculumSection'
+import type { AssessmentType } from '../AddContentSidebar/AddContentSidebar'
 import './ContentList.css'
 
 export interface ContentItem {
@@ -149,11 +150,25 @@ function ContentCard({
 interface ContentListProps {
   extraItems?: ContentItem[]
   onDeleteExtra?: (id: number) => void
+  /* Empty-state CTA (and old single-action callback). Receives a sectionId if available. */
   onAddContent?: (sectionId?: string) => void
+  /* Section-level per-type handlers. The section's "Add Content" button opens a popover
+     that mirrors the sidebar; clicking an item invokes the matching handler. */
+  onAddLibrary?: (sectionId: string) => void
+  onAddScorm?: (sectionId: string) => void
+  onAddAssessment?: (type: AssessmentType, sectionId: string) => void
   targetSectionId?: string | null
 }
 
-function ContentList({ extraItems = [], onDeleteExtra, onAddContent, targetSectionId }: ContentListProps) {
+function ContentList({
+  extraItems = [],
+  onDeleteExtra,
+  onAddContent,
+  onAddLibrary,
+  onAddScorm,
+  onAddAssessment,
+  targetSectionId,
+}: ContentListProps) {
   const [itemsByKey, setItemsByKey] = useState<Record<string, ContentItem>>({})
   const [sections, setSections] = useState<Section[]>(() => [makeDefaultSection()])
 
@@ -486,7 +501,9 @@ function ContentList({ extraItems = [], onDeleteExtra, onAddContent, targetSecti
           onDelete={() =>
             section.itemKeys.length === 0 ? deleteSection(section) : setConfirmDelete(section)
           }
-          onAddLesson={onAddContent ? () => onAddContent(section.id) : undefined}
+          onAddLibrary={onAddLibrary ? () => onAddLibrary(section.id) : undefined}
+          onAddScorm={onAddScorm ? () => onAddScorm(section.id) : undefined}
+          onAddAssessment={onAddAssessment ? (type) => onAddAssessment(type, section.id) : undefined}
           destinationActive={containerDropTarget === section.id}
           onBodyDragOver={handleContainerDragOver(section.id)}
           onBodyDrop={handleContainerDrop(section.id)}

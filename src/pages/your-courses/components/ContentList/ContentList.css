@@ -346,6 +346,11 @@
   color: var(--text-tertiary);
 }
 
+.curriculum-section__add-content-wrap {
+  position: relative;
+  align-self: flex-start;
+}
+
 .curriculum-section__add-lesson {
   /* Small outlined button — DS spec: 8px 16px padding, 12px font, 16px icon */
   align-self: flex-start;

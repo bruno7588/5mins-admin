@@ -8,6 +8,8 @@ import {
 } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import MoreIcon from '../../../../components/icons/MoreIcon'
+import AddContentPopover from '../AddContentPopover/AddContentPopover'
+import type { AssessmentType } from '../AddContentSidebar/AddContentSidebar'
 import type { ReactNode } from 'react'
 
 export interface Section {
@@ -109,7 +111,9 @@ interface CurriculumSectionProps {
   onToggleCollapse: () => void
   onRename: (newName: string) => void
   onDelete: () => void
-  onAddLesson?: () => void
+  onAddLibrary?: () => void
+  onAddScorm?: () => void
+  onAddAssessment?: (type: AssessmentType) => void
   destinationActive?: boolean
   onBodyDragOver?: (e: React.DragEvent) => void
   onBodyDrop?: () => void
@@ -133,7 +137,9 @@ function CurriculumSection({
   onToggleCollapse,
   onRename,
   onDelete,
-  onAddLesson,
+  onAddLibrary,
+  onAddScorm,
+  onAddAssessment,
   destinationActive = false,
   onBodyDragOver,
   onBodyDrop,
@@ -141,6 +147,7 @@ function CurriculumSection({
 }: CurriculumSectionProps) {
   const [renaming, setRenaming] = useState(startInRenameMode)
   const [draft, setDraft] = useState(section.name)
+  const [addMenuOpen, setAddMenuOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
   const summaryRef = useRef<HTMLParagraphElement>(null)
@@ -406,15 +413,26 @@ function CurriculumSection({
         ) : (
           <div className="curriculum-section__items">{children}</div>
         )}
-        {onAddLesson && (
-          <button
-            type="button"
-            className="curriculum-section__add-lesson"
-            onClick={onAddLesson}
-          >
-            <span>Add Content</span>
-            <Add size={16} color="currentColor" variant="Linear" />
-          </button>
+        {(onAddLibrary || onAddScorm || onAddAssessment) && (
+          <div className="curriculum-section__add-content-wrap">
+            <button
+              type="button"
+              className="curriculum-section__add-lesson"
+              aria-haspopup="menu"
+              aria-expanded={addMenuOpen}
+              onClick={() => setAddMenuOpen((v) => !v)}
+            >
+              <span>Add Content</span>
+              <Add size={16} color="currentColor" variant="Linear" />
+            </button>
+            <AddContentPopover
+              open={addMenuOpen}
+              onClose={() => setAddMenuOpen(false)}
+              onLibraryClick={onAddLibrary}
+              onScormClick={onAddScorm}
+              onAssessmentClick={onAddAssessment}
+            />
+          </div>
         )}
       </div>
     </section>
