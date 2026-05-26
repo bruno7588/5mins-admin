@@ -12,20 +12,16 @@ import '../my-team/MyTeam.css'
 import './Workspace.css'
 
 import { upcomingItems, type CalendarItem } from '../calendar/mockItems'
-import CalendarView, { EventCard, type CalendarTab } from '../calendar/CalendarView'
+import { EventCard } from '../calendar/CalendarView'
 import WorkspaceCourseCard from '../../components/WorkspaceCourseCard/WorkspaceCourseCard'
 import CategoryCard from '../../components/CategoryCard/CategoryCard'
 import Carousel from '../../components/Carousel/Carousel'
 import EventDetailsDrawer from './EventDetailsDrawer'
 import { workspaceCourses, workspaceCategories } from './mockItems'
 
-type WorkspaceTab = 'learn' | 'calendar'
-
 function Workspace() {
   const navigate = useNavigate()
   const location = useLocation()
-  const [tab, setTab] = useState<WorkspaceTab>('learn')
-  const [calendarFilter, setCalendarFilter] = useState<CalendarTab>('upcoming')
   const [selectedEvent, setSelectedEvent] = useState<CalendarItem | null>(null)
 
   const upcomingEvents = upcomingItems
@@ -97,66 +93,7 @@ function Workspace() {
         </aside>
 
         <section className="mt-body ws-body">
-          <header className="mt-pageheader">
-            <div className="mt-pageheader__row">
-              <div className="mt-pageheader__headline">
-                <h1 className="mt-pageheader__title">Your Workspace</h1>
-                <p className="mt-pageheader__subtitle">Everything you're learning, scheduled and on your plate</p>
-              </div>
-            </div>
-
-            <div className="mt-pageheader__divider" />
-
-            <div className="ws-tabrow">
-              <nav className="mt-tabs" role="tablist" aria-label="Workspace view">
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={tab === 'learn'}
-                  className={`mt-tab${tab === 'learn' ? ' mt-tab--active' : ''}`}
-                  onClick={() => setTab('learn')}
-                >
-                  <span>Learn</span>
-                  {tab === 'learn' && <span className="mt-tab__indicator" aria-hidden="true" />}
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={tab === 'calendar'}
-                  className={`mt-tab${tab === 'calendar' ? ' mt-tab--active' : ''}`}
-                  onClick={() => setTab('calendar')}
-                >
-                  <span>Calendar</span>
-                  {tab === 'calendar' && <span className="mt-tab__indicator" aria-hidden="true" />}
-                </button>
-              </nav>
-              {tab === 'calendar' ? (
-                <div className="mt-cp__switcher" role="tablist" aria-label="Calendar filter">
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={calendarFilter === 'upcoming'}
-                    className={`mt-cp__switcher-item${calendarFilter === 'upcoming' ? ' mt-cp__switcher-item--active' : ''}`}
-                    onClick={() => setCalendarFilter('upcoming')}
-                  >
-                    Upcoming
-                  </button>
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={calendarFilter === 'past'}
-                    className={`mt-cp__switcher-item${calendarFilter === 'past' ? ' mt-cp__switcher-item--active' : ''}`}
-                    onClick={() => setCalendarFilter('past')}
-                  >
-                    Previous
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          </header>
-
-          {tab === 'learn' ? (
-            <div className="ws-sections">
+          <div className="ws-sections">
               <section className="ws-section">
                 <header className="ws-section__header">
                   <div className="ws-section__headline">
@@ -225,10 +162,7 @@ function Workspace() {
                   ))}
                 </Carousel>
               </section>
-            </div>
-          ) : (
-            <CalendarView filter={calendarFilter} />
-          )}
+          </div>
         </section>
       </div>
 
