@@ -236,7 +236,7 @@
   font-size: 12px;
   font-weight: 400;
   line-height: 1.2;
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -296,6 +296,7 @@
   gap: var(--space-sm);
   padding: var(--space-m);
   background: var(--page-background);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
 
 .curriculum-section__items {
@@ -325,18 +326,18 @@
 }
 
 .curriculum-section__add-lesson {
-  /* Medium outlined button — DS spec: 10px 20px padding, 14px font, 20px icon */
+  /* Small outlined button — DS spec: 8px 16px padding, 12px font, 16px icon */
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-s);
-  padding: 10px var(--space-ml);
+  gap: var(--space-xs);
+  padding: var(--space-s) var(--space-m);
   background: transparent;
   color: var(--primary-600);
   border: 1px solid var(--primary-600);
   border-radius: var(--radius-s);
   font-family: 'Poppins', sans-serif;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.5;
   cursor: pointer;

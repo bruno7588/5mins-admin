@@ -365,7 +365,7 @@ function CurriculumSection({
             onClick={onAddLesson}
           >
             <span>Add Content</span>
-            <Add size={20} color="currentColor" variant="Linear" />
+            <Add size={16} color="currentColor" variant="Linear" />
           </button>
         )}
       </div>
