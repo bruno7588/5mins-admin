@@ -142,6 +142,11 @@
   border-radius: 0;
 }
 
+/* No drag handle (single section) — bump left padding so the title isn't flush. */
+.curriculum-section--no-drag .curriculum-section__header {
+  padding-left: var(--space-m);
+}
+
 .curriculum-section__header {
   /* align-items stays flex-start; GSAP tweens paddingTop on drag handle and info column
      to fake center-alignment in the expanded state and animate the shift on toggle. */

@@ -13,3 +13,19 @@
   flex-direction: column;
   gap: 0;
 }
+
+/* Assessments submenu — appears to the right of its parent row. */
+.add-content-popover__submenu-anchor {
+  position: relative;
+}
+
+.add-content-popover__chevron {
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+  margin-left: auto;
+}
+
+.add-content-popover--submenu {
+  top: 0;
+  left: calc(100% + 4px);
+}

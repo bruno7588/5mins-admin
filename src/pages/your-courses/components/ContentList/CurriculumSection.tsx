@@ -306,6 +306,7 @@ function CurriculumSection({
   const classes = [
     'curriculum-section',
     hideChrome && 'curriculum-section--chromeless',
+    hideDragHandle && 'curriculum-section--no-drag',
     collapsed && 'curriculum-section--collapsed',
     isDragging && 'curriculum-section--dragging',
     dropAbove && 'curriculum-section--drop-above',

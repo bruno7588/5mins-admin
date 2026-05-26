@@ -4,7 +4,6 @@ import {
   Link1,
   DocumentCode,
   Calendar,
-  Edit,
   DocumentText,
   MessageText,
   Text,
@@ -12,6 +11,7 @@ import {
   Chart,
 } from 'iconsax-react'
 import AddContentMenuItem from './AddContentMenuItem'
+import AssessmentIcon from '../../../../components/icons/AssessmentIcon'
 import './AddContentSidebar.css'
 
 const iconSize = 20
@@ -65,7 +65,7 @@ function AddContentSidebar({ collapsed, activeDrawer = null, onAssessmentClick, 
         collapsed={collapsed}
       />
       <AddContentMenuItem
-        icon={<Edit size={iconSize} color={iconColor} variant="Linear" />}
+        icon={<AssessmentIcon size={iconSize} color={iconColor} />}
         label="Assessments"
         hasDropdown
         collapsed={collapsed}

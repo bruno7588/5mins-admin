@@ -1,11 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Book1,
   FolderOpen,
   Link1,
   DocumentCode,
   Calendar,
-  Edit,
   DocumentText,
   MessageText,
   Text,
@@ -13,6 +12,7 @@ import {
   Chart,
 } from 'iconsax-react'
 import AddContentMenuItem from '../AddContentSidebar/AddContentMenuItem'
+import AssessmentIcon from '../../../../components/icons/AssessmentIcon'
 import type { AssessmentType } from '../AddContentSidebar/AddContentSidebar'
 import './AddContentPopover.css'
 
@@ -33,6 +33,26 @@ interface AddContentPopoverProps {
    popover and routes to the corresponding drawer/modal. */
 function AddContentPopover({ open, onClose, onLibraryClick, onScormClick, onAssessmentClick }: AddContentPopoverProps) {
   const ref = useRef<HTMLDivElement>(null)
+  const [assessmentOpen, setAssessmentOpen] = useState(false)
+  const closeTimerRef = useRef<number | null>(null)
+
+  // Hover-driven submenu — open immediately on enter, close after a short grace period
+  // so the user can move the cursor across the 4px gap between row and submenu.
+  const cancelClose = () => {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+  }
+  const openSubmenu = () => {
+    cancelClose()
+    setAssessmentOpen(true)
+  }
+  const scheduleCloseSubmenu = () => {
+    cancelClose()
+    closeTimerRef.current = window.setTimeout(() => setAssessmentOpen(false), 200)
+  }
+  useEffect(() => () => cancelClose(), [])
 
   useEffect(() => {
     if (!open) return
@@ -49,6 +69,11 @@ function AddContentPopover({ open, onClose, onLibraryClick, onScormClick, onAsse
       document.removeEventListener('keydown', onKey)
     }
   }, [open, onClose])
+
+  // Reset submenu state whenever the popover closes/reopens.
+  useEffect(() => {
+    if (!open) setAssessmentOpen(false)
+  }, [open])
 
   if (!open) return null
 
@@ -81,32 +106,70 @@ function AddContentPopover({ open, onClose, onLibraryClick, onScormClick, onAsse
         icon={<Calendar size={iconSize} color={iconColor} variant="Linear" />}
         label="Events"
       />
-      <AddContentMenuItem
-        icon={<Edit size={iconSize} color={iconColor} variant="Linear" />}
-        label="Assessments"
-        hasDropdown
+      <div
+        className="add-content-popover__submenu-anchor"
+        onMouseEnter={openSubmenu}
+        onMouseLeave={scheduleCloseSubmenu}
       >
-        <AddContentMenuItem
-          icon={<MessageText size={iconSize} color={iconColor} variant="Linear" />}
-          label="Multiple Choice"
-          onClick={route(() => onAssessmentClick?.('multiple-choice'))}
-        />
-        <AddContentMenuItem
-          icon={<Text size={iconSize} color={iconColor} variant="Linear" />}
-          label="Short Text"
-          onClick={route(() => onAssessmentClick?.('short-text'))}
-        />
-        <AddContentMenuItem
-          icon={<ClipboardText size={iconSize} color={iconColor} variant="Linear" />}
-          label="Exercise"
-          onClick={route(() => onAssessmentClick?.('exercise'))}
-        />
-        <AddContentMenuItem
-          icon={<Chart size={iconSize} color={iconColor} variant="Linear" />}
-          label="Poll"
-          onClick={route(() => onAssessmentClick?.('poll'))}
-        />
-      </AddContentMenuItem>
+        <button
+          type="button"
+          className="add-content-menu-item"
+          aria-haspopup="menu"
+          aria-expanded={assessmentOpen}
+          onClick={() => setAssessmentOpen((v) => !v)}
+          onFocus={openSubmenu}
+        >
+          <span className="add-content-menu-item-icon">
+            <AssessmentIcon size={iconSize} color={iconColor} />
+          </span>
+          <span className="add-content-menu-item-label">Assessments</span>
+          <svg
+            className="add-content-popover__chevron"
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M4.5 3L7.5 6L4.5 9"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+        {assessmentOpen && (
+          <div
+            className="add-content-popover add-content-popover--submenu"
+            role="menu"
+            onMouseEnter={openSubmenu}
+            onMouseLeave={scheduleCloseSubmenu}
+          >
+            <AddContentMenuItem
+              icon={<MessageText size={iconSize} color={iconColor} variant="Linear" />}
+              label="Multiple Choice"
+              onClick={route(() => onAssessmentClick?.('multiple-choice'))}
+            />
+            <AddContentMenuItem
+              icon={<Text size={iconSize} color={iconColor} variant="Linear" />}
+              label="Short Text"
+              onClick={route(() => onAssessmentClick?.('short-text'))}
+            />
+            <AddContentMenuItem
+              icon={<ClipboardText size={iconSize} color={iconColor} variant="Linear" />}
+              label="Exercise"
+              onClick={route(() => onAssessmentClick?.('exercise'))}
+            />
+            <AddContentMenuItem
+              icon={<Chart size={iconSize} color={iconColor} variant="Linear" />}
+              label="Poll"
+              onClick={route(() => onAssessmentClick?.('poll'))}
+            />
+          </div>
+        )}
+      </div>
       <AddContentMenuItem
         icon={<DocumentText size={iconSize} color={iconColor} variant="Linear" />}
         label="Resources"
