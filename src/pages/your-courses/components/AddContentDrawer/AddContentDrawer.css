@@ -1,0 +1,83 @@
+/* AddContentDrawer — non-modal side panel (per Figma 8590:12734). No backdrop;
+   the main content area animates to shrink in sync with the drawer's slide-in so
+   the empty-state placeholder visibly contracts as the panel arrives. */
+
+.side-drawer.add-content-drawer {
+  width: 240px;
+  top: var(--page-header-offset, 178px); /* anchored to PageHeader divider bottom */
+  height: auto;
+  padding: var(--space-l) var(--space-m) var(--space-s) var(--space-s); /* top 24, right 16, bottom 8, left 8 */
+  gap: var(--space-s);
+  border-left: 1px solid var(--border);
+  box-shadow: none;
+  z-index: 30; /* above main-content, below modals */
+}
+
+/* Right-pad the content area to make room for whichever right-side surface is open:
+   - default (no panel, no strip): 0
+   - Add Content panel open (full 240px expanded menu): 240px
+   - Secondary drawer open (icon strip visible alongside): 60px
+   Sync timing with .side-drawer-in (300ms cubic-bezier in CoursesDrawer.css). */
+.app-content-area {
+  padding-right: 0;
+  transition: padding-right 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.app-content-area--with-icon-strip {
+  padding-right: 60px;
+}
+
+.app-content-area--with-add-content {
+  padding-right: 240px;
+}
+
+.add-content-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-m);
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.add-content-drawer__title {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.add-content-drawer__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.add-content-drawer__close:hover {
+  background: var(--cards-background-hover);
+  color: var(--text-primary);
+}
+
+.add-content-drawer__close:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+}
+
+.add-content-drawer__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}

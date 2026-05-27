@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import PageHeader from './components/PageHeader/PageHeader'
 import ContentList from './components/ContentList/ContentList'
 import type { ContentItem } from './components/ContentList/ContentList'
-import AddContentSidebar from './components/AddContentSidebar/AddContentSidebar'
+import AddContentDrawer from './components/AddContentDrawer/AddContentDrawer'
+import AddContentIconStrip from './components/AddContentIconStrip/AddContentIconStrip'
 import type { AssessmentType } from './components/AddContentSidebar/AddContentSidebar'
 import type { ScormFile } from './components/ScormDrawer/ScormDrawer'
 import ContentDrawer from './components/ContentDrawer/ContentDrawer'
@@ -26,21 +27,44 @@ function CreateCourse() {
   const [addedScormIds, setAddedScormIds] = useState<Set<number>>(new Set())
   const [assessmentModal, setAssessmentModal] = useState<{ type: AssessmentType } | null>(null)
   const [activeDrawer, setActiveDrawer] = useState<ActiveDrawer>(null)
+  const [addContentOpen, setAddContentOpen] = useState(false)
   const [addedLibraryIds, setAddedLibraryIds] = useState<Set<number>>(new Set())
   const [targetSectionId, setTargetSectionId] = useState<string | null>(null)
 
-  const openLibraryDrawer = (sectionId?: string) => {
-    setTargetSectionId(sectionId ?? null)
+  /* The Add Content drawer snaps to the bottom edge of the PageHeader's divider —
+     so the panel butts directly against the divider line and the tabs row sits
+     beside the drawer. Measured via the divider's viewport-relative bottom. */
+  useLayoutEffect(() => {
+    const update = () => {
+      const divider = document.querySelector<HTMLElement>('.page-header-divider')
+      if (!divider) return
+      const offset = divider.getBoundingClientRect().bottom
+      document.documentElement.style.setProperty('--page-header-offset', `${offset}px`)
+    }
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+
+  const openAddContent = (sectionId: string) => {
+    setTargetSectionId(sectionId)
+    setAddContentOpen(true)
+  }
+
+  const closeAddContent = () => setAddContentOpen(false)
+
+  const openLibraryDrawer = () => {
+    setAddContentOpen(false)
     setActiveDrawer('library')
   }
 
-  const openScormDrawerFor = (sectionId: string) => {
-    setTargetSectionId(sectionId)
+  const openScormDrawer = () => {
+    setAddContentOpen(false)
     setActiveDrawer('scorm')
   }
 
-  const openAssessmentFor = (type: AssessmentType, sectionId: string) => {
-    setTargetSectionId(sectionId)
+  const openAssessment = (type: AssessmentType) => {
+    setAddContentOpen(false)
     setAssessmentModal({ type })
   }
 
@@ -116,44 +140,44 @@ function CreateCourse() {
   return (
     <>
       <PageHeader />
-      <div className="app-content-area">
+      <div
+        className={[
+          'app-content-area',
+          addContentOpen && 'app-content-area--with-add-content',
+          activeDrawer && 'app-content-area--with-icon-strip',
+        ].filter(Boolean).join(' ')}
+      >
         <main className="main-content">
           <ContentList
             extraItems={scormItems}
             onDeleteExtra={handleRemoveScorm}
-            onAddContent={openLibraryDrawer}
-            onAddLibrary={openLibraryDrawer}
-            onAddScorm={openScormDrawerFor}
-            onAddAssessment={openAssessmentFor}
+            onAddContent={openAddContent}
             targetSectionId={targetSectionId}
           />
         </main>
-        {!assessmentModal && (
-          <AddContentSidebar
-            collapsed={activeDrawer !== null}
-            activeDrawer={activeDrawer}
-            onAssessmentClick={(type) => setAssessmentModal({ type })}
-            onLibraryClick={() => openLibraryDrawer()}
-            onScormClick={() => setActiveDrawer('scorm')}
-          />
-        )}
         {assessmentModal && (
           <AssessmentModal
             type={assessmentModal.type}
             onClose={() => setAssessmentModal(null)}
             onAdd={handleAddAssessment}
-            sidebarIcons={
-              <AddContentSidebar
-                collapsed
-                activeDrawer={activeDrawer}
-                onAssessmentClick={(type) => setAssessmentModal({ type })}
-                onLibraryClick={() => openLibraryDrawer()}
-                onScormClick={() => setActiveDrawer('scorm')}
-              />
-            }
           />
         )}
       </div>
+      {activeDrawer && (
+        <AddContentIconStrip
+          active={activeDrawer}
+          onLibraryClick={() => setActiveDrawer('library')}
+          onScormClick={() => setActiveDrawer('scorm')}
+          onAssessmentClick={openAssessment}
+        />
+      )}
+      <AddContentDrawer
+        open={addContentOpen}
+        onClose={closeAddContent}
+        onLibraryClick={openLibraryDrawer}
+        onScormClick={openScormDrawer}
+        onAssessmentClick={openAssessment}
+      />
       <ContentDrawer
         activeDrawer={activeDrawer}
         onClose={closeDrawer}

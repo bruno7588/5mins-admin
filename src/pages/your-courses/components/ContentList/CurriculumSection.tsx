@@ -1,15 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import {
-  Add,
-  ArrowDown2,
-  Edit2,
-  Trash,
-} from 'iconsax-react'
+import { Add, ArrowDown2, Edit2, Trash } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import MoreIcon from '../../../../components/icons/MoreIcon'
-import AddContentPopover from '../AddContentPopover/AddContentPopover'
-import type { AssessmentType } from '../AddContentSidebar/AddContentSidebar'
 import type { ReactNode } from 'react'
 
 export interface Section {
@@ -111,9 +104,10 @@ interface CurriculumSectionProps {
   onToggleCollapse: () => void
   onRename: (newName: string) => void
   onDelete: () => void
-  onAddLibrary?: () => void
-  onAddScorm?: () => void
-  onAddAssessment?: (type: AssessmentType) => void
+  onAddContent?: () => void
+  canRename?: boolean
+  canDelete?: boolean
+  unsectioned?: boolean
   destinationActive?: boolean
   onBodyDragOver?: (e: React.DragEvent) => void
   onBodyDrop?: () => void
@@ -137,9 +131,10 @@ function CurriculumSection({
   onToggleCollapse,
   onRename,
   onDelete,
-  onAddLibrary,
-  onAddScorm,
-  onAddAssessment,
+  onAddContent,
+  canRename = true,
+  canDelete = true,
+  unsectioned = false,
   destinationActive = false,
   onBodyDragOver,
   onBodyDrop,
@@ -147,7 +142,6 @@ function CurriculumSection({
 }: CurriculumSectionProps) {
   const [renaming, setRenaming] = useState(startInRenameMode)
   const [draft, setDraft] = useState(section.name)
-  const [addMenuOpen, setAddMenuOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
   const summaryRef = useRef<HTMLParagraphElement>(null)
@@ -262,6 +256,7 @@ function CurriculumSection({
     dropAbove && 'curriculum-section--drop-above',
     dropBelow && 'curriculum-section--drop-below',
     destinationActive && 'curriculum-section--drop-destination',
+    unsectioned && 'curriculum-section--unsectioned',
   ].filter(Boolean).join(' ')
 
   const showSectionDrag = !hideChrome && !hideDragHandle
@@ -282,10 +277,18 @@ function CurriculumSection({
           onDragEnd={onDragEnd}
         >
           <DragHandle innerRef={dragRef} />
+          <div className="curriculum-section__drag-line" aria-hidden="true" />
         </div>
       )}
 
-      {!hideChrome && (
+      {!hideChrome && unsectioned && (
+        <header className="curriculum-section__divider-header">
+          <span className="curriculum-section__divider-label">{section.name}</span>
+          <div className="curriculum-section__divider-line" aria-hidden="true" />
+        </header>
+      )}
+
+      {!hideChrome && !unsectioned && (
       <header className="curriculum-section__header">
         {renaming ? (
           <>
@@ -331,22 +334,24 @@ function CurriculumSection({
                 <p ref={summaryRef} className="curriculum-section__summary">{summary}</p>
               )}
             </div>
-            <KebabMenu
-              ariaLabel={`Actions for ${section.name}`}
-              items={[
-                {
-                  label: 'Rename',
-                  onClick: startRename,
-                  icon: <Edit2 size={16} color="currentColor" variant="Linear" />,
-                },
-                {
-                  label: 'Remove Section',
-                  onClick: onDelete,
-                  danger: true,
-                  icon: <Trash size={16} color="currentColor" variant="Linear" />,
-                },
-              ]}
-            />
+            {(canRename || canDelete) && (
+              <KebabMenu
+                ariaLabel={`Actions for ${section.name}`}
+                items={[
+                  canRename && {
+                    label: 'Rename',
+                    onClick: startRename,
+                    icon: <Edit2 size={16} color="currentColor" variant="Linear" />,
+                  },
+                  canDelete && {
+                    label: 'Remove Section',
+                    onClick: onDelete,
+                    danger: true,
+                    icon: <Trash size={16} color="currentColor" variant="Linear" />,
+                  },
+                ].filter(Boolean) as { label: string; onClick: () => void; danger?: boolean; icon?: ReactNode }[]}
+              />
+            )}
             <button
               type="button"
               className={`curriculum-section__chevron${collapsed ? ' curriculum-section__chevron--collapsed' : ''}`}
@@ -367,33 +372,19 @@ function CurriculumSection({
         onDragOver={onBodyDragOver}
         onDrop={onBodyDrop}
       >
-        {itemCount === 0 ? (
-          <div className="curriculum-section__empty">
-            <p className="curriculum-section__empty-text">No content on this section</p>
-          </div>
-        ) : (
+        {itemCount > 0 && (
           <div className="curriculum-section__items">{children}</div>
         )}
-        {(onAddLibrary || onAddScorm || onAddAssessment) && (
-          <div className="curriculum-section__add-content-wrap">
-            <button
-              type="button"
-              className="curriculum-section__add-lesson"
-              aria-haspopup="menu"
-              aria-expanded={addMenuOpen}
-              onClick={() => setAddMenuOpen((v) => !v)}
-            >
-              <span>Add Content</span>
-              <Add size={20} color="currentColor" variant="Linear" />
-            </button>
-            <AddContentPopover
-              open={addMenuOpen}
-              onClose={() => setAddMenuOpen(false)}
-              onLibraryClick={onAddLibrary}
-              onScormClick={onAddScorm}
-              onAssessmentClick={onAddAssessment}
-            />
-          </div>
+        {onAddContent && !unsectioned && (
+          <button
+            type="button"
+            className="curriculum-section__placeholder"
+            onClick={onAddContent}
+            aria-label="Add content here"
+          >
+            <Add size={20} color="currentColor" variant="Linear" />
+            <span>Add Content Here</span>
+          </button>
         )}
       </div>
     </section>

@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { Eye } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import './PageHeader.css'
 
@@ -17,7 +18,11 @@ function PageHeader() {
       <div className="page-header-top">
         <h2 className="page-header-title">Create course</h2>
         <div className="page-header-actions">
-          <button className="page-header-btn-outline page-header-btn-disabled">
+          <button className="page-header-btn-outline">
+            <span>Preview</span>
+            <Eye size={20} color="currentColor" variant="Linear" />
+          </button>
+          <button className="page-header-btn-outline-primary page-header-btn-disabled">
             Save Draft
           </button>
           <button className="page-header-btn-filled page-header-btn-disabled">
@@ -26,6 +31,7 @@ function PageHeader() {
           <CloseButton onClick={() => navigate('/your-courses')} className="page-header-close" />
         </div>
       </div>
+      <div className="page-header-divider" aria-hidden="true" />
       <nav className="page-header-tabs">
         {tabs.map((tab) => (
           <button

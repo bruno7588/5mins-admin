@@ -1,10 +1,20 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { Add, Danger, Edit2, Trash } from 'iconsax-react'
+import { Add, Clock, Edit2, PlayCircle, TextalignJustifyleft, Trash } from 'iconsax-react'
+import AssessmentIcon from '../../../../components/icons/AssessmentIcon'
+import Badge from '../../../../components/Badge/Badge'
 import ToastContainer, { useToast } from '../../../../components/Toast/Toast'
 import Tooltip from '../../../../components/Tooltip/Tooltip'
 import CurriculumSection from './CurriculumSection'
-import type { AssessmentType } from '../AddContentSidebar/AddContentSidebar'
 import './ContentList.css'
+
+/* Parse "3m 45s" / "4min" / "4 min" / "20 mins" patterns into minutes (float). */
+function parseDurationMinutes(metadata: string): number {
+  const msMatch = metadata.match(/(\d+)\s*m\s*(\d+)\s*s/)
+  if (msMatch) return Number(msMatch[1]) + Number(msMatch[2]) / 60
+  const minMatch = metadata.match(/(\d+)\s*min/)
+  if (minMatch) return Number(minMatch[1])
+  return 0
+}
 
 export interface ContentItem {
   id: number
@@ -27,6 +37,8 @@ interface Section {
 }
 
 const DEFAULT_SECTION_NAME = 'Section 1'
+const UNSECTIONED_ID = 's-unsectioned'
+const UNSECTIONED_NAME = 'Unsectioned'
 
 function itemKey(item: ContentItem) {
   return `${item.type}-${item.id}`
@@ -150,13 +162,8 @@ function ContentCard({
 interface ContentListProps {
   extraItems?: ContentItem[]
   onDeleteExtra?: (id: number) => void
-  /* Empty-state CTA (and old single-action callback). Receives a sectionId if available. */
-  onAddContent?: (sectionId?: string) => void
-  /* Section-level per-type handlers. The section's "Add Content" button opens a popover
-     that mirrors the sidebar; clicking an item invokes the matching handler. */
-  onAddLibrary?: (sectionId: string) => void
-  onAddScorm?: (sectionId: string) => void
-  onAddAssessment?: (type: AssessmentType, sectionId: string) => void
+  /* Opens the AddContentDrawer (slide-in side panel) scoped to a sectionId. */
+  onAddContent?: (sectionId: string) => void
   targetSectionId?: string | null
 }
 
@@ -164,9 +171,6 @@ function ContentList({
   extraItems = [],
   onDeleteExtra,
   onAddContent,
-  onAddLibrary,
-  onAddScorm,
-  onAddAssessment,
   targetSectionId,
 }: ContentListProps) {
   const [itemsByKey, setItemsByKey] = useState<Record<string, ContentItem>>({})
@@ -181,7 +185,6 @@ function ContentList({
   const [sectionDragId, setSectionDragId] = useState<string | null>(null)
 
   const [autoRenameSectionId, setAutoRenameSectionId] = useState<string | null>(null)
-  const [confirmDelete, setConfirmDelete] = useState<Section | null>(null)
 
   const { toasts, show: showToast } = useToast()
   const prevExtraRef = useRef<string>(extraItems.map(itemKey).join(','))
@@ -245,25 +248,35 @@ function ContentList({
     setSections((prev) => prev.map((s) => (s.id === id ? { ...s, collapsed: !s.collapsed } : s)))
   }
 
+  /* Section delete: never destructive. Empty sections are removed outright; sections with
+     content lose their wrapper but their items move to a special "Unsectioned" bucket. */
   const deleteSection = (section: Section) => {
-    setItemsByKey((prev) => {
-      const next = { ...prev }
-      for (const k of section.itemKeys) {
-        const item = next[k]
-        if (item && (item.type === 'SCORM' || item.type === 'Assessment' || item.type === 'LibraryLesson')) {
-          onDeleteExtra?.(item.id)
-        }
-        delete next[k]
-      }
-      return next
-    })
+    if (section.id === UNSECTIONED_ID) return
+    const orphanCount = section.itemKeys.length
     setSections((prev) => {
-      const next = prev.filter((s) => s.id !== section.id)
-      // Never leave the list section-less — the auto-default keeps the UI in a single mode.
-      return next.length === 0 ? [makeDefaultSection()] : next
+      const without = prev.filter((s) => s.id !== section.id)
+      if (orphanCount === 0) {
+        return without.length === 0 ? [makeDefaultSection()] : without
+      }
+      const hasUnsectioned = without.some((s) => s.id === UNSECTIONED_ID)
+      if (hasUnsectioned) {
+        return without.map((s) =>
+          s.id === UNSECTIONED_ID ? { ...s, itemKeys: [...s.itemKeys, ...section.itemKeys] } : s,
+        )
+      }
+      return [
+        ...without,
+        { id: UNSECTIONED_ID, name: UNSECTIONED_NAME, itemKeys: [...section.itemKeys], collapsed: false },
+      ]
     })
-    showToast('success', `Section "${section.name}" removed`)
-    setConfirmDelete(null)
+    if (orphanCount === 0) {
+      showToast('success', `Section "${section.name}" removed`)
+    } else {
+      showToast(
+        'success',
+        `Section "${section.name}" removed · ${orphanCount} item${orphanCount === 1 ? '' : 's'} moved to Unsectioned`,
+      )
+    }
   }
 
   const deleteItem = (key: string) => {
@@ -449,147 +462,159 @@ function ContentList({
     else startCreate()
   }
 
+  /* Course metadata — live counts for the top-of-page chip strip.
+     Hidden until the user has added at least one item. */
+  const namedSectionCount = sections.filter((s) => s.id !== UNSECTIONED_ID).length
+  const allItems = sections
+    .flatMap((s) => s.itemKeys.map((k) => itemsByKey[k]))
+    .filter((it): it is ContentItem => !!it)
+  const lessonCount = allItems.filter((it) => it.type !== 'Assessment').length
+  const assessmentCount = allItems.filter((it) => it.type === 'Assessment').length
+  const totalMinutes = Math.round(
+    allItems
+      .filter((it) => it.type !== 'Assessment')
+      .reduce((sum, it) => sum + parseDurationMinutes(it.metadata), 0),
+  )
+  const showMeta = lessonCount + assessmentCount > 0
+
   return (
-    <section className="content-list" onDragOver={(e) => e.preventDefault()}>
-      {showEmptyState && (
-        <div className="course-empty-state" role="status">
-          <div className="course-empty-state__icon" aria-hidden="true">
-            <Add size={72} color="var(--text-tertiary)" variant="Linear" />
-          </div>
-          <div className="course-empty-state__info">
-            <h2 className="course-empty-state__title">Add content to your course</h2>
-            <p className="course-empty-state__body">
-              Use the side menu to add content, upload resources, and create assessments
-            </p>
-          </div>
-          <div className="course-empty-state__cta">
-            <button
-              type="button"
-              className="course-empty-state__btn course-empty-state__btn--outlined"
-              onClick={startSectioning}
-            >
-              Add Section
-            </button>
-            <button
-              type="button"
-              className="course-empty-state__btn course-empty-state__btn--filled"
-              onClick={() => onAddContent?.(onlySection!.id)}
-            >
-              <span>Add Content</span>
-              <Add size={20} color="currentColor" variant="Linear" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {!showEmptyState && sections.map((section, idx) => {
-        // Divider only renders between two adjacent sections that are BOTH expanded.
-        // Collapsed sections are already visually distinct enough on their own.
-        const prev = sections[idx - 1]
-        const showDivider = !!prev && !prev.collapsed && !section.collapsed
-        return (
-        <Fragment key={section.id}>
-        {showDivider && <div className="curriculum-divider" aria-hidden="true" />}
-        <CurriculumSection
-          section={{ id: section.id, name: section.name, items: [], collapsed: section.collapsed }}
-          itemCount={section.itemKeys.length}
-          summary={buildSummary(section.itemKeys)}
-          hideChrome={isFlatMode}
-          hideDragHandle={sections.length === 1}
-          startInRenameMode={section.id === autoRenameSectionId}
-          isDragging={sectionDragId === section.id}
-          onDragStart={handleSectionDragStart(section.id)}
-          onDragOver={handleSectionDragOver(section.id)}
-          onDragEnd={handleSectionDragEnd}
-          onDrop={handleSectionDrop}
-          onToggleCollapse={() => toggleCollapse(section.id)}
-          onRename={(name) => renameSection(section.id, name)}
-          onDelete={() =>
-            section.itemKeys.length === 0 ? deleteSection(section) : setConfirmDelete(section)
-          }
-          onAddLibrary={onAddLibrary ? () => onAddLibrary(section.id) : undefined}
-          onAddScorm={onAddScorm ? () => onAddScorm(section.id) : undefined}
-          onAddAssessment={onAddAssessment ? (type) => onAddAssessment(type, section.id) : undefined}
-          destinationActive={containerDropTarget === section.id}
-          onBodyDragOver={handleContainerDragOver(section.id)}
-          onBodyDrop={handleContainerDrop(section.id)}
-        >
-          {section.itemKeys.map((key) => {
-            const item = itemsByKey[key]
-            if (!item) return null
-            return (
-              <ContentCard
-                key={key}
-                item={item}
-                onDelete={() => deleteItem(key)}
-                isDragging={dragKey === key}
-                dropAbove={dropTarget?.itemKey === key && dropTarget.position === 'above'}
-                dropBelow={dropTarget?.itemKey === key && dropTarget.position === 'below'}
-                onDragStart={handleDragStart(key)}
-                onDragOver={handleDragOver(key)}
-                onDragEnd={handleDragEnd}
-                onDrop={handleDrop}
+    <div
+      className={`content-list-layout${showEmptyState ? ' content-list-layout--empty' : ''}`}
+      onDragOver={(e) => e.preventDefault()}
+    >
+      <section className="content-list">
+        {showMeta && (
+          <div className="course-meta" aria-label="Course summary">
+            <Badge
+              type="informative"
+              customIcon={<TextalignJustifyleft size={16} color="currentColor" variant="Linear" />}
+              label={`${namedSectionCount} ${namedSectionCount === 1 ? 'section' : 'sections'}`}
+            />
+            <Badge
+              type="informative"
+              customIcon={<PlayCircle size={16} color="currentColor" variant="Linear" />}
+              label={`${lessonCount} ${lessonCount === 1 ? 'lesson' : 'lessons'}`}
+            />
+            <Badge
+              type="informative"
+              customIcon={<AssessmentIcon size={16} color="currentColor" />}
+              label={`${assessmentCount} ${assessmentCount === 1 ? 'assessment' : 'assessments'}`}
+            />
+            {totalMinutes > 0 && (
+              <Badge
+                type="informative"
+                customIcon={<Clock size={16} color="currentColor" variant="Linear" />}
+                label={`${totalMinutes} ${totalMinutes === 1 ? 'min' : 'mins'}`}
               />
-            )
-          })}
-        </CurriculumSection>
-        </Fragment>
-        )
-      })}
-
-      {!showEmptyState && (
-        <button type="button" className="curriculum-add-section" onClick={startCreate}>
-          <span>Add Section</span>
-          <Add size={20} color="currentColor" variant="Linear" />
-        </button>
-      )}
-
-      {confirmDelete && (
-        <>
-          <div className="overlay-backdrop" aria-hidden="true" />
-          <div
-            className="dialog dialog--error"
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="delete-section-title"
-          >
-            <div className="dialog__icon" aria-hidden="true">
-              <Danger size={72} color="var(--danger-500)" variant="Linear" />
+            )}
+          </div>
+        )}
+        {showEmptyState && (
+          <div className="course-empty-state" role="status">
+            <div className="course-empty-state__icon" aria-hidden="true">
+              <Add size={72} color="var(--text-tertiary)" variant="Linear" />
             </div>
-            <div className="dialog__info">
-              <h2 id="delete-section-title" className="dialog__title">
-                Remove section?
-              </h2>
-              <p className="dialog__description">
-                This will remove <strong>{confirmDelete.name}</strong>
-                {confirmDelete.itemKeys.length > 0
-                  ? ` and its ${confirmDelete.itemKeys.length} lesson${confirmDelete.itemKeys.length === 1 ? '' : 's'}`
-                  : ''}
-                . This cannot be undone.
+            <div className="course-empty-state__info">
+              <h2 className="course-empty-state__title">Add content to your course</h2>
+              <p className="course-empty-state__body">
+                Add content, upload resources, and create assessments, or start by creating a section to organise what's coming.
               </p>
             </div>
-            <div className="dialog__cta">
+            <div className="course-empty-state__cta">
               <button
                 type="button"
-                className="dialog__btn dialog__btn--outlined-error"
-                onClick={() => setConfirmDelete(null)}
+                className="course-empty-state__btn course-empty-state__btn--outlined"
+                onClick={startSectioning}
               >
-                Cancel
+                Start With A Section
               </button>
               <button
                 type="button"
-                className="dialog__btn dialog__btn--filled-error"
-                onClick={() => deleteSection(confirmDelete)}
+                className="course-empty-state__btn course-empty-state__btn--filled"
+                onClick={() => onAddContent?.(onlySection!.id)}
               >
-                Remove Section
+                <span>Add Content</span>
+                <Add size={20} color="currentColor" variant="Linear" />
               </button>
             </div>
           </div>
-        </>
-      )}
+        )}
 
-      <ToastContainer toasts={toasts} />
-    </section>
+        {!showEmptyState && sections.map((section) => {
+          const isUnsectioned = section.id === UNSECTIONED_ID
+          return (
+            <Fragment key={section.id}>
+              <div id={`section-${section.id}`}>
+                <CurriculumSection
+                  section={{ id: section.id, name: section.name, items: [], collapsed: section.collapsed }}
+                  itemCount={section.itemKeys.length}
+                  summary={buildSummary(section.itemKeys)}
+                  hideChrome={isFlatMode}
+                  hideDragHandle={sections.length === 1 || isUnsectioned}
+                  startInRenameMode={section.id === autoRenameSectionId}
+                  isDragging={sectionDragId === section.id}
+                  onDragStart={handleSectionDragStart(section.id)}
+                  onDragOver={handleSectionDragOver(section.id)}
+                  onDragEnd={handleSectionDragEnd}
+                  onDrop={handleSectionDrop}
+                  onToggleCollapse={() => toggleCollapse(section.id)}
+                  onRename={(name) => renameSection(section.id, name)}
+                  onDelete={() => deleteSection(section)}
+                  onAddContent={onAddContent ? () => onAddContent(section.id) : undefined}
+                  canRename={!isUnsectioned}
+                  canDelete={!isUnsectioned}
+                  unsectioned={isUnsectioned}
+                  destinationActive={containerDropTarget === section.id}
+                  onBodyDragOver={handleContainerDragOver(section.id)}
+                  onBodyDrop={handleContainerDrop(section.id)}
+                >
+                  {section.itemKeys.map((key) => {
+                    const item = itemsByKey[key]
+                    if (!item) return null
+                    return (
+                      <div key={key} id={`item-${key}`}>
+                        <ContentCard
+                          item={item}
+                          onDelete={() => deleteItem(key)}
+                          isDragging={dragKey === key}
+                          dropAbove={dropTarget?.itemKey === key && dropTarget.position === 'above'}
+                          dropBelow={dropTarget?.itemKey === key && dropTarget.position === 'below'}
+                          onDragStart={handleDragStart(key)}
+                          onDragOver={handleDragOver(key)}
+                          onDragEnd={handleDragEnd}
+                          onDrop={handleDrop}
+                        />
+                      </div>
+                    )
+                  })}
+                </CurriculumSection>
+              </div>
+            </Fragment>
+          )
+        })}
+
+        {!showEmptyState && (
+          <div className="curriculum-bottom-actions">
+            {sections[sections.length - 1]?.id === UNSECTIONED_ID && (
+              <button
+                type="button"
+                className="curriculum-add-content"
+                onClick={() => onAddContent?.(UNSECTIONED_ID)}
+              >
+                <Add size={20} color="currentColor" variant="Linear" />
+                <span>Add Content</span>
+              </button>
+            )}
+            <button type="button" className="curriculum-add-section" onClick={startCreate}>
+              <TextalignJustifyleft size={20} color="currentColor" variant="Linear" />
+              <span>Add Section</span>
+            </button>
+          </div>
+        )}
+
+        <ToastContainer toasts={toasts} />
+      </section>
+    </div>
   )
 }
 

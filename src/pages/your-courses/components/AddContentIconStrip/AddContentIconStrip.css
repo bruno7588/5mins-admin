@@ -1,0 +1,56 @@
+/* Persistent right-edge icon strip per Figma 8646:16767. Anchors to the same
+   top offset as the expanded AddContentDrawer (just below the PageHeader divider)
+   so the two visually stack — strip behind, drawer in front. */
+
+/* Anchored from below the TopNav (70px) down to the bottom — fully covers the
+   right 60px column so the PageHeader's "Close course" X doesn't peek through.
+   Icons start from the top of the strip with a small 20px breathing room
+   (matches Figma 8646:16767 `py-20`). */
+.add-content-icon-strip {
+  position: fixed;
+  top: 70px; /* sits below the fixed TopNav */
+  right: 0;
+  bottom: 0;
+  width: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-ml) 0;
+  background-color: var(--page-background);
+  border-left: 1px solid var(--border);
+  /* Must beat PageHeader CTAs (no z-index, default 0) AND the open secondary
+     drawer (z-index 1001) so its content doesn't bleed under the icon strip.
+     Stays below the TopNav (z-100) so global nav remains accessible. */
+  z-index: 1002;
+  transition: opacity 150ms ease;
+}
+
+.add-content-icon-strip__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-s);
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.add-content-icon-strip__item:hover {
+  background: var(--cards-background-hover);
+  color: var(--text-primary);
+}
+
+.add-content-icon-strip__item--active {
+  color: var(--selected); /* yellow per DS active treatment */
+}
+
+.add-content-icon-strip__item:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: -2px;
+}

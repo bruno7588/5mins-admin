@@ -1,10 +1,41 @@
+/* Top-level layout: 240px left outline (sticky) + centered 900px content column. */
+.content-list-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-l);
+  padding: var(--space-l) 0;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* Empty-state mode: drop the 1180px / 900px constraints so the empty placeholder
+   spans the full main-content width. */
+.content-list-layout--empty {
+  max-width: none;
+}
+
 .content-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-ml); /* 20px between sections / dividers / Add Section CTA */
-  padding: var(--space-l) 0;
+  gap: var(--space-ml); /* 20px between sections / Add Section CTA */
+  flex: 1;
+  min-width: 0;
   max-width: 900px;
   margin: 0 auto;
+}
+
+/* Course metadata badges — top-of-page summary (sections / lessons / assessments / mins).
+   Uses the DS <Badge type="informative"> with customIcon. Hidden until the user adds
+   at least one item. Per Figma 8651:13033. */
+.course-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  flex-wrap: wrap;
+}
+
+.content-list-layout--empty .content-list {
+  max-width: none;
 }
 
 /* Two adjacent collapsed sections: tighter 16px gap (rather than 32px) since
@@ -143,15 +174,75 @@
   box-shadow: none;
 }
 
+/* Collapsed sections: header becomes the whole card; remove header/body gap. */
+.curriculum-section--collapsed {
+  height: fit-content;
+  row-gap: 0px;
+}
+
+/* Drag column spans BOTH grid rows (header + body) so its vertical divider
+   line auto-fits the section body's current height. Handle aligns vertically
+   with the header text via 12px padding-top (per Figma 8651:12373). */
 .curriculum-section__drag-column {
   grid-column: 1;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-s);
+  padding-top: var(--space-sm);
+  width: 20px;
+  flex-shrink: 0;
+}
+
+/* Vertical divider line below the drag handle — fills the remaining drag-column
+   height so it stretches with the body (per Figma 8651:12375). */
+.curriculum-section__drag-line {
+  width: 1px;
+  flex: 1;
+  min-height: 0;
+  background: var(--border);
+  border-radius: var(--radius-xs);
+}
+
+/* When the section is collapsed (body height: 0), hide the line so the drag
+   column collapses to just the handle. */
+.curriculum-section--collapsed .curriculum-section__drag-line {
+  display: none;
+}
+
+/* Unsectioned/loose content uses a divider-style header (label + horizontal line)
+   instead of the card header — no rename, no chevron, no collapse. */
+.curriculum-section__divider-header {
+  grid-column: 2;
   grid-row: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
-  align-self: stretch;
-  width: 20px;
+  gap: var(--space-s);
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.curriculum-section--unsectioned .curriculum-section__divider-header {
+  grid-column: 1 / -1;
+}
+
+.curriculum-section__divider-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-tertiary);
   flex-shrink: 0;
+}
+
+.curriculum-section__divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  border-radius: var(--radius-xs);
 }
 
 .curriculum-section__body {
@@ -159,14 +250,6 @@
   grid-row: 2;
 }
 
-/* Divider rendered between adjacent expanded sections — matches the section
-   content width (skips the drag-column area on the left). Per Figma 8622:16640. */
-.curriculum-divider {
-  margin-left: calc(20px + var(--space-s));
-  height: 1px;
-  background: var(--border);
-  border-radius: var(--radius-xs);
-}
 
 /* Chromeless: the only-default-section state. No drag column, no header, no
    tinted item rails — the section body becomes the page's flat list. */
@@ -182,7 +265,6 @@
   display: flex;
   align-items: center;
   gap: var(--space-s);
-  min-height: 48px;
   padding: var(--space-sm) var(--space-s) var(--space-sm) var(--space-m);
   background: var(--cards-background);
   border-radius: var(--radius-sm);
@@ -268,8 +350,8 @@
 
 .curriculum-section__title {
   margin: 0;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 500;
   line-height: 1.5;
   color: var(--text-primary);
   cursor: text;
@@ -303,8 +385,8 @@
   min-width: 0;
   padding: 0 0 2px;
   font-family: 'Poppins', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 500;
   line-height: 1.5;
   color: var(--text-primary);
   background: transparent;
@@ -359,64 +441,34 @@
   gap: var(--space-sm); /* 12px between item containers (per Figma 8622:17275) */
 }
 
-.curriculum-section__empty {
+/* Per-section placeholder — full-width dashed, transparent bg, tertiary text,
+   regular weight, "Add Content Here" copy (per Figma 8651:12404). */
+.curriculum-section__placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-m);
+  gap: var(--space-xs);
+  width: 100%;
+  padding: var(--space-s) var(--space-m);
   background: transparent;
   border: 1px dashed var(--border);
   border-radius: var(--radius-sm);
-}
-
-.curriculum-section__empty-text {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.5;
   color: var(--text-tertiary);
-}
-
-.curriculum-section__add-content-wrap {
-  position: relative;
-  align-self: flex-start;
-}
-
-.curriculum-section__add-lesson {
-  /* Per Figma 8622:16831 — outlined button: 8/16 padding, 8 radius, 14px Bold,
-     primary border/text, 4px gap, 20px icon. */
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xs);
-  padding: var(--space-s) var(--space-m);
-  background: transparent;
-  color: var(--primary-600);
-  border: 1px solid var(--primary-600);
-  border-radius: var(--radius-s);
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.5;
   cursor: pointer;
-  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
-.curriculum-section__add-lesson:hover {
-  background: var(--primary-100);
-  color: var(--primary-700);
-  border-color: var(--primary-700);
+.curriculum-section__placeholder:hover {
+  background: var(--input-background);
+  border-color: var(--border-hover);
+  color: var(--text-secondary);
 }
 
-.curriculum-section__add-lesson:active {
-  background: var(--primary-100);
-  color: var(--primary-800);
-  border-color: var(--primary-800);
-}
-
-.curriculum-section__add-lesson:focus-visible {
+.curriculum-section__placeholder:focus-visible {
   outline: 2px solid var(--primary-600);
   outline-offset: 2px;
 }
@@ -515,14 +567,53 @@
   background: var(--danger-100);
 }
 
-/* ── Add section CTA + inline creation ──────────────────────── */
-.curriculum-add-section {
-  /* Full-width dashed dropzone — section-level affordance (per Figma 8600:71534) */
+/* ── Add Content / Add Section CTAs (bottom row) ────────────── */
+/* Side-by-side row when loose/unsectioned content exists; otherwise just
+   Add Section. Indented to align with the section header (past the drag column). */
+.curriculum-bottom-actions {
+  align-self: flex-start;
+  margin-left: calc(20px + var(--space-s));
   display: flex;
+  align-items: center;
+  gap: var(--space-m);
+}
+
+/* Compact pill — dashed border, transparent bg, primary text (per Figma 8647:12060). */
+.curriculum-add-content {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
-  padding: var(--space-s);
+  padding: var(--space-s) var(--space-m);
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.curriculum-add-content:hover {
+  background: var(--input-background);
+  border-color: var(--border-hover);
+}
+
+.curriculum-add-content:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+}
+
+/* Compact pill — dashed border, input bg, secondary text (per Figma 8647:12069). */
+.curriculum-add-section {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-m);
   background: var(--input-background);
   border: 1px dashed var(--border);
   border-radius: var(--radius-sm);
@@ -536,8 +627,9 @@
 }
 
 .curriculum-add-section:hover {
+  background: var(--input-background-hover);
   border-color: var(--border-hover);
-  color: var(--primary-700);
+  color: var(--text-primary);
 }
 
 .curriculum-add-section:focus-visible {

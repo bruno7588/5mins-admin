@@ -1,13 +1,19 @@
-.page-header {
-  padding: 0 var(--space-xl);
+/* Double-class selectors outrank the duplicate `.page-header*` rules in
+   scorm-content/components/PageHeader/PageHeader.css that are bundled globally
+   and would otherwise override our padding/gap via source order. */
+.page-header.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m); /* 16px gap between top row, divider, tabs */
+  padding: var(--space-m) var(--space-xl) 0 var(--space-xl);
   background: var(--page-background);
 }
 
-.page-header-top {
+.page-header-top.page-header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-m) 0;
+  padding: 0;
 }
 
 .page-header-title {
@@ -23,21 +29,58 @@
   gap: var(--space-m);
 }
 
+/* DS "Outlined-2" — neutral border/text at rest, primary-tinted on interaction.
+   See design-system/buttons.md → Outlined-2. */
 .page-header-btn-outline {
-  padding: var(--space-s) var(--space-ml);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 10px var(--space-ml); /* DS medium: 10px 20px → 41px height */
   font-size: 14px;
   font-weight: 700;
-  border: 1px solid var(--border);
+  line-height: 1.5;
+  border: 1px solid var(--text-primary);
   border-radius: var(--radius-s);
-  background-color: unset;
-  background: unset;
+  background: transparent;
   color: var(--text-primary);
   cursor: pointer;
-  transition: background 150ms ease;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
 }
 
 .page-header-btn-outline:hover {
-  background: var(--neutral-50);
+  background: rgba(0, 206, 230, 0.16); /* primary-500 @ 16% — DS Outlined-2 hover */
+  color: var(--primary-600);
+  border-color: var(--primary-600);
+}
+
+.page-header-btn-outline:active {
+  background: rgba(0, 206, 230, 0.16);
+  color: var(--primary-700);
+  border-color: var(--primary-700);
+}
+
+.page-header-btn-outline:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+}
+
+/* Primary-outlined variant (Save Draft) — cyan border + cyan text, transparent bg */
+.page-header-btn-outline-primary {
+  padding: var(--space-s) var(--space-ml);
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid var(--primary-600);
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--primary-600);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.page-header-btn-outline-primary:hover {
+  background: var(--primary-100);
+  color: var(--primary-700);
+  border-color: var(--primary-700);
 }
 
 .page-header-btn-filled {
@@ -56,8 +99,9 @@
   background: var(--primary-700);
 }
 
-/* Disabled state for both buttons */
-.page-header-btn-disabled.page-header-btn-outline {
+/* Disabled state for all button variants */
+.page-header-btn-disabled.page-header-btn-outline,
+.page-header-btn-disabled.page-header-btn-outline-primary {
   border-color: var(--text-disabled);
   color: var(--text-disabled);
   cursor: default;
@@ -86,11 +130,17 @@
   background: var(--neutral-200);
 }
 
-/* Tabs */
+/* Full-width divider between top row and tabs (per Figma 8644:16189) */
+.page-header-divider {
+  height: 1px;
+  background: var(--border);
+  border-radius: var(--radius-xs);
+}
+
+/* Tabs — gap 20px; divider lives above (page-header-divider). */
 .page-header-tabs {
   display: flex;
-  gap: var(--space-l);
-  border-bottom: 1px solid var(--border);
+  gap: var(--space-ml);
 }
 
 .page-header-tab {
