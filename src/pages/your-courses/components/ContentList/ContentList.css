@@ -1,10 +1,18 @@
 .content-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-ml); /* 20px between sections / loose / Add Section CTA */
+  gap: var(--space-ml); /* 20px between sections / dividers / Add Section CTA */
   padding: var(--space-l) 0;
   max-width: 900px;
   margin: 0 auto;
+}
+
+/* Two adjacent collapsed sections: tighter 16px gap (rather than 32px) since
+   collapsed cards are short and a big gap reads as wasted space. The dividers
+   are only rendered between two expanded sections, so adjacent collapsed
+   sections are always direct siblings in the DOM. */
+.curriculum-section--collapsed + .curriculum-section--collapsed {
+  margin-top: -16px;
 }
 
 .content-list__loose {
@@ -118,54 +126,72 @@
 }
 
 /* ── Curriculum section card ────────────────────────────────── */
+/* Outer section wrapper — 2-column grid: [drag column][content].
+   Grid puts the drag column in the SAME ROW as the header so its height
+   tracks the header card's height automatically (which varies when the
+   summary becomes visible on collapse). */
 .curriculum-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: var(--space-s);
+  row-gap: var(--space-m); /* 16px between header and body (per Figma 8622:17003) */
   padding: 0;
   background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border: none;
+  border-radius: 0;
   box-shadow: none;
 }
 
-/* Chromeless: the only-default-section state. No header, no outer frame —
-   the section body acts as the page's flat list. */
+.curriculum-section__drag-column {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.curriculum-section__body {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+/* Divider rendered between adjacent expanded sections — matches the section
+   content width (skips the drag-column area on the left). Per Figma 8622:16640. */
+.curriculum-divider {
+  margin-left: calc(20px + var(--space-s));
+  height: 1px;
+  background: var(--border);
+  border-radius: var(--radius-xs);
+}
+
+/* Chromeless: the only-default-section state. No drag column, no header, no
+   tinted item rails — the section body becomes the page's flat list. */
 .curriculum-section--chromeless {
-  border: none;
-  border-radius: 0;
-}
-
-.curriculum-section--chromeless .curriculum-section__body {
-  padding: 0;
-  background: transparent;
-  border-radius: 0;
-}
-
-/* No drag handle (single section) — bump left padding so the title isn't flush. */
-.curriculum-section--no-drag .curriculum-section__header {
-  padding-left: var(--space-m);
+  row-gap: 0;
+  column-gap: 0;
 }
 
 .curriculum-section__header {
-  /* align-items stays flex-start; GSAP tweens paddingTop on drag handle and info column
-     to fake center-alignment in the expanded state and animate the shift on toggle. */
+  grid-column: 2;
+  grid-row: 1;
+  /* Self-contained header card — independent of body (gap separates them). */
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-s);
-  min-height: 32px;
-  padding: var(--space-sm) var(--space-s);
+  min-height: 48px;
+  padding: var(--space-sm) var(--space-s) var(--space-sm) var(--space-m);
   background: var(--cards-background);
-  border-bottom: 1px solid var(--border);
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-  transition: border-radius 150ms ease, border-color 150ms ease;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-s);
+  transition: background 150ms ease, box-shadow 150ms ease;
 }
 
 .curriculum-section--collapsed .curriculum-section__header {
-  border-bottom-color: transparent;
-  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background 150ms ease, border-radius 150ms ease, border-color 150ms ease;
 }
 
 .curriculum-section--collapsed .curriculum-section__header:hover {
@@ -315,20 +341,22 @@
   outline-offset: 2px;
 }
 
-/* Body */
+/* Body — vertical stack below the header card. No border or padding here;
+   each item carries its own tinted wrapper. Gap of 16px between the items wrapper
+   and the Add Content button (per Figma 8622:17003 internal gap). */
 .curriculum-section__body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-  padding: var(--space-m);
-  background: var(--page-background);
-  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  gap: var(--space-m);
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
 }
 
 .curriculum-section__items {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-sm); /* 12px between item containers (per Figma 8622:17275) */
 }
 
 .curriculum-section__empty {
@@ -357,7 +385,8 @@
 }
 
 .curriculum-section__add-lesson {
-  /* Small outlined button — DS spec: 8px 16px padding, 12px font, 16px icon */
+  /* Per Figma 8622:16831 — outlined button: 8/16 padding, 8 radius, 14px Bold,
+     primary border/text, 4px gap, 20px icon. */
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
@@ -368,7 +397,7 @@
   border: 1px solid var(--primary-600);
   border-radius: var(--radius-s);
   font-family: 'Poppins', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   line-height: 1.5;
   cursor: pointer;

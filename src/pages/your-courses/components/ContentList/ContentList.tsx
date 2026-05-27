@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Add, Danger, Edit2, Trash } from 'iconsax-react'
 import ToastContainer, { useToast } from '../../../../components/Toast/Toast'
 import Tooltip from '../../../../components/Tooltip/Tooltip'
@@ -482,9 +482,15 @@ function ContentList({
         </div>
       )}
 
-      {!showEmptyState && sections.map((section) => (
+      {!showEmptyState && sections.map((section, idx) => {
+        // Divider only renders between two adjacent sections that are BOTH expanded.
+        // Collapsed sections are already visually distinct enough on their own.
+        const prev = sections[idx - 1]
+        const showDivider = !!prev && !prev.collapsed && !section.collapsed
+        return (
+        <Fragment key={section.id}>
+        {showDivider && <div className="curriculum-divider" aria-hidden="true" />}
         <CurriculumSection
-          key={section.id}
           section={{ id: section.id, name: section.name, items: [], collapsed: section.collapsed }}
           itemCount={section.itemKeys.length}
           summary={buildSummary(section.itemKeys)}
@@ -527,7 +533,9 @@ function ContentList({
             )
           })}
         </CurriculumSection>
-      ))}
+        </Fragment>
+        )
+      })}
 
       {!showEmptyState && (
         <button type="button" className="curriculum-add-section" onClick={startCreate}>

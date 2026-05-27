@@ -95,7 +95,7 @@
   --icon-size-xl: 32px;
 
   /* Shadows */
-  --shadow-s: -1px -1px 4px rgba(32, 34, 42, 0.06), 1px 1px 4px rgba(32, 34, 42, 0.06);
+  --shadow-s: -1px -1px 4px 0 rgba(32, 34, 42, 0.04), 1px 1px 4px 0 rgba(32, 34, 42, 0.04);
   --shadow-panel: -24px 0px 24px 0px rgba(32, 34, 42, 0.04);
 }
 

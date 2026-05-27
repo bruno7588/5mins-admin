@@ -156,16 +156,6 @@ function CurriculumSection({
   const initialMountRef = useRef(true)
   const prevHideChromeRef = useRef(hideChrome)
 
-  // Header alignment tweens between center (expanded) and top-with-title (collapsed).
-  // Header uses align-items: flex-start in CSS; we fake centering via paddingTop on the
-  // 20px drag handle and the title-only info column.
-  //  - Expanded: aligned to 32px chevron row → drag +6, info +4
-  //  - Collapsed: drag centered against 24px title row → drag +2, info +0
-  const DRAG_PAD_EXPANDED = 6
-  const DRAG_PAD_COLLAPSED = 2
-  const INFO_PAD_EXPANDED = 4
-  const INFO_PAD_COLLAPSED = 0
-
   useEffect(() => {
     if (renaming) {
       inputRef.current?.focus()
@@ -173,31 +163,20 @@ function CurriculumSection({
     }
   }, [renaming])
 
-  // GSAP expand/collapse — body height + opacity, subtitle fade, header alignment
+  // GSAP expand/collapse — body height + opacity, subtitle fade.
+  // The new layout has a self-contained header card (no border-shared body), so
+  // we no longer animate drag/info paddingTop to fake alignment.
   useEffect(() => {
     const body = bodyRef.current
     const sub = summaryRef.current
-    const drag = dragRef.current
-    const info = infoRef.current
     if (!body) return
 
     if (initialMountRef.current) {
-      // No animation on first render — set the final state directly
       if (section.collapsed) {
-        gsap.set(body, {
-          height: 0,
-          paddingTop: 0,
-          paddingBottom: 0,
-          opacity: 0,
-          overflow: 'hidden',
-        })
+        gsap.set(body, { height: 0, opacity: 0, overflow: 'hidden' })
         if (sub) gsap.set(sub, { height: 'auto', marginTop: 4, opacity: 1 })
-        if (drag) gsap.set(drag, { paddingTop: DRAG_PAD_COLLAPSED })
-        if (info) gsap.set(info, { paddingTop: INFO_PAD_COLLAPSED })
-      } else {
-        if (sub) gsap.set(sub, { height: 0, marginTop: 0, opacity: 0, overflow: 'hidden' })
-        if (drag) gsap.set(drag, { paddingTop: DRAG_PAD_EXPANDED })
-        if (info) gsap.set(info, { paddingTop: INFO_PAD_EXPANDED })
+      } else if (sub) {
+        gsap.set(sub, { height: 0, marginTop: 0, opacity: 0, overflow: 'hidden' })
       }
       initialMountRef.current = false
       return
@@ -205,22 +184,12 @@ function CurriculumSection({
 
     gsap.killTweensOf(body)
     if (sub) gsap.killTweensOf(sub)
-    if (drag) gsap.killTweensOf(drag)
-    if (info) gsap.killTweensOf(info)
 
     const duration = 0.3
     const ease = 'power2.inOut'
 
     if (section.collapsed) {
-      gsap.to(body, {
-        height: 0,
-        paddingTop: 0,
-        paddingBottom: 0,
-        opacity: 0,
-        duration,
-        ease,
-        overflow: 'hidden',
-      })
+      gsap.to(body, { height: 0, opacity: 0, duration, ease, overflow: 'hidden' })
       if (sub) {
         gsap.to(sub, {
           height: 'auto',
@@ -234,13 +203,9 @@ function CurriculumSection({
           },
         })
       }
-      if (drag) gsap.to(drag, { paddingTop: DRAG_PAD_COLLAPSED, duration, ease })
-      if (info) gsap.to(info, { paddingTop: INFO_PAD_COLLAPSED, duration, ease })
     } else {
       gsap.to(body, {
         height: 'auto',
-        paddingTop: 16,
-        paddingBottom: 16,
         opacity: 1,
         duration,
         ease,
@@ -250,34 +215,19 @@ function CurriculumSection({
         },
       })
       if (sub) {
-        gsap.to(sub, {
-          height: 0,
-          marginTop: 0,
-          opacity: 0,
-          duration,
-          ease,
-          overflow: 'hidden',
-        })
+        gsap.to(sub, { height: 0, marginTop: 0, opacity: 0, duration, ease, overflow: 'hidden' })
       }
-      if (drag) gsap.to(drag, { paddingTop: DRAG_PAD_EXPANDED, duration, ease })
-      if (info) gsap.to(info, { paddingTop: INFO_PAD_EXPANDED, duration, ease })
     }
   }, [section.collapsed])
 
-  // Chrome just appeared (e.g., user added a 2nd section). Set initial header alignment
-  // without animation — refs were null while chromeless, so the regular collapse effect
-  // never set their paddingTop.
+  // Chrome appeared after a swap — reset summary visibility.
   useEffect(() => {
     if (!prevHideChromeRef.current || hideChrome) {
       prevHideChromeRef.current = hideChrome
       return
     }
     prevHideChromeRef.current = hideChrome
-    const drag = dragRef.current
-    const info = infoRef.current
     const sub = summaryRef.current
-    if (drag) gsap.set(drag, { paddingTop: section.collapsed ? DRAG_PAD_COLLAPSED : DRAG_PAD_EXPANDED })
-    if (info) gsap.set(info, { paddingTop: section.collapsed ? INFO_PAD_COLLAPSED : INFO_PAD_EXPANDED })
     if (sub) {
       if (section.collapsed) gsap.set(sub, { height: 'auto', marginTop: 4, opacity: 1 })
       else gsap.set(sub, { height: 0, marginTop: 0, opacity: 0, overflow: 'hidden' })
@@ -314,19 +264,29 @@ function CurriculumSection({
     destinationActive && 'curriculum-section--drop-destination',
   ].filter(Boolean).join(' ')
 
+  const showSectionDrag = !hideChrome && !hideDragHandle
+
   return (
     <section
       className={classes}
       aria-labelledby={`section-${section.id}-title`}
-      draggable={draggable}
-      onDragStart={draggable ? onDragStart : undefined}
       onDragOver={onDragOver}
       onDragEnd={onDragEnd}
       onDrop={onDrop}
     >
+      {showSectionDrag && (
+        <div
+          className="curriculum-section__drag-column"
+          draggable={draggable}
+          onDragStart={draggable ? onDragStart : undefined}
+          onDragEnd={onDragEnd}
+        >
+          <DragHandle innerRef={dragRef} />
+        </div>
+      )}
+
       {!hideChrome && (
       <header className="curriculum-section__header">
-        {!hideDragHandle && <DragHandle innerRef={dragRef} />}
         {renaming ? (
           <>
             <input
@@ -424,7 +384,7 @@ function CurriculumSection({
               onClick={() => setAddMenuOpen((v) => !v)}
             >
               <span>Add Content</span>
-              <Add size={16} color="currentColor" variant="Linear" />
+              <Add size={20} color="currentColor" variant="Linear" />
             </button>
             <AddContentPopover
               open={addMenuOpen}
