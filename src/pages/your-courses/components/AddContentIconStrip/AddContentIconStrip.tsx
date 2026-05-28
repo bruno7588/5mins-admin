@@ -10,7 +10,7 @@ import AssessmentIcon from '../../../../components/icons/AssessmentIcon'
 import type { AssessmentType } from '../AddContentSidebar/AddContentSidebar'
 import './AddContentIconStrip.css'
 
-export type StripActive = 'library' | 'scorm' | null
+export type StripActive = 'library' | 'scorm' | 'assessment' | null
 
 const iconSize = 20
 
@@ -79,7 +79,7 @@ function AddContentIconStrip({
       </button>
       <button
         type="button"
-        className="add-content-icon-strip__item"
+        className={`add-content-icon-strip__item${active === 'assessment' ? ' add-content-icon-strip__item--active' : ''}`}
         onClick={() => onAssessmentClick?.('multiple-choice')}
         aria-label="Assessments"
         title="Assessments"

@@ -536,20 +536,21 @@ function ContentList({
   const layoutClass = [
     'content-list-layout',
     showEmptyState && 'content-list-layout--empty',
-    // Populated content slides flush to the left gutter (clamped, never off-screen).
-    bodyShiftPx > 0 && !showEmptyState && 'content-list-layout--drawer-shift',
   ]
     .filter(Boolean)
     .join(' ')
 
+  // With a right-side panel/drawer open, the empty placeholder reserves the panel's
+  // width and fills the left of the viewport, while populated content stays centered
+  // within the remaining (viewport − panel) area — a half-panel-width leftward shift.
+  const layoutStyle = bodyShiftPx
+    ? showEmptyState
+      ? { paddingRight: bodyShiftPx }
+      : { transform: `translateX(-${bodyShiftPx / 2}px)` }
+    : undefined
+
   return (
-    <div
-      className={layoutClass}
-      // Empty placeholder stays gutter-anchored and reserves the drawer's width on the
-      // right so it fills the visible area without sliding off-screen.
-      style={bodyShiftPx > 0 && showEmptyState ? { paddingRight: bodyShiftPx } : undefined}
-      onDragOver={(e) => e.preventDefault()}
-    >
+    <div className={layoutClass} style={layoutStyle} onDragOver={(e) => e.preventDefault()}>
       <section className="content-list">
         <Presence show={showMeta}>
           <div

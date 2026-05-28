@@ -7,7 +7,6 @@ import AddContentIconStrip from './components/AddContentIconStrip/AddContentIcon
 import type { AssessmentType } from './components/AddContentSidebar/AddContentSidebar'
 import type { ScormFile } from './components/ScormDrawer/ScormDrawer'
 import ContentDrawer from './components/ContentDrawer/ContentDrawer'
-import AssessmentModal from './components/AssessmentModal/AssessmentModal'
 import type { AssessmentData } from './components/AssessmentModal/AssessmentModal'
 import type { LibraryLesson } from './components/LibraryDrawer/LibraryDrawer'
 
@@ -20,12 +19,12 @@ const assessmentLabels: Record<AssessmentType, string> = {
 
 let nextAssessmentId = 100
 
-type ActiveDrawer = 'library' | 'scorm' | null
+type ActiveDrawer = 'library' | 'scorm' | 'assessment' | null
 
 function CreateCourse() {
   const [scormItems, setScormItems] = useState<ContentItem[]>([])
   const [addedScormIds, setAddedScormIds] = useState<Set<number>>(new Set())
-  const [assessmentModal, setAssessmentModal] = useState<{ type: AssessmentType } | null>(null)
+  const [assessmentType, setAssessmentType] = useState<AssessmentType>('multiple-choice')
   const [activeDrawer, setActiveDrawer] = useState<ActiveDrawer>(null)
   const [addContentOpen, setAddContentOpen] = useState(false)
   const [addedLibraryIds, setAddedLibraryIds] = useState<Set<number>>(new Set())
@@ -65,7 +64,8 @@ function CreateCourse() {
 
   const openAssessment = (type: AssessmentType) => {
     setAddContentOpen(false)
-    setAssessmentModal({ type })
+    setAssessmentType(type)
+    setActiveDrawer('assessment')
   }
 
   const closeDrawer = () => {
@@ -112,7 +112,8 @@ function CreateCourse() {
       showEditIcon: true,
     }
     setScormItems(prev => [...prev, newItem])
-    setAssessmentModal(null)
+    setActiveDrawer(null)
+    setTargetSectionId(null)
   }
 
   const handleAddLibraryLesson = (lesson: LibraryLesson) => {
@@ -155,13 +156,6 @@ function CreateCourse() {
             bodyShiftPx={activeDrawer ? 720 : addContentOpen ? 240 : 0}
           />
         </main>
-        {assessmentModal && (
-          <AssessmentModal
-            type={assessmentModal.type}
-            onClose={() => setAssessmentModal(null)}
-            onAdd={handleAddAssessment}
-          />
-        )}
       </div>
       {activeDrawer && (
         <AddContentIconStrip
@@ -187,6 +181,8 @@ function CreateCourse() {
         scormAddedIds={addedScormIds}
         onScormAdd={handleAddScorm}
         onScormRemove={handleRemoveScorm}
+        assessmentType={assessmentType}
+        onAssessmentAdd={handleAddAssessment}
       />
     </>
   )

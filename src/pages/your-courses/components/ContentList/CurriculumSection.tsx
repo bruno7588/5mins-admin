@@ -388,10 +388,10 @@ function CurriculumSection({
             type="button"
             className="curriculum-section__placeholder"
             onClick={onAddContent}
-            aria-label="Add content here"
+            aria-label="Add content to section"
           >
             <Add size={20} color="currentColor" variant="Linear" />
-            <span>Add Content Here</span>
+            <span>Add Content to Section</span>
           </button>
         )}
       </div>

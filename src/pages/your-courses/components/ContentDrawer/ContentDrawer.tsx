@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import { LibraryDrawerContent, type LibraryLesson } from '../LibraryDrawer/LibraryDrawer'
 import { ScormDrawerContent } from '../ScormDrawer/ScormDrawer'
 import type { ScormFile } from '../ScormDrawer/ScormDrawer'
+import AssessmentModal, { type AssessmentData } from '../AssessmentModal/AssessmentModal'
+import type { AssessmentType } from '../AddContentSidebar/AddContentSidebar'
 import '../../../my-team/CoursesDrawer.css'
 import '../LibraryDrawer/LibraryDrawer.css'
 import '../ScormDrawer/ScormDrawer.css'
 
-export type ActiveDrawer = 'library' | 'scorm' | null
+export type ActiveDrawer = 'library' | 'scorm' | 'assessment' | null
 
 interface Props {
   activeDrawer: ActiveDrawer
@@ -19,6 +21,9 @@ interface Props {
   scormAddedIds: Set<number>
   onScormAdd: (file: ScormFile) => void
   onScormRemove: (id: number) => void
+  /* Assessment */
+  assessmentType: AssessmentType
+  onAssessmentAdd: (data: AssessmentData) => void
 }
 
 /* Single drawer shell that hosts library or SCORM content. Stays mounted across
@@ -33,6 +38,8 @@ function ContentDrawer({
   scormAddedIds,
   onScormAdd,
   onScormRemove,
+  assessmentType,
+  onAssessmentAdd,
 }: Props) {
   // What content to actually render. Lags activeDrawer when closing so the
   // close animation can complete before unmounting.
@@ -86,7 +93,7 @@ function ContentDrawer({
         aria-hidden="true"
       />
       <aside
-        className={`side-drawer side-drawer--with-sidebar${closing ? ' side-drawer--closing' : ''} ${rendered === 'library' ? 'library-drawer' : 'scorm-drawer-shell'}`}
+        className={`side-drawer side-drawer--with-sidebar${closing ? ' side-drawer--closing' : ''} ${rendered === 'library' ? 'library-drawer' : rendered === 'scorm' ? 'scorm-drawer-shell' : 'assessment-drawer-shell'}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="content-drawer-title"
@@ -105,6 +112,14 @@ function ContentDrawer({
             addedIds={scormAddedIds}
             onAdd={onScormAdd}
             onRemove={onScormRemove}
+          />
+        )}
+        {rendered === 'assessment' && (
+          <AssessmentModal
+            variant="drawer"
+            type={assessmentType}
+            onClose={onClose}
+            onAdd={onAssessmentAdd}
           />
         )}
       </aside>

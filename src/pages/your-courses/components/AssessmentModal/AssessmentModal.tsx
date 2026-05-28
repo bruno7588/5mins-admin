@@ -42,11 +42,14 @@ interface AssessmentModalProps {
   onClose: () => void
   onAdd: (data: AssessmentData) => void
   sidebarIcons?: React.ReactNode
+  /* 'modal' (default) renders its own overlay + sliding panel; 'drawer' renders just
+     the form body so it can live inside the shared ContentDrawer shell. */
+  variant?: 'modal' | 'drawer'
 }
 
 const ACCEPTED_TYPES = 'image/png,image/jpeg,image/gif,image/webp,audio/mpeg,audio/wav,audio/ogg'
 
-function AssessmentModal({ type, onClose, onAdd, sidebarIcons }: AssessmentModalProps) {
+function AssessmentModal({ type, onClose, onAdd, sidebarIcons, variant = 'modal' }: AssessmentModalProps) {
   const [closing, setClosing] = useState(false)
   const [question, setQuestion] = useState('')
   const [options, setOptions] = useState(['', ''])
@@ -160,6 +163,11 @@ function AssessmentModal({ type, onClose, onAdd, sidebarIcons }: AssessmentModal
   const config = typeConfig[type]
 
   const handleClose = () => {
+    // In drawer mode the ContentDrawer shell owns the slide-out animation.
+    if (variant === 'drawer') {
+      onClose()
+      return
+    }
     setClosing(true)
     setTimeout(onClose, 300)
   }
@@ -403,18 +411,8 @@ function AssessmentModal({ type, onClose, onAdd, sidebarIcons }: AssessmentModal
 
   const canSubmit = question.trim().length > 0 && options.some(o => o.trim().length > 0)
 
-  return (
-    <>
-    <div
-      className={`assessment-modal-overlay${closing ? ' assessment-modal-overlay--closing' : ''}`}
-      onClick={handleClose}
-    />
-      <aside
-        className={`assessment-modal${closing ? ' assessment-modal--closing' : ''}`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Main form area */}
-        <div className="assessment-modal-content">
+  const formContent = (
+        <div className={`assessment-modal-content${variant === 'drawer' ? ' assessment-modal-content--drawer' : ''}`}>
         {/* Close button */}
         <CloseButton onClick={handleClose} className="assessment-modal-close" />
 
@@ -604,15 +602,31 @@ function AssessmentModal({ type, onClose, onAdd, sidebarIcons }: AssessmentModal
             Save
           </button>
         </div>
-        </div>{/* end .assessment-modal-content */}
+        </div>
+  )
 
-        {/* Collapsed sidebar icons on the right */}
-        {sidebarIcons && (
-          <div className="assessment-modal-sidebar">
-            {sidebarIcons}
-          </div>
-        )}
-      </aside>
+  return (
+    <>
+      {variant === 'drawer' ? (
+        formContent
+      ) : (
+        <>
+          <div
+            className={`assessment-modal-overlay${closing ? ' assessment-modal-overlay--closing' : ''}`}
+            onClick={handleClose}
+          />
+          <aside
+            className={`assessment-modal${closing ? ' assessment-modal--closing' : ''}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {formContent}
+            {/* Collapsed sidebar icons on the right */}
+            {sidebarIcons && (
+              <div className="assessment-modal-sidebar">{sidebarIcons}</div>
+            )}
+          </aside>
+        </>
+      )}
 
     {/* ===== Attach Media Modal — rendered outside assessment overlay for proper z-index ===== */}
     {showMediaModal && (

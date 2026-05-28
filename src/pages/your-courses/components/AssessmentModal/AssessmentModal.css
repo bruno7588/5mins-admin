@@ -48,6 +48,14 @@
   position: relative;
 }
 
+/* Drawer variant: the form fills the shared ContentDrawer shell instead of its own
+   fixed-width modal panel. */
+.assessment-modal-content--drawer {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
 /* Collapsed sidebar strip on the right */
 .assessment-modal-sidebar {
   width: 60px;
@@ -526,7 +534,9 @@
 .media-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 300;
+  /* Above the ContentDrawer (1001) + icon strip (1002) so it works when the
+     assessment form is hosted inside the side drawer. */
+  z-index: 1100;
   background: rgba(15, 16, 20, 0.5);
   display: flex;
   align-items: center;
