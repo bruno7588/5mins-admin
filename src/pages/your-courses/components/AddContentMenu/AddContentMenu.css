@@ -1,0 +1,79 @@
+/* Anchored "Add Content" dropdown — replaces the old picker drawer.
+   Geometry per Figma 8695:16349 (container r12 / p8, rows 12·16, shadow L).
+   Rendered in a body portal as position:fixed so it can't be clipped by the
+   content area's overflow. Light panel to match this project's overlay rule. */
+.acm-popover {
+  position: fixed;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-s);
+  background: var(--neutral-0);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: -4px 0 24px 0 rgba(32, 34, 42, 0.12), 0 12px 28px 0 rgba(32, 34, 42, 0.14);
+  transform-origin: top left;
+  animation: acm-pop-in 120ms ease;
+}
+.acm-popover--up {
+  transform-origin: bottom left;
+}
+
+@keyframes acm-pop-in {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Rows reuse the shared .add-content-menu-item visual; acm-row just guarantees the
+   button resets in this floating context. */
+.acm-row {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* The Assessments parent row keeps its highlight while the flyout is open. */
+.acm-row--sub .add-content-menu-item-label {
+  flex: 1;
+}
+.acm-row--open {
+  background: var(--neutral-50);
+}
+
+.acm-has-sub {
+  position: relative;
+  width: 100%;
+}
+
+/* Side-by-side flyout panel (Figma 8695:16555). Offset up by the container padding so
+   its first item lines up with the Assessments row. */
+.acm-submenu {
+  position: absolute;
+  top: calc(-1 * var(--space-s));
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-s);
+  background: var(--neutral-0);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: -4px 0 24px 0 rgba(32, 34, 42, 0.12), 0 12px 28px 0 rgba(32, 34, 42, 0.14);
+  animation: acm-pop-in 120ms ease;
+}
+/* Offset = popover padding (8px) + the visible gap (8px) so the two cards read as
+   separate floating panels, matching Figma rather than sharing an edge. */
+.acm-submenu--right {
+  left: calc(100% + 16px);
+  transform-origin: top left;
+}
+.acm-submenu--left {
+  right: calc(100% + 16px);
+  transform-origin: top right;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acm-popover,
+  .acm-submenu {
+    animation: none;
+  }
+}

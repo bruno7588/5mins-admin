@@ -62,9 +62,22 @@
 .presence--exit {
   opacity: 0;
 }
+/* Exit is quicker than enter — removing the last item/section should fade the
+   badge(s) out crisply, not linger for the full enter duration. Must match
+   PRESENCE_EXIT_MS in ContentList.tsx. */
+.presence--exit {
+  transition-duration: 120ms;
+}
 .presence--in {
   opacity: 1;
   transform: translateX(0);
+}
+/* The meta strip itself never fades — its badges own the enter/exit motion, so the
+   slide stays visible even when the whole strip appears/disappears (last item removed,
+   first item added). Without this the strip's own fade would mask the badge slide. */
+.presence--meta.presence--enter,
+.presence--meta.presence--exit {
+  opacity: 1;
 }
 .presence--badge {
   display: inline-grid;
@@ -78,13 +91,25 @@
   overflow: hidden;
   white-space: nowrap;
 }
+.presence--badge.presence--exit {
+  transition-duration: 120ms;
+}
 .presence--badge.presence--enter,
 .presence--badge.presence--exit {
   grid-template-columns: 0fr;
   margin-right: 0;
 }
-.presence--badge.presence--enter {
+.presence--badge.presence--enter,
+.presence--badge.presence--exit {
   transform: translateX(-8px);
+}
+/* Going back to empty state: the whole strip is leaving, so there are no neighbours
+   to glide left. Suppress the slide + width-collapse and let each badge just fade in
+   place — the leftward slide otherwise reads as a glitch. */
+.presence--meta.presence--exit .presence--badge.presence--exit {
+  grid-template-columns: 1fr;
+  margin-right: var(--space-s);
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -92,7 +117,8 @@
   .presence--badge {
     transition: none;
   }
-  .presence--badge.presence--enter {
+  .presence--badge.presence--enter,
+  .presence--badge.presence--exit {
     transform: none;
   }
 }

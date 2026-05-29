@@ -108,7 +108,7 @@ interface CurriculumSectionProps {
   onToggleCollapse: () => void
   onRename: (newName: string) => void
   onDelete: () => void
-  onAddContent?: () => void
+  onAddContent?: (anchor: HTMLElement) => void
   canRename?: boolean
   canDelete?: boolean
   unsectioned?: boolean
@@ -387,7 +387,7 @@ function CurriculumSection({
           <button
             type="button"
             className="curriculum-section__placeholder"
-            onClick={onAddContent}
+            onClick={(e) => onAddContent(e.currentTarget)}
             aria-label="Add content to section"
           >
             <Add size={20} color="currentColor" variant="Linear" />

@@ -16,9 +16,10 @@ function parseDurationMinutes(metadata: string): number {
   return 0
 }
 
-/* Keeps children mounted long enough to play a fade + slight horizontal slide on exit.
-   `show` drives both directions; the timeout must match the CSS transition duration. */
-const PRESENCE_MS = 240
+/* Keeps children mounted long enough to play the fade/slide. Enter is leisurely
+   (delightful), exit is quick so removing the last item/section snaps shut rather
+   than lingering. Each timeout must match the matching CSS transition duration. */
+const PRESENCE_EXIT_MS = 120
 
 function Presence({ show, className = '', children }: { show: boolean; className?: string; children: ReactNode }) {
   const [mounted, setMounted] = useState(show)
@@ -33,7 +34,7 @@ function Presence({ show, className = '', children }: { show: boolean; className
     }
     setActive(false)
     setExiting(true)
-    const t = setTimeout(() => setMounted(false), PRESENCE_MS)
+    const t = setTimeout(() => setMounted(false), PRESENCE_EXIT_MS)
     return () => clearTimeout(t)
   }, [show])
 
@@ -194,8 +195,8 @@ function ContentCard({
 interface ContentListProps {
   extraItems?: ContentItem[]
   onDeleteExtra?: (id: number) => void
-  /* Opens the AddContentDrawer (slide-in side panel) scoped to a sectionId. */
-  onAddContent?: (sectionId: string) => void
+  /* Opens the AddContentMenu dropdown anchored to the clicked trigger, scoped to a sectionId. */
+  onAddContent?: (sectionId: string, anchor: HTMLElement) => void
   targetSectionId?: string | null
   /* Pixels to shift the body left so it clears an open right-side surface:
      240 for the Add Content panel, 720 for the side drawer, 0 when none. */
@@ -552,7 +553,7 @@ function ContentList({
   return (
     <div className={layoutClass} style={layoutStyle} onDragOver={(e) => e.preventDefault()}>
       <section className="content-list">
-        <Presence show={showMeta}>
+        <Presence show={showMeta} className="presence--meta">
           <div
             className={`course-meta${isFlatMode ? '' : ' course-meta--indented'}`}
             aria-label="Course summary"
@@ -613,7 +614,7 @@ function ContentList({
               <button
                 type="button"
                 className="course-empty-state__btn course-empty-state__btn--filled"
-                onClick={() => onAddContent?.(onlySection!.id)}
+                onClick={(e) => onAddContent?.(onlySection!.id, e.currentTarget)}
               >
                 <span>Add Content</span>
                 <Add size={20} color="currentColor" variant="Linear" />
@@ -642,7 +643,7 @@ function ContentList({
                   onToggleCollapse={() => toggleCollapse(section.id)}
                   onRename={(name) => renameSection(section.id, name)}
                   onDelete={() => deleteSection(section)}
-                  onAddContent={onAddContent ? () => onAddContent(section.id) : undefined}
+                  onAddContent={onAddContent ? (anchor) => onAddContent(section.id, anchor) : undefined}
                   canRename={!isUnsectioned}
                   canDelete={!isUnsectioned}
                   unsectioned={isUnsectioned}
@@ -681,7 +682,7 @@ function ContentList({
               <button
                 type="button"
                 className="curriculum-add-content"
-                onClick={() => onAddContent?.(isFlatMode ? onlySection!.id : UNSECTIONED_ID)}
+                onClick={(e) => onAddContent?.(isFlatMode ? onlySection!.id : UNSECTIONED_ID, e.currentTarget)}
               >
                 <Add size={20} color="currentColor" variant="Linear" />
                 <span>Add Content</span>

@@ -2,7 +2,8 @@ import { useLayoutEffect, useState } from 'react'
 import PageHeader from './components/PageHeader/PageHeader'
 import ContentList from './components/ContentList/ContentList'
 import type { ContentItem } from './components/ContentList/ContentList'
-import AddContentDrawer from './components/AddContentDrawer/AddContentDrawer'
+import AddContentMenu from './components/AddContentMenu/AddContentMenu'
+import type { AddContentKind } from './components/AddContentMenu/AddContentMenu'
 import AddContentIconStrip from './components/AddContentIconStrip/AddContentIconStrip'
 import type { AssessmentType } from './components/AddContentSidebar/AddContentSidebar'
 import type { ScormFile } from './components/ScormDrawer/ScormDrawer'
@@ -26,7 +27,7 @@ function CreateCourse() {
   const [addedScormIds, setAddedScormIds] = useState<Set<number>>(new Set())
   const [assessmentType, setAssessmentType] = useState<AssessmentType>('multiple-choice')
   const [activeDrawer, setActiveDrawer] = useState<ActiveDrawer>(null)
-  const [addContentOpen, setAddContentOpen] = useState(false)
+  const [addMenuAnchor, setAddMenuAnchor] = useState<HTMLElement | null>(null)
   const [addedLibraryIds, setAddedLibraryIds] = useState<Set<number>>(new Set())
   const [targetSectionId, setTargetSectionId] = useState<string | null>(null)
 
@@ -45,27 +46,31 @@ function CreateCourse() {
     return () => window.removeEventListener('resize', update)
   }, [])
 
-  const openAddContent = (sectionId: string) => {
+  const openAddContent = (sectionId: string, anchor: HTMLElement) => {
     setTargetSectionId(sectionId)
-    setAddContentOpen(true)
+    setAddMenuAnchor(anchor)
   }
 
-  const closeAddContent = () => setAddContentOpen(false)
+  const closeAddMenu = () => setAddMenuAnchor(null)
 
-  const openLibraryDrawer = () => {
-    setAddContentOpen(false)
-    setActiveDrawer('library')
-  }
+  const openLibraryDrawer = () => setActiveDrawer('library')
 
-  const openScormDrawer = () => {
-    setAddContentOpen(false)
-    setActiveDrawer('scorm')
-  }
+  const openScormDrawer = () => setActiveDrawer('scorm')
 
   const openAssessment = (type: AssessmentType) => {
-    setAddContentOpen(false)
     setAssessmentType(type)
     setActiveDrawer('assessment')
+  }
+
+  const assessmentTypes: AssessmentType[] = ['multiple-choice', 'short-text', 'exercise', 'poll']
+
+  /* Route a menu pick to the matching content drawer. Your Content / Embed Links /
+     Events / Resources are not wired to drawers yet (same as the old picker), so they
+     just dismiss the menu for now. */
+  const handleAddMenuSelect = (kind: AddContentKind) => {
+    if (kind === 'library') openLibraryDrawer()
+    else if (kind === 'scorm') openScormDrawer()
+    else if (assessmentTypes.includes(kind as AssessmentType)) openAssessment(kind as AssessmentType)
   }
 
   const closeDrawer = () => {
@@ -153,7 +158,7 @@ function CreateCourse() {
             onDeleteExtra={handleRemoveScorm}
             onAddContent={openAddContent}
             targetSectionId={targetSectionId}
-            bodyShiftPx={activeDrawer ? 720 : addContentOpen ? 240 : 0}
+            bodyShiftPx={activeDrawer ? 720 : 0}
           />
         </main>
       </div>
@@ -165,12 +170,11 @@ function CreateCourse() {
           onAssessmentClick={openAssessment}
         />
       )}
-      <AddContentDrawer
-        open={addContentOpen}
-        onClose={closeAddContent}
-        onLibraryClick={openLibraryDrawer}
-        onScormClick={openScormDrawer}
-        onAssessmentClick={openAssessment}
+      <AddContentMenu
+        open={!!addMenuAnchor}
+        anchor={addMenuAnchor}
+        onClose={closeAddMenu}
+        onSelect={handleAddMenuSelect}
       />
       <ContentDrawer
         activeDrawer={activeDrawer}
