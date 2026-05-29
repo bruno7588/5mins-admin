@@ -8,3 +8,6 @@ dist
 
 # Local Claude Code state (per-machine settings, allowed tools, etc.)
 .claude/settings.local.json
+
+# Local agent tooling / scratch output (not part of the app)
+agents/
