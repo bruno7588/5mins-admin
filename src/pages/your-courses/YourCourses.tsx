@@ -53,7 +53,18 @@ function YourCourses() {
             <span className="your-courses-new-folder-label">New Folder</span>
           </div>
 
-          <div className="your-courses-folder-card">
+          <div
+            className="your-courses-folder-card"
+            role="button"
+            tabIndex={0}
+            onClick={() => navigate('/your-courses/list')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                navigate('/your-courses/list')
+              }
+            }}
+          >
             <div className="your-courses-folder-thumb">
               <div className="your-courses-folder-thumbs">
                 <div className="your-courses-folder-img-back" />
@@ -64,7 +75,7 @@ function YourCourses() {
               </div>
             </div>
             <div className="your-courses-folder-info">
-              <span className="your-courses-folder-name">Your courses</span>
+              <span className="your-courses-folder-name">Courses</span>
               <span className="your-courses-folder-count">27 courses</span>
             </div>
           </div>

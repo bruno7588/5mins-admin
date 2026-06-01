@@ -3,6 +3,7 @@ import TopNav from './components/TopNav/TopNav'
 
 import YourContent from './pages/your-courses/YourContent'
 import YourCourses from './pages/your-courses/YourCourses'
+import YourCoursesList from './pages/your-courses/YourCoursesList'
 import CreateCourse from './pages/your-courses/CreateCourse'
 import AddContent from './pages/add-content/AddContent'
 
@@ -61,6 +62,7 @@ function App() {
                 <Route path="/content-library" element={<YourContent />} />
                 <Route path="/content-library/add-content" element={<AddContent />} />
                 <Route path="/your-courses" element={<YourCourses />} />
+                <Route path="/your-courses/list" element={<YourCoursesList />} />
                 <Route path="/people" element={<People />} />
                 <Route path="/user-fields" element={<UserFields />} />
                 <Route path="/roles" element={<Roles />} />

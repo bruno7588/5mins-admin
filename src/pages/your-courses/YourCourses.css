@@ -137,6 +137,7 @@
   justify-content: center;
   padding: var(--space-l);
   position: relative;
+  box-shadow: var(--shadow-s);
   transition: box-shadow 150ms ease, background-color 150ms ease;
 }
 
@@ -165,7 +166,7 @@
 
 .your-courses-folder-card:hover .your-courses-folder-img-back {
   background: var(--neutral-200);
-  transform: translate(-50%, -50%) scale(0.92);
+  transform: translate(-50%, -50%) scale(0.833);
 }
 
 .your-courses-folder-img-mid {
@@ -175,30 +176,31 @@
   left: 50%;
   top: calc(50% - 4px);
   transform: translate(-50%, -50%);
-  background: var(--neutral-100);
+  background: var(--neutral-200);
   border-radius: var(--radius-s);
   transition: background-color 300ms ease-in-out, transform 300ms ease-in-out;
 }
 
 .your-courses-folder-card:hover .your-courses-folder-img-mid {
-  background: var(--neutral-100);
-  transform: translate(-50%, -50%) scale(0.92);
+  background: var(--neutral-300);
+  transform: translate(-50%, -50%) scale(0.833);
 }
 
 .your-courses-folder-img-front {
   position: absolute;
   width: 240px;
-  height: 148px;
+  height: 140px;
   left: 50%;
   bottom: 0;
   transform: translateX(-50%);
+  transform-origin: bottom center;
   border-radius: var(--radius-s);
   overflow: hidden;
   transition: transform 300ms ease-in-out;
 }
 
 .your-courses-folder-card:hover .your-courses-folder-img-front {
-  transform: translateX(-50%) scale(0.92);
+  transform: translateX(-50%) scale(0.833);
 }
 
 .your-courses-folder-img-front img {
