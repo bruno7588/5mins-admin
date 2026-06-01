@@ -200,6 +200,12 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.courses-list-course-title:hover {
+  color: var(--primary-600);
 }
 
 /* Updated date — stacked (Mon DD, / YYYY) */
