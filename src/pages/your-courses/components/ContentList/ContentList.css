@@ -568,7 +568,7 @@
   border-radius: var(--radius-sm);
   color: var(--text-tertiary);
   font-family: 'Poppins', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
   cursor: pointer;
@@ -697,41 +697,12 @@
   margin-left: 0;
 }
 
-/* Compact pill — dashed border, transparent bg, primary text (per Figma 8647:12060). */
+/* Compact pill — the more prominent of the two: dashed border, input bg fill, primary text. */
 .curriculum-add-content {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
-  padding: var(--space-s) var(--space-m);
-  background: transparent;
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.5;
-  cursor: pointer;
-  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
-}
-
-.curriculum-add-content:hover {
-  background: var(--input-background);
-  border-color: var(--border-hover);
-}
-
-.curriculum-add-content:focus-visible {
-  outline: 2px solid var(--primary-600);
-  outline-offset: 2px;
-}
-
-/* Compact pill — dashed border, input bg, secondary text (per Figma 8647:12069). */
-.curriculum-add-section {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-s);
   padding: var(--space-s) var(--space-m);
   background: var(--input-background);
   border: 1px dashed var(--border);
@@ -745,10 +716,39 @@
   transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
-.curriculum-add-section:hover {
+.curriculum-add-content:hover {
   background: var(--input-background-hover);
   border-color: var(--border-hover);
   color: var(--text-primary);
+}
+
+.curriculum-add-content:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+}
+
+/* Compact pill — the quieter, secondary action: dashed border, transparent bg, primary text. */
+.curriculum-add-section {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-m);
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.curriculum-add-section:hover {
+  background: var(--input-background);
+  border-color: var(--border-hover);
 }
 
 .curriculum-add-section:focus-visible {
