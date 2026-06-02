@@ -441,7 +441,7 @@
 }
 
 .cd-cell--status {
-  width: 184px;
+  width: 150px;
   flex-shrink: 0;
   gap: var(--space-xs);
 }
@@ -474,10 +474,133 @@
   flex-shrink: 0;
 }
 
+.cd-cell--attempt {
+  width: 120px;
+  flex-shrink: 0;
+  gap: var(--space-xs);
+  justify-content: center;
+}
+
+.cd-cell--sortable {
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Attempt no header — sort button + info tooltip */
+.cd-attempt-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.cd-attempt-info,
+.cd-attempt-info .tooltip__trigger {
+  display: inline-flex;
+  align-items: center;
+}
+
+.cd-attempt-info .tooltip__trigger {
+  cursor: default;
+}
+
 .cd-cell--actions {
   width: 48px;
   flex-shrink: 0;
   justify-content: center;
+  position: relative;
+}
+
+/* Row action menu — DS Listbox */
+.cd-row-menu {
+  position: absolute;
+  top: calc(100% + var(--space-s));
+  right: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-s);
+  background: var(--cards-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: -4px 0 24px rgba(32, 34, 42, 0.12);
+}
+
+/* Caret pointing up toward the trigger */
+.cd-row-menu::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  right: 14px;
+  width: 10px;
+  height: 10px;
+  background: var(--cards-background);
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  transform: rotate(45deg);
+}
+
+.cd-row-menu-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-s);
+  width: 100%;
+  padding: var(--space-s) var(--space-sm);
+  border: none;
+  background: none;
+  border-radius: var(--radius-s);
+  text-align: left;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.cd-row-menu-item:hover {
+  background: var(--cards-background-hover);
+}
+
+.cd-row-menu-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.cd-row-menu-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.cd-row-menu-desc {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.cd-row-menu-item--danger .cd-row-menu-title,
+.cd-row-menu-item--danger .cd-row-menu-desc {
+  color: var(--text-error);
+}
+
+.cd-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
 }
 
 /* Status badge */

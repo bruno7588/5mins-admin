@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ComponentType } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Add,
@@ -6,6 +6,8 @@ import {
   ArrowLeft2,
   ArrowRight2,
   Briefcase,
+  CalendarAdd,
+  CalendarEdit,
   Clock,
   Danger,
   DocumentDownload,
@@ -13,14 +15,21 @@ import {
   Link2,
   MedalStar,
   PlayCircle,
+  Repeat,
+  ArrowRotateLeft,
   Sort,
+  TaskSquare,
   TickCircle,
+  UserMinus,
 } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import Search from '../../components/Search/Search'
 import Checkbox from '../../components/Checkbox/Checkbox'
 import Tooltip from '../../components/Tooltip/Tooltip'
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import MoreIcon from '../../components/icons/MoreIcon'
+import CourseSettings from './components/CourseSettings/CourseSettings'
+import '../people/People.css'
 import './CourseDetails.css'
 
 type Tab = 'content' | 'enrolments' | 'assessments' | 'settings' | 'overview'
@@ -38,6 +47,7 @@ interface Learner {
   status: LearnerStatus
   quizAttemptsLeft?: number
   quizAttemptsMax?: number
+  attemptNo: number
   completionDate: string | null
   repeat: string
 }
@@ -53,16 +63,16 @@ const COURSE_TITLE = 'Building Company Culture A Guide for HR Teams'
 const TOTAL = 128
 
 const learners: Learner[] = [
-  { id: 1, name: 'Anthony Wallace', email: 'anthony.wallace@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 60, status: 'failed', completionDate: 'Sep 25, 2025', repeat: 'Every 12 months' },
-  { id: 2, name: 'Sophia Carter', email: 'sophia.carter@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 92, status: 'passed', completionDate: 'Sep 25, 2025', repeat: 'Never' },
-  { id: 3, name: 'Oliver Bennett', email: 'oliver.bennett@email.com', startDate: 'Jul 14, 2024', dueDate: 'Oct 25, 2025', progress: 0, score: null, status: 'not-started', completionDate: null, repeat: 'Every 12 months' },
-  { id: 4, name: 'Emma Thompson', email: 'emma.thompson@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 50, status: 'in-progress', quizAttemptsLeft: 2, quizAttemptsMax: 3, completionDate: null, repeat: 'Every 6 months' },
-  { id: 5, name: 'Liam Johnson', email: 'liam.johnson@email.com', startDate: 'Sep 02, 2024', dueDate: 'Nov 30, 2025', progress: 0, score: null, status: 'not-started', completionDate: null, repeat: 'Never' },
-  { id: 6, name: 'Ava Martinez', email: 'ava.martinez@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 78, status: 'failed', completionDate: 'Oct 01, 2025', repeat: 'Every 12 months' },
-  { id: 7, name: 'Noah Davis', email: 'noah.davis@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 50, score: 65, status: 'in-progress', completionDate: null, repeat: 'Every 12 months' },
-  { id: 8, name: 'Isabella Lewis', email: 'isabella.lewis@email.com', startDate: 'Jun 18, 2024', dueDate: 'Sep 15, 2025', progress: 100, score: 96, status: 'passed', completionDate: 'Sep 12, 2025', repeat: 'Never' },
-  { id: 9, name: 'James Walker', email: 'james.walker@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 96, status: 'passed', completionDate: 'Aug 30, 2025', repeat: 'Every 12 months' },
-  { id: 10, name: 'Mia Robinson', email: 'mia.robinson@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 88, score: 80, status: 'in-progress', completionDate: null, repeat: 'Every 6 months' },
+  { id: 1, name: 'Anthony Wallace', email: 'anthony.wallace@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 60, status: 'failed', attemptNo: 2, completionDate: 'Sep 25, 2025', repeat: 'Every 12 months' },
+  { id: 2, name: 'Sophia Carter', email: 'sophia.carter@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 92, status: 'passed', attemptNo: 1, completionDate: 'Sep 25, 2025', repeat: 'Never' },
+  { id: 3, name: 'Oliver Bennett', email: 'oliver.bennett@email.com', startDate: 'Jul 14, 2024', dueDate: 'Oct 25, 2025', progress: 0, score: null, status: 'not-started', attemptNo: 1, completionDate: null, repeat: 'Every 12 months' },
+  { id: 4, name: 'Emma Thompson', email: 'emma.thompson@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 50, status: 'in-progress', quizAttemptsLeft: 2, quizAttemptsMax: 3, attemptNo: 3, completionDate: null, repeat: 'Every 6 months' },
+  { id: 5, name: 'Liam Johnson', email: 'liam.johnson@email.com', startDate: 'Sep 02, 2024', dueDate: 'Nov 30, 2025', progress: 0, score: null, status: 'not-started', attemptNo: 1, completionDate: null, repeat: 'Never' },
+  { id: 6, name: 'Ava Martinez', email: 'ava.martinez@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 78, status: 'failed', attemptNo: 4, completionDate: 'Oct 01, 2025', repeat: 'Every 12 months' },
+  { id: 7, name: 'Noah Davis', email: 'noah.davis@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 50, score: 65, status: 'in-progress', attemptNo: 2, completionDate: null, repeat: 'Every 12 months' },
+  { id: 8, name: 'Isabella Lewis', email: 'isabella.lewis@email.com', startDate: 'Jun 18, 2024', dueDate: 'Sep 15, 2025', progress: 100, score: 96, status: 'passed', attemptNo: 1, completionDate: 'Sep 12, 2025', repeat: 'Never' },
+  { id: 9, name: 'James Walker', email: 'james.walker@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 96, status: 'passed', attemptNo: 1, completionDate: 'Aug 30, 2025', repeat: 'Every 12 months' },
+  { id: 10, name: 'Mia Robinson', email: 'mia.robinson@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 88, score: 80, status: 'in-progress', attemptNo: 2, completionDate: null, repeat: 'Every 6 months' },
 ]
 
 const TABS: { key: Tab; label: string; count?: number }[] = [
@@ -72,6 +82,49 @@ const TABS: { key: Tab; label: string; count?: number }[] = [
   { key: 'settings', label: 'Settings' },
   { key: 'overview', label: 'Overview' },
 ]
+
+type IconComponent = ComponentType<{ size?: number; color?: string; variant?: 'Linear' | 'Bold' }>
+
+// Recurring/repeat-rules glyph (partial arc + dashed arc).
+function RepeatRules({ size = 20, color = 'currentColor' }: { size?: number; color?: string; variant?: 'Linear' | 'Bold' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M12.1243 18.0557C15.6993 17.1141 18.3327 13.8641 18.3327 9.9974C18.3327 5.3974 14.6327 1.66406 9.99935 1.66406C4.44102 1.66406 1.66602 6.2974 1.66602 6.2974M5.36602 6.2974H3.34102H1.66602V2.4974" stroke={color} strokeWidth="1.04167" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M1.66602 10C1.66602 14.6 5.39935 18.3333 9.99935 18.3333" stroke={color} strokeWidth="1.04167" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="2.5 2.5" />
+    </svg>
+  )
+}
+
+interface RowMenuAction {
+  key: string
+  label: string
+  description: string
+  Icon: IconComponent
+  variant?: 'Linear' | 'Bold'
+  danger?: boolean
+}
+
+const ROW_MENU: RowMenuAction[] = [
+  { key: 'view', label: 'View progress', description: "See this learner's lesson and quiz progress", Icon: TaskSquare },
+  { key: 'extend', label: 'Extend due date', description: 'Give this learner more time to finish', Icon: CalendarAdd },
+  { key: 'editStart', label: 'Edit start date', description: "Change when this learner's enrolment begins", Icon: CalendarEdit },
+  { key: 'editRepeat', label: 'Edit repeat rules', description: 'Change how often this course recurs', Icon: RepeatRules },
+  { key: 'restart', label: 'Restart enrolment', description: 'Begin a new enrolment cycle with fresh dates', Icon: Repeat, variant: 'Bold' },
+  { key: 'reset', label: 'Reset progress', description: 'Archive this attempt and start a fresh one', Icon: ArrowRotateLeft },
+  { key: 'unenrol', label: 'Unenrol', description: 'Remove this learner from the course', Icon: UserMinus, danger: true },
+]
+
+// Info icon (circle-i) used for column/stat hints.
+function InfoMark({ size = 16, color = 'var(--text-secondary)' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M7.75 2C4.57469 2 2 4.57469 2 7.75C2 10.9253 4.57469 13.5 7.75 13.5C10.9253 13.5 13.5 10.9253 13.5 7.75C13.5 4.57469 10.9253 2 7.75 2Z" stroke={color} strokeMiterlimit="10" />
+      <path d="M6.875 6.875H7.875V10.5" stroke={color} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6.5 10.625H9.25" stroke={color} strokeMiterlimit="10" strokeLinecap="round" />
+      <path d="M7.75 4.0625C7.5893 4.0625 7.43221 4.11015 7.2986 4.19943C7.16498 4.28871 7.06084 4.4156 6.99935 4.56407C6.93785 4.71253 6.92176 4.8759 6.95311 5.03351C6.98446 5.19112 7.06185 5.33589 7.17548 5.44952C7.28911 5.56315 7.43388 5.64054 7.59149 5.67189C7.7491 5.70324 7.91247 5.68715 8.06093 5.62565C8.2094 5.56416 8.33629 5.46002 8.42557 5.3264C8.51485 5.19279 8.5625 5.0357 8.5625 4.875C8.5625 4.65951 8.4769 4.45285 8.32452 4.30048C8.17215 4.1481 7.96549 4.0625 7.75 4.0625Z" fill={color} />
+    </svg>
+  )
+}
 
 function StackedDate({ value }: { value: string | null }) {
   if (!value) return <span className="cd-cell-muted">—</span>
@@ -136,12 +189,15 @@ function CourseDetails() {
   const [activeTab, setActiveTab] = useState<Tab>('enrolments')
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<Set<number>>(new Set())
+  const [learnerList, setLearnerList] = useState<Learner[]>(learners)
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null)
+  const [resetTarget, setResetTarget] = useState<Learner | null>(null)
 
   const rows = useMemo(() => {
     const q = search.trim().toLowerCase()
-    if (!q) return learners
-    return learners.filter((l) => l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q))
-  }, [search])
+    if (!q) return learnerList
+    return learnerList.filter((l) => l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q))
+  }, [search, learnerList])
 
   const allSelected = rows.length > 0 && rows.every((r) => selected.has(r.id))
 
@@ -156,6 +212,26 @@ function CourseDetails() {
 
   function toggleAll() {
     setSelected(allSelected ? new Set() : new Set(rows.map((r) => r.id)))
+  }
+
+  function confirmReset(id: number) {
+    setLearnerList((prev) =>
+      prev.map((l) =>
+        l.id === id
+          ? {
+              ...l,
+              attemptNo: l.attemptNo + 1,
+              status: 'in-progress',
+              progress: 0,
+              score: null,
+              completionDate: null,
+              quizAttemptsLeft: undefined,
+              quizAttemptsMax: undefined,
+            }
+          : l,
+      ),
+    )
+    setResetTarget(null)
   }
 
   return (
@@ -213,7 +289,7 @@ function CourseDetails() {
                 Certificate of completion
               </span>
               <span className="cd-helper-item">
-                <InfoCircle size={18} color="var(--text-tertiary)" variant="Linear" />
+                <InfoMark size={18} />
                 Pass score: 80%
               </span>
             </div>
@@ -247,7 +323,7 @@ function CourseDetails() {
                 <div className="cd-stat-label">
                   <TickCircle size={18} color="var(--success-500)" variant="Linear" />
                   <span>Completed</span>
-                  <InfoCircle size={16} color="var(--text-tertiary)" variant="Linear" />
+                  <InfoMark />
                 </div>
                 <div className="cd-stat-value">
                   <span className="cd-stat-pct">48%</span>
@@ -268,7 +344,7 @@ function CourseDetails() {
                 <div className="cd-stat-label">
                   <InfoCircle size={18} color="var(--warning-500)" variant="Linear" />
                   <span>At risk!</span>
-                  <InfoCircle size={16} color="var(--text-tertiary)" variant="Linear" />
+                  <InfoMark />
                 </div>
                 <div className="cd-stat-value">
                   <span className="cd-stat-pct">11%</span>
@@ -346,9 +422,20 @@ function CourseDetails() {
                 <div className="cd-cell cd-cell--progress">Progress</div>
                 <div className="cd-cell cd-cell--score">
                   Score
-                  <InfoCircle size={16} color="var(--text-tertiary)" variant="Linear" />
+                  <InfoMark />
                 </div>
                 <div className="cd-cell cd-cell--status">Status</div>
+                <div className="cd-cell cd-cell--attempt">
+                  Attempt no
+                  <Tooltip
+                    icon={false}
+                    position="Top"
+                    text="Number of course attempts. It increases each time the learner's progress is reset — by an admin or by auto-reset on failure. Quiz retries don't count."
+                    className="cd-attempt-info"
+                  >
+                    <InfoMark />
+                  </Tooltip>
+                </div>
                 <div className="cd-cell cd-cell--completion">Completion date</div>
                 <div className="cd-cell cd-cell--repeat">Repeat</div>
                 <div className="cd-cell cd-cell--actions" aria-hidden="true" />
@@ -381,14 +468,47 @@ function CourseDetails() {
                   <div className="cd-cell cd-cell--status">
                     <EnrolmentStatus {...row} />
                   </div>
+                  <div className="cd-cell cd-cell--attempt">{row.attemptNo}</div>
                   <div className="cd-cell cd-cell--completion">
                     <StackedDate value={row.completionDate} />
                   </div>
                   <div className="cd-cell cd-cell--repeat">{row.repeat}</div>
                   <div className="cd-cell cd-cell--actions">
-                    <button className="cd-icon-btn cd-icon-btn--sm" aria-label={`Actions for ${row.name}`}>
+                    <button
+                      className="cd-icon-btn cd-icon-btn--sm"
+                      aria-label={`Actions for ${row.name}`}
+                      aria-haspopup="menu"
+                      aria-expanded={openMenuId === row.id}
+                      onClick={() => setOpenMenuId(openMenuId === row.id ? null : row.id)}
+                    >
                       <MoreIcon size={20} color="var(--text-secondary)" />
                     </button>
+                    {openMenuId === row.id && (
+                      <div className="cd-row-menu" role="menu">
+                        {ROW_MENU.map(({ key, label, description, Icon, variant, danger }) => (
+                          <button
+                            key={key}
+                            type="button"
+                            role="menuitem"
+                            className={`cd-row-menu-item${danger ? ' cd-row-menu-item--danger' : ''}`}
+                            onClick={() => {
+                              setOpenMenuId(null)
+                              if (key === 'reset') setResetTarget(row)
+                            }}
+                          >
+                            <Icon
+                              size={20}
+                              color={danger ? 'var(--text-error)' : 'var(--text-primary)'}
+                              variant={variant ?? 'Linear'}
+                            />
+                            <span className="cd-row-menu-text">
+                              <span className="cd-row-menu-title">{label}</span>
+                              <span className="cd-row-menu-desc">{description}</span>
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -406,9 +526,39 @@ function CourseDetails() {
               </div>
             </div>
           </section>
+        ) : activeTab === 'settings' ? (
+          <CourseSettings />
         ) : (
           <section className="cd-placeholder">This tab isn’t part of this prototype yet.</section>
         )}
+
+        {openMenuId !== null && <div className="cd-menu-backdrop" onClick={() => setOpenMenuId(null)} />}
+
+        <ConfirmModal open={!!resetTarget} onClose={() => setResetTarget(null)}>
+          {resetTarget && (
+            <>
+              <div className="confirm-modal-header confirm-modal-header--center">
+                <div className="confirm-modal-icon">
+                  <ArrowRotateLeft size={72} color="var(--primary-600)" variant="Linear" />
+                </div>
+                <h2 className="confirm-modal-title">Reset progress</h2>
+                <p className="confirm-modal-body">
+                  Reset {resetTarget.name}&apos;s progress on &ldquo;{COURSE_TITLE}&rdquo;? Their current attempt will be
+                  archived and they&apos;ll start a fresh course attempt within the same enrolment. Their start date,
+                  due date, and recurrence cycle are unchanged.
+                </p>
+              </div>
+              <div className="confirm-modal-actions">
+                <button className="confirm-modal-btn confirm-modal-btn--outlined" onClick={() => setResetTarget(null)}>
+                  Cancel
+                </button>
+                <button className="confirm-modal-btn confirm-modal-btn--primary" onClick={() => confirmReset(resetTarget.id)}>
+                  Reset Progress
+                </button>
+              </div>
+            </>
+          )}
+        </ConfirmModal>
       </main>
     </div>
   )

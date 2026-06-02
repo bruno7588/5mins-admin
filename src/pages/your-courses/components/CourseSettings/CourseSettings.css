@@ -1,0 +1,97 @@
+.cs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+  width: 100%;
+  max-width: 900px;
+  margin-inline: auto;
+  padding: var(--space-m) var(--space-m);
+}
+
+/* Header */
+.cs-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xl);
+}
+
+.cs-header-title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.cs-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.cs-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Section */
+.cs-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.cs-section-heading {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* Setting card */
+.cs-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-m);
+  border-radius: var(--radius-sm);
+  background: var(--cards-background);
+  box-shadow: var(--shadow-s);
+}
+
+.cs-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  min-width: 0;
+}
+
+.cs-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.cs-card-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.cs-link {
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cs-link:hover {
+  color: var(--primary-600);
+}
+
+/* Revealed content (e.g. max attempts when auto-reset is on) */
+.cs-card-expand {
+  margin-top: var(--space-xs);
+}
