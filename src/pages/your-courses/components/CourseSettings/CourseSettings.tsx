@@ -6,6 +6,7 @@ import './CourseSettings.css'
 
 type SettingKey =
   | 'managersSeeAll'
+  | 'complianceCourse'
   | 'addToCategory'
   | 'enablePassScore'
   | 'accessAfterDue'
@@ -29,21 +30,32 @@ interface SettingSection {
   items: SettingItem[]
 }
 
+const INITIAL_VALUES: Record<SettingKey, boolean> = {
+  managersSeeAll: false,
+  complianceCourse: false,
+  addToCategory: false,
+  enablePassScore: true,
+  accessAfterDue: false,
+  rewards: false,
+  certificate: false,
+  autoReset: false,
+  lessonsInOrder: false,
+  fastForward: false,
+  backgroundPlayback: false,
+}
+
+const INITIAL_MAX_ATTEMPTS = 3
+const INITIAL_DUE_DAYS = 5
+
 function CourseSettings() {
-  const [values, setValues] = useState<Record<SettingKey, boolean>>({
-    managersSeeAll: false,
-    addToCategory: false,
-    enablePassScore: true,
-    accessAfterDue: false,
-    rewards: false,
-    certificate: false,
-    autoReset: false,
-    lessonsInOrder: false,
-    fastForward: false,
-    backgroundPlayback: false,
-  })
-  const [maxAttempts, setMaxAttempts] = useState(3)
-  const [newAttemptDueDays, setNewAttemptDueDays] = useState(5)
+  const [values, setValues] = useState<Record<SettingKey, boolean>>(INITIAL_VALUES)
+  const [maxAttempts, setMaxAttempts] = useState(INITIAL_MAX_ATTEMPTS)
+  const [newAttemptDueDays, setNewAttemptDueDays] = useState(INITIAL_DUE_DAYS)
+
+  // Last-saved snapshot — a section's Update button is enabled only while it has unsaved changes.
+  const [savedValues, setSavedValues] = useState<Record<SettingKey, boolean>>(INITIAL_VALUES)
+  const [savedMaxAttempts, setSavedMaxAttempts] = useState(INITIAL_MAX_ATTEMPTS)
+  const [savedDueDays, setSavedDueDays] = useState(INITIAL_DUE_DAYS)
 
   const toggle = (key: SettingKey) => setValues((prev) => ({ ...prev, [key]: !prev[key] }))
 
@@ -60,19 +72,30 @@ function CourseSettings() {
       ],
     },
     {
-      heading: 'Categories',
+      heading: 'Course organisation',
       items: [
+        {
+          key: 'complianceCourse',
+          title: 'Compliance course',
+          description:
+            'When selected, this course will be treated as a compliance course and included in Reports as well as Learning records.',
+        },
         {
           key: 'addToCategory',
           title: 'Add to category',
           description: (
             <>
               Add this course to a relevant category (e.g., Compliance, Marketing). These courses would show up in
-              the 'Your Workspace' page. You can edit these categories from{' '}
-              <a className="cs-link" href="#">
+              the &ldquo;Your Workspace&rdquo; page. You can edit these categories from{' '}
+              <a
+                className="cs-link"
+                href="https://app.5mins.ai/admin/account-settings?tab=5"
+                target="_blank"
+                rel="noreferrer"
+              >
                 Account &amp; Settings
               </a>{' '}
-              page
+              page.
             </>
           ),
         },
@@ -103,13 +126,13 @@ function CourseSettings() {
         },
         {
           key: 'accessAfterDue',
-          title: 'Allow Course access after Due Date',
-          description: 'Users can continue viewing lessons and assessments after the due date has passed',
+          title: 'Allow course access after Due Date',
+          description: 'Users can continue viewing lessons and assessments after the due date has passed.',
         },
         {
           key: 'rewards',
           title: 'Rewards',
-          description: 'Award jewels when course is completed (max of 500 jewels)',
+          description: 'Award jewels when course is completed (max of 500 jewels).',
         },
         {
           key: 'certificate',
@@ -120,7 +143,7 @@ function CourseSettings() {
               <a className="cs-link" href="#">
                 Read
               </a>{' '}
-              how certification works
+              how certification works.
             </>
           ),
         },
@@ -161,36 +184,60 @@ function CourseSettings() {
       items: [
         {
           key: 'lessonsInOrder',
-          title: 'Lessons must be completed in order',
-          description: 'Users must complete each lesson before unlocking the next one',
+          title: 'Course must be completed in order',
+          description: 'Users must complete each course item before unlocking the next one.',
         },
         {
           key: 'fastForward',
           title: 'Allow Fast Forwarding',
-          description: 'Turn on fast forward so learners can skip ahead in videos',
+          description: 'Turn on fast forward so learners can skip ahead in videos.',
         },
         {
           key: 'backgroundPlayback',
-          title: 'Enable Video Playback in Background',
-          description: 'Allow learners to keep videos playing while viewing other tabs',
+          title: 'Enable video playback in background',
+          description: 'Allow learners to keep videos playing while viewing other tabs.',
         },
       ],
     },
   ]
 
+  function sectionDirty(section: SettingSection) {
+    const boolChanged = section.items.some((item) => values[item.key] !== savedValues[item.key])
+    const hasAutoReset = section.items.some((item) => item.key === 'autoReset')
+    const numbersChanged =
+      hasAutoReset && (maxAttempts !== savedMaxAttempts || newAttemptDueDays !== savedDueDays)
+    return boolChanged || numbersChanged
+  }
+
+  function updateSection(section: SettingSection) {
+    setSavedValues((prev) => {
+      const next = { ...prev }
+      section.items.forEach((item) => {
+        next[item.key] = values[item.key]
+      })
+      return next
+    })
+    if (section.items.some((item) => item.key === 'autoReset')) {
+      setSavedMaxAttempts(maxAttempts)
+      setSavedDueDays(newAttemptDueDays)
+    }
+  }
+
   return (
     <section className="cs">
-      <header className="cs-header">
-        <div className="cs-header-title">
-          <h2 className="cs-title">Course settings</h2>
-          <p className="cs-subtitle">Customise your course settings and make sure you never miss a beat</p>
-        </div>
-        <button className="btn-primary">Update Settings</button>
-      </header>
-
       {sections.map((section) => (
         <div className="cs-section" key={section.heading}>
-          <h3 className="cs-section-heading">{section.heading}</h3>
+          <div className="cs-section-header">
+            <h3 className="cs-section-heading">{section.heading}</h3>
+            <button
+              type="button"
+              className="cs-section-update"
+              disabled={!sectionDirty(section)}
+              onClick={() => updateSection(section)}
+            >
+              Update
+            </button>
+          </div>
           {section.items.map((item) => (
             <div className="cs-card" key={item.key}>
               <Checkbox checked={values[item.key]} onChange={() => toggle(item.key)} />

@@ -8,53 +8,59 @@
   padding: var(--space-m) var(--space-m);
 }
 
-/* Header */
-.cs-header {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-xl);
-}
-
-.cs-header-title {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.cs-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-primary);
-  line-height: 1.5;
-}
-
-.cs-subtitle {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
 /* Section */
 .cs-section {
   display: flex;
   flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Section sub-header — heading + per-section Update button */
+.cs-section-header {
+  display: flex;
+  align-items: center;
   gap: var(--space-m);
+  width: 100%;
 }
 
 .cs-section-heading {
+  flex: 1;
+  min-width: 0;
   font-size: 16px;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.5;
 }
 
+.cs-section-update {
+  flex-shrink: 0;
+  padding: var(--space-s) var(--space-m);
+  border: none;
+  border-radius: var(--radius-s);
+  background: var(--primary-600);
+  color: var(--neutral-25);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.cs-section-update:hover:not(:disabled) {
+  background: var(--button-background-hover);
+}
+
+.cs-section-update:disabled {
+  background: var(--button-background-disabled);
+  color: var(--text-button-disabled);
+  cursor: default;
+}
+
 /* Setting card */
 .cs-card {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-sm);
+  gap: var(--space-s);
   padding: var(--space-m);
   border-radius: var(--radius-sm);
   background: var(--cards-background);
