@@ -43,6 +43,7 @@ function CourseSettings() {
     backgroundPlayback: false,
   })
   const [maxAttempts, setMaxAttempts] = useState(3)
+  const [newAttemptDueDays, setNewAttemptDueDays] = useState(5)
 
   const toggle = (key: SettingKey) => setValues((prev) => ({ ...prev, [key]: !prev[key] }))
 
@@ -127,15 +128,28 @@ function CourseSettings() {
           key: 'autoReset',
           title: 'Auto-reset on failure',
           description:
-            "Automatically reset a learner's progress for a fresh attempt when they fail, so they can retry without admin intervention. Their start date, due date, and recurrence cycle are unchanged.",
+            "Automatically reset a learner's progress for a fresh attempt when they fail, so they can retry without admin intervention.",
           expand: (
             <div className="cs-card-expand">
               <InputInteger
+                className="input-integer--inline"
                 label="Maximum course attempts"
                 value={maxAttempts}
                 onChange={setMaxAttempts}
                 min={1}
-                helperText="Once a learner reaches this many attempts, auto-reset stops and they're marked Failed."
+                helperText={
+                  <>
+                    Once a learner reaches this many attempts, auto-reset stops and they&apos;re marked{' '}
+                    <span className="cs-failed">Failed</span>.
+                  </>
+                }
+              />
+              <InputInteger
+                className="input-integer--inline"
+                label="Due days to complete course"
+                value={newAttemptDueDays}
+                onChange={setNewAttemptDueDays}
+                min={1}
               />
             </div>
           ),

@@ -453,14 +453,6 @@
   gap: var(--space-xs);
 }
 
-/* Quiz attempts remaining — heart + count inline after the In Progress label */
-.cd-status-attempts {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  color: #f44336;
-}
-
 .cd-status-tooltip,
 .cd-status-tooltip .tooltip__trigger {
   display: inline-flex;
@@ -486,6 +478,15 @@
   flex-shrink: 0;
   gap: var(--space-xs);
   justify-content: center;
+}
+
+/* Attempt count "2/3" — current attempt prominent, max muted */
+.cd-attempt {
+  color: var(--text-primary);
+}
+
+.cd-attempt-max {
+  color: var(--text-tertiary);
 }
 
 .cd-cell--sortable {
@@ -655,6 +656,12 @@
 .cd-status--in-progress {
   background: rgba(0, 206, 230, 0.16);
   color: var(--primary-700);
+}
+
+/* Content done but quizzes not yet passed — warning styling */
+.cd-status--quizzes-pending {
+  background: rgba(255, 187, 56, 0.16);
+  color: var(--text-warning);
 }
 
 .cd-status--passed {

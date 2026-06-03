@@ -123,7 +123,20 @@ function YourCoursesList() {
                   <div className="courses-list-thumb">
                     <img src={thumbImage} alt="" />
                   </div>
-                  <span className="courses-list-course-title">{row.title}</span>
+                  <span
+                    className="courses-list-course-title"
+                    role="link"
+                    tabIndex={0}
+                    onClick={() => navigate('/your-courses/course', { state: { courseTitle: row.title } })}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        navigate('/your-courses/course', { state: { courseTitle: row.title } })
+                      }
+                    }}
+                  >
+                    {row.title}
+                  </span>
                 </div>
                 <div className="courses-list-cell courses-list-cell--status">
                   {row.status === 'published' ? (

@@ -100,4 +100,13 @@
    Spacing lives here (inside the animated Collapse) so it tweens with the height. */
 .cs-card-expand {
   margin-top: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+/* Emphasised "Failed" inside helper copy */
+.cs-failed {
+  color: var(--text-error);
+  font-weight: 500;
 }

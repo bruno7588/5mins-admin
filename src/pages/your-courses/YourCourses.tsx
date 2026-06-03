@@ -89,11 +89,11 @@ function YourCourses() {
                     className="your-courses-enrol-course-title"
                     role="link"
                     tabIndex={0}
-                    onClick={() => navigate('/your-courses/course')}
+                    onClick={() => navigate('/your-courses/course', { state: { courseTitle: row.title } })}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault()
-                        navigate('/your-courses/course')
+                        navigate('/your-courses/course', { state: { courseTitle: row.title } })
                       }
                     }}
                   >

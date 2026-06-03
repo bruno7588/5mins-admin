@@ -4,6 +4,20 @@
   gap: var(--space-s);
 }
 
+/* Inline variant — label sits before (left of) the control; helper wraps full-width below. */
+.input-integer--inline {
+  display: grid;
+  grid-template-columns: max-content max-content 1fr;
+  align-items: center;
+  column-gap: var(--space-m);
+  row-gap: var(--space-xs);
+  width: 100%;
+}
+
+.input-integer--inline .input-integer__helper {
+  grid-column: 1 / -1;
+}
+
 .input-integer__label {
   font-size: 14px;
   font-weight: 500;

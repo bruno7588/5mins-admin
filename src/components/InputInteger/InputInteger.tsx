@@ -1,4 +1,4 @@
-import { useId } from 'react'
+import { useId, type ReactNode } from 'react'
 import { Add, Minus } from 'iconsax-react'
 import './InputInteger.css'
 
@@ -9,7 +9,7 @@ interface InputIntegerProps {
   min?: number
   max?: number
   step?: number
-  helperText?: string
+  helperText?: ReactNode
   validation?: 'none' | 'error' | 'success'
   disabled?: boolean
   className?: string
