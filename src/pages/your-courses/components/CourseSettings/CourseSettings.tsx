@@ -209,7 +209,7 @@ function CourseSettings() {
     return boolChanged || numbersChanged
   }
 
-  function updateSection(section: SettingSection) {
+  function saveSection(section: SettingSection) {
     setSavedValues((prev) => {
       const next = { ...prev }
       section.items.forEach((item) => {
@@ -227,27 +227,29 @@ function CourseSettings() {
     <section className="cs">
       {sections.map((section) => (
         <div className="cs-section" key={section.heading}>
-          <div className="cs-section-header">
-            <h3 className="cs-section-heading">{section.heading}</h3>
-            <button
-              type="button"
-              className="cs-section-update"
-              disabled={!sectionDirty(section)}
-              onClick={() => updateSection(section)}
-            >
-              Update
-            </button>
-          </div>
-          {section.items.map((item) => (
-            <div className="cs-card" key={item.key}>
-              <Checkbox checked={values[item.key]} onChange={() => toggle(item.key)} />
-              <div className="cs-card-body">
-                <span className="cs-card-title">{item.title}</span>
-                <p className="cs-card-desc">{item.description}</p>
-                {item.expand && <Collapse open={values[item.key]}>{item.expand}</Collapse>}
+          <h3 className="cs-section-heading">{section.heading}</h3>
+          <div className="cs-card">
+            {section.items.map((item) => (
+              <div className="cs-setting" key={item.key}>
+                <Checkbox checked={values[item.key]} onChange={() => toggle(item.key)} />
+                <div className="cs-card-body">
+                  <span className="cs-card-title">{item.title}</span>
+                  <p className="cs-card-desc">{item.description}</p>
+                  {item.expand && <Collapse open={values[item.key]}>{item.expand}</Collapse>}
+                </div>
               </div>
+            ))}
+            <div className="cs-cta">
+              <button
+                type="button"
+                className="cs-save"
+                disabled={!sectionDirty(section)}
+                onClick={() => saveSection(section)}
+              >
+                Save
+              </button>
             </div>
-          ))}
+          </div>
         </div>
       ))}
     </section>

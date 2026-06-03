@@ -15,25 +15,15 @@
   gap: var(--space-sm);
 }
 
-/* Section sub-header — heading + per-section Update button */
-.cs-section-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-m);
-  width: 100%;
-}
-
 .cs-section-heading {
-  flex: 1;
-  min-width: 0;
   font-size: 16px;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.5;
 }
 
-.cs-section-update {
-  flex-shrink: 0;
+/* Per-section Save — bottom of the section card */
+.cs-save {
   padding: var(--space-s) var(--space-m);
   border: none;
   border-radius: var(--radius-s);
@@ -46,25 +36,39 @@
   transition: background 150ms ease;
 }
 
-.cs-section-update:hover:not(:disabled) {
+.cs-save:hover:not(:disabled) {
   background: var(--button-background-hover);
 }
 
-.cs-section-update:disabled {
+.cs-save:disabled {
   background: var(--button-background-disabled);
   color: var(--text-button-disabled);
   cursor: default;
 }
 
-/* Setting card */
+/* Section card — holds all of a section's settings + one Save at the bottom */
 .cs-card {
   display: flex;
-  align-items: flex-start;
-  gap: var(--space-s);
+  flex-direction: column;
+  gap: var(--space-m);
   padding: var(--space-m);
   border-radius: var(--radius-sm);
   background: var(--cards-background);
   box-shadow: var(--shadow-s);
+}
+
+/* A single setting row inside the section card */
+.cs-setting {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-s);
+  width: 100%;
+}
+
+/* Save CTA — indented to align with the body text (past the 24px checkbox + 8px gap) */
+.cs-cta {
+  display: flex;
+  padding-left: var(--space-xl);
 }
 
 .cs-card-body {
