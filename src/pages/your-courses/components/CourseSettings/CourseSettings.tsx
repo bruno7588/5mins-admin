@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import Checkbox from '../../../../components/Checkbox/Checkbox'
 import InputInteger from '../../../../components/InputInteger/InputInteger'
+import Collapse from '../../../../components/Collapse/Collapse'
 import './CourseSettings.css'
 
 type SettingKey =
@@ -182,7 +183,7 @@ function CourseSettings() {
               <div className="cs-card-body">
                 <span className="cs-card-title">{item.title}</span>
                 <p className="cs-card-desc">{item.description}</p>
-                {item.expand && values[item.key] && item.expand}
+                {item.expand && <Collapse open={values[item.key]}>{item.expand}</Collapse>}
               </div>
             </div>
           ))}

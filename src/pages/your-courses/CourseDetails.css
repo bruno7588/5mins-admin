@@ -389,6 +389,13 @@
   background: var(--cards-background-hover);
 }
 
+/* Selected row — secondary-500 (#FFBB38) at 12% for both fill and border */
+.cd-row--selected,
+.cd-row--selected:hover {
+  background: rgba(255, 187, 56, 0.12);
+  border-color: rgba(255, 187, 56, 0.12);
+}
+
 .cd-row--head,
 .cd-row--head:hover {
   border: none;
@@ -595,6 +602,29 @@
 .cd-row-menu-item--danger .cd-row-menu-title,
 .cd-row-menu-item--danger .cd-row-menu-desc {
   color: var(--text-error);
+}
+
+.cd-row-menu-divider {
+  height: 1px;
+  width: 100%;
+  margin: var(--space-s) 0;
+  background: var(--border);
+  border-radius: var(--radius-x);
+}
+
+/* Reset-progress dialog width (Figma: 600px, vs ConfirmModal default 560px) */
+.confirm-modal.cd-reset-modal {
+  width: 600px;
+}
+
+/* Reset-progress over-cap warning: Figma uses 14px Medium (DS Alert default is 16px Regular) */
+.cd-reset-cap-alert {
+  gap: var(--space-sm); /* 12px bell→text, vs DS Alert default 24px */
+}
+
+.cd-reset-cap-alert .alert__message {
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .cd-menu-backdrop {

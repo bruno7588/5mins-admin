@@ -1,4 +1,4 @@
-import { useMemo, useState, type ComponentType } from 'react'
+import { Fragment, useMemo, useState, type ComponentType } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Add,
@@ -27,6 +27,7 @@ import Search from '../../components/Search/Search'
 import Checkbox from '../../components/Checkbox/Checkbox'
 import Tooltip from '../../components/Tooltip/Tooltip'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
+import Alert from '../../components/Alert/Alert'
 import MoreIcon from '../../components/icons/MoreIcon'
 import CourseSettings from './components/CourseSettings/CourseSettings'
 import '../people/People.css'
@@ -62,13 +63,19 @@ const STATUS_LABELS: Record<LearnerStatus, string> = {
 const COURSE_TITLE = 'Building Company Culture A Guide for HR Teams'
 const TOTAL = 128
 
+// Course-level attempt policy. In the real app these come from the Settings tab
+// (CourseSettings: `autoReset` + `maxAttempts`); mirrored here as constants for the prototype.
+// The cap is only enforced while auto-reset is on, so it only frames the manual reset when on.
+const AUTO_RESET_ON_FAILURE = true
+const MAX_COURSE_ATTEMPTS = 3
+
 const learners: Learner[] = [
   { id: 1, name: 'Anthony Wallace', email: 'anthony.wallace@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 60, status: 'failed', attemptNo: 2, completionDate: 'Sep 25, 2025', repeat: 'Every 12 months' },
   { id: 2, name: 'Sophia Carter', email: 'sophia.carter@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 92, status: 'passed', attemptNo: 1, completionDate: 'Sep 25, 2025', repeat: 'Never' },
   { id: 3, name: 'Oliver Bennett', email: 'oliver.bennett@email.com', startDate: 'Jul 14, 2024', dueDate: 'Oct 25, 2025', progress: 0, score: null, status: 'not-started', attemptNo: 1, completionDate: null, repeat: 'Every 12 months' },
   { id: 4, name: 'Emma Thompson', email: 'emma.thompson@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 50, status: 'in-progress', quizAttemptsLeft: 2, quizAttemptsMax: 3, attemptNo: 3, completionDate: null, repeat: 'Every 6 months' },
   { id: 5, name: 'Liam Johnson', email: 'liam.johnson@email.com', startDate: 'Sep 02, 2024', dueDate: 'Nov 30, 2025', progress: 0, score: null, status: 'not-started', attemptNo: 1, completionDate: null, repeat: 'Never' },
-  { id: 6, name: 'Ava Martinez', email: 'ava.martinez@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 78, status: 'failed', attemptNo: 4, completionDate: 'Oct 01, 2025', repeat: 'Every 12 months' },
+  { id: 6, name: 'Ava Martinez', email: 'ava.martinez@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 78, status: 'failed', attemptNo: 3, completionDate: 'Oct 01, 2025', repeat: 'Every 12 months' },
   { id: 7, name: 'Noah Davis', email: 'noah.davis@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 50, score: 65, status: 'in-progress', attemptNo: 2, completionDate: null, repeat: 'Every 12 months' },
   { id: 8, name: 'Isabella Lewis', email: 'isabella.lewis@email.com', startDate: 'Jun 18, 2024', dueDate: 'Sep 15, 2025', progress: 100, score: 96, status: 'passed', attemptNo: 1, completionDate: 'Sep 12, 2025', repeat: 'Never' },
   { id: 9, name: 'James Walker', email: 'james.walker@email.com', startDate: 'Aug 27, 2024', dueDate: 'Oct 25, 2025', progress: 100, score: 96, status: 'passed', attemptNo: 1, completionDate: 'Aug 30, 2025', repeat: 'Every 12 months' },
@@ -102,16 +109,18 @@ interface RowMenuAction {
   Icon: IconComponent
   variant?: 'Linear' | 'Bold'
   danger?: boolean
+  /** Render a divider above this item. */
+  dividerBefore?: boolean
 }
 
 const ROW_MENU: RowMenuAction[] = [
-  { key: 'view', label: 'View progress', description: "See this learner's lesson and quiz progress", Icon: TaskSquare },
-  { key: 'extend', label: 'Extend due date', description: 'Give this learner more time to finish', Icon: CalendarAdd },
-  { key: 'editStart', label: 'Edit start date', description: "Change when this learner's enrolment begins", Icon: CalendarEdit },
-  { key: 'editRepeat', label: 'Edit repeat rules', description: 'Change how often this course recurs', Icon: RepeatRules },
-  { key: 'restart', label: 'Restart enrolment', description: 'Begin a new enrolment cycle with fresh dates', Icon: Repeat, variant: 'Bold' },
-  { key: 'reset', label: 'Reset progress', description: 'Archive this attempt and start a fresh one', Icon: ArrowRotateLeft },
-  { key: 'unenrol', label: 'Unenrol', description: 'Remove this learner from the course', Icon: UserMinus, danger: true },
+  { key: 'view', label: 'View progress', description: "See learner's lesson and quiz progress", Icon: TaskSquare },
+  { key: 'extend', label: 'Extend due date', description: 'Give more time to complete the course', Icon: CalendarAdd },
+  { key: 'editStart', label: 'Edit start date', description: 'Change when the enrolment begins', Icon: CalendarEdit },
+  { key: 'editRepeat', label: 'Edit repeat rules', description: 'How often this course repeats', Icon: RepeatRules },
+  { key: 'restart', label: 'Restart enrolment', description: 'Start a new enrolment cycle with new dates', Icon: Repeat, variant: 'Bold' },
+  { key: 'reset', label: 'Reset progress', description: 'Archive this attempt and start over', Icon: ArrowRotateLeft },
+  { key: 'unenrol', label: 'Unenrol', description: 'Remove this learner from the course', Icon: UserMinus, danger: true, dividerBefore: true },
 ]
 
 // Info icon (circle-i) used for column/stat hints.
@@ -124,6 +133,39 @@ function InfoMark({ size = 16, color = 'var(--text-secondary)' }: { size?: numbe
       <path d="M7.75 4.0625C7.5893 4.0625 7.43221 4.11015 7.2986 4.19943C7.16498 4.28871 7.06084 4.4156 6.99935 4.56407C6.93785 4.71253 6.92176 4.8759 6.95311 5.03351C6.98446 5.19112 7.06185 5.33589 7.17548 5.44952C7.28911 5.56315 7.43388 5.64054 7.59149 5.67189C7.7491 5.70324 7.91247 5.68715 8.06093 5.62565C8.2094 5.56416 8.33629 5.46002 8.42557 5.3264C8.51485 5.19279 8.5625 5.0357 8.5625 4.875C8.5625 4.65951 8.4769 4.45285 8.32452 4.30048C8.17215 4.1481 7.96549 4.0625 7.75 4.0625Z" fill={color} />
     </svg>
   )
+}
+
+// Multi-colour bell used in the over-cap warning alert (matches Figma).
+function BellIcon() {
+  return (
+    <svg className="alert__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M8.2207 2.21493C8.2207 0.993788 9.1824 0 10.3641 0C11.5458 0 12.5075 0.993788 12.5075 2.21493C12.5075 3.43606 11.5458 4.42985 10.3641 4.42985C9.1824 4.42985 8.2207 3.43778 8.2207 2.21493ZM9.46741 2.21493C9.46741 2.72646 9.86909 3.14154 10.3641 3.14154C10.8591 3.14154 11.2608 2.72646 11.2608 2.21493C11.2608 1.70339 10.8591 1.28831 10.3641 1.28831C9.86909 1.28831 9.46741 1.70511 9.46741 2.21493Z" fill="#E2A610" />
+      <path d="M12.2075 1.09375C12.2075 1.09375 12.3025 1.48472 11.8642 1.69829C11.4258 1.91014 11.1358 1.75341 11.1358 1.75341C11.2141 1.89119 11.2608 2.04792 11.2608 2.21844C11.2608 2.72997 10.8591 3.14505 10.3641 3.14505C9.86909 3.14505 9.46741 2.72997 9.46741 2.21844C9.46741 2.16677 9.47908 1.97214 9.55908 1.81024C8.81572 2.17538 8.2507 1.86363 8.2507 1.86363C8.23237 1.97903 8.2207 2.09787 8.2207 2.21844C8.2207 3.43957 9.1824 4.43336 10.3641 4.43336C11.5458 4.43336 12.5075 3.43957 12.5075 2.21671C12.5075 1.8068 12.3975 1.42272 12.2075 1.09375Z" fill="#9E740B" />
+      <path d="M1.07671 15.8252C2.20508 14.6799 2.90843 14.2941 3.19511 12.6337C3.48178 10.9734 3.25178 7.47532 4.51515 5.18462C5.66852 3.08681 7.78525 2.21875 9.85032 2.21875C9.90032 2.21875 9.95032 2.22219 10.0003 2.22219C10.0503 2.22047 10.1003 2.21875 10.1503 2.21875C12.2154 2.21875 14.3321 3.08681 15.4855 5.18289C16.7472 7.47532 16.5189 10.9734 16.8055 12.632C17.0922 14.2923 17.7956 14.6781 18.9239 15.8235C19.4106 16.3178 19.999 17.1049 20.0006 17.6113C20.0023 18.1176 19.7523 18.3019 19.1573 18.5603C17.4739 19.2923 15.2238 20.0019 10.0003 20.0019C4.77682 20.0019 2.52675 19.2923 0.843368 18.5603C0.248349 18.3019 -0.00165844 18.1194 8.27502e-06 17.6113C0.00167499 17.1066 0.590027 16.3195 1.07671 15.8252Z" fill="#FFCA28" />
+      <path d="M18.284 17.6469C18.284 16.8839 14.5755 16.2656 10.0004 16.2656C5.42525 16.2656 1.7168 16.8839 1.7168 17.6469C1.7168 18.4099 5.42525 19.3211 10.0004 19.3211C14.5755 19.3211 18.284 18.4099 18.284 17.6469Z" fill="#4E342E" />
+      <path d="M14.9744 6.69599C15.0361 6.93884 15.0878 7.18169 15.1294 7.41937C15.3411 8.63534 15.3028 9.88232 15.3978 11.1138C15.5261 12.7621 15.8095 13.6301 16.4545 14.4052C16.5395 14.5068 16.4528 14.6635 16.3245 14.6429C15.4628 14.5068 14.7711 14.3707 13.9827 13.8334C12.806 13.0325 12.516 11.5254 12.5077 10.1717C12.4944 8.15653 12.531 6.20513 12.376 5.46452C12.161 4.43284 11.961 3.88342 11.6343 3.38222C11.136 2.6175 13.071 3.67846 13.3744 3.91442C14.2194 4.57407 14.7044 5.63503 14.9744 6.69599Z" fill="#E2A610" />
+      <path d="M4.48183 9.3691C4.46183 8.06357 4.47183 6.71325 4.97518 5.51451C5.27686 4.79801 5.78854 4.15214 6.44189 3.75083C6.95524 3.43565 7.99861 3.08773 8.37362 3.8025C8.44862 3.94546 8.47862 4.11252 8.48362 4.27615C8.49696 4.84624 8.21028 5.37327 7.93194 5.86586C7.10858 7.3264 6.78024 8.92301 6.34522 10.542C6.16688 11.2103 5.94021 11.8768 5.55186 12.4417C5.28519 12.8293 3.80014 14.2071 4.14015 12.9619C4.46683 11.758 4.50016 10.623 4.48183 9.3691Z" fill="#FFF59D" />
+      <path d="M11.5152 17.3755C11.5136 17.0793 11.3586 16.9087 11.0019 16.7813C10.2619 16.5178 9.33518 16.566 8.79516 16.8657C8.22847 17.1792 8.62182 18.917 10.0002 18.917C11.3786 18.917 11.5169 17.6011 11.5152 17.3755Z" fill="#E2A610" />
+      <path d="M4.87537 14.7923C3.41199 15.0576 2.35195 15.6311 1.89361 16.0961C1.53026 16.463 1.53026 16.7523 2.17028 16.4509C2.65196 16.2236 4.19535 15.762 5.54705 15.6225C7.86879 15.3814 9.30217 15.3762 9.54051 15.3814C10.0989 15.3934 10.1455 14.949 9.01716 14.7923C7.88879 14.6373 6.33875 14.5288 4.87537 14.7923Z" fill="#FFF59D" />
+      <path d="M9.4105 18.5786C9.60384 18.7164 9.86051 18.7835 10.0772 18.6905C10.2939 18.5975 10.4339 18.3133 10.3272 18.098C10.2855 18.0136 10.2139 17.9499 10.1422 17.8914C9.94385 17.7312 9.72384 17.6003 9.4905 17.5038C9.39883 17.4659 9.30216 17.4315 9.20216 17.4384C9.10382 17.4436 9.00049 17.4969 8.96215 17.5917C8.79715 17.9792 9.12716 18.3788 9.4105 18.5786Z" fill="#FFF59D" />
+    </svg>
+  )
+}
+
+// 1 → "1st", 2 → "2nd", 4 → "4th", 11 → "11th".
+function ordinal(n: number) {
+  const rem100 = n % 100
+  if (rem100 >= 11 && rem100 <= 13) return `${n}th`
+  switch (n % 10) {
+    case 1:
+      return `${n}st`
+    case 2:
+      return `${n}nd`
+    case 3:
+      return `${n}rd`
+    default:
+      return `${n}th`
+  }
 }
 
 function StackedDate({ value }: { value: string | null }) {
@@ -442,7 +484,7 @@ function CourseDetails() {
               </div>
 
               {rows.map((row) => (
-                <div className="cd-row" key={row.id}>
+                <div className={`cd-row${selected.has(row.id) ? ' cd-row--selected' : ''}`} key={row.id}>
                   <div className="cd-cell cd-cell--name">
                     <Checkbox checked={selected.has(row.id)} onChange={() => toggleRow(row.id)} />
                     <div className="cd-learner">
@@ -485,27 +527,29 @@ function CourseDetails() {
                     </button>
                     {openMenuId === row.id && (
                       <div className="cd-row-menu" role="menu">
-                        {ROW_MENU.map(({ key, label, description, Icon, variant, danger }) => (
-                          <button
-                            key={key}
-                            type="button"
-                            role="menuitem"
-                            className={`cd-row-menu-item${danger ? ' cd-row-menu-item--danger' : ''}`}
-                            onClick={() => {
-                              setOpenMenuId(null)
-                              if (key === 'reset') setResetTarget(row)
-                            }}
-                          >
-                            <Icon
-                              size={20}
-                              color={danger ? 'var(--text-error)' : 'var(--text-primary)'}
-                              variant={variant ?? 'Linear'}
-                            />
-                            <span className="cd-row-menu-text">
-                              <span className="cd-row-menu-title">{label}</span>
-                              <span className="cd-row-menu-desc">{description}</span>
-                            </span>
-                          </button>
+                        {ROW_MENU.map(({ key, label, description, Icon, variant, danger, dividerBefore }) => (
+                          <Fragment key={key}>
+                            {dividerBefore && <div className="cd-row-menu-divider" role="separator" />}
+                            <button
+                              type="button"
+                              role="menuitem"
+                              className={`cd-row-menu-item${danger ? ' cd-row-menu-item--danger' : ''}`}
+                              onClick={() => {
+                                setOpenMenuId(null)
+                                if (key === 'reset') setResetTarget(row)
+                              }}
+                            >
+                              <Icon
+                                size={20}
+                                color={danger ? 'var(--text-error)' : 'var(--text-primary)'}
+                                variant={variant ?? 'Linear'}
+                              />
+                              <span className="cd-row-menu-text">
+                                <span className="cd-row-menu-title">{label}</span>
+                                <span className="cd-row-menu-desc">{description}</span>
+                              </span>
+                            </button>
+                          </Fragment>
                         ))}
                       </div>
                     )}
@@ -534,30 +578,49 @@ function CourseDetails() {
 
         {openMenuId !== null && <div className="cd-menu-backdrop" onClick={() => setOpenMenuId(null)} />}
 
-        <ConfirmModal open={!!resetTarget} onClose={() => setResetTarget(null)}>
-          {resetTarget && (
+        <ConfirmModal open={!!resetTarget} onClose={() => setResetTarget(null)} className="cd-reset-modal">
+          {(() => {
+            if (!resetTarget) return null
+            const nextAttempt = resetTarget.attemptNo + 1
+            const exceedsCap = AUTO_RESET_ON_FAILURE && nextAttempt > MAX_COURSE_ATTEMPTS
+            return (
             <>
               <div className="confirm-modal-header confirm-modal-header--center">
                 <div className="confirm-modal-icon">
-                  <ArrowRotateLeft size={72} color="var(--primary-600)" variant="Linear" />
+                  <ArrowRotateLeft size={72} color="var(--warning-500)" variant="Linear" />
                 </div>
                 <h2 className="confirm-modal-title">Reset progress</h2>
                 <p className="confirm-modal-body">
-                  Reset {resetTarget.name}&apos;s progress on &ldquo;{COURSE_TITLE}&rdquo;? Their current attempt will be
-                  archived and they&apos;ll start a fresh course attempt within the same enrolment. Their start date,
-                  due date, and recurrence cycle are unchanged.
+                  Reset {resetTarget.name}&apos;s progress on this course
                 </p>
               </div>
+              <Alert
+                type="Callout"
+                title="What happens:"
+                bullets={[
+                  'Their current attempt is archived and a fresh one starts in the same enrolment',
+                  'Start date, due date, and recurrence stay the same',
+                ]}
+              />
+              {exceedsCap && (
+                <Alert
+                  type="Alert"
+                  customIcon={<BellIcon />}
+                  className="cd-reset-cap-alert"
+                  message={`${resetTarget.name} has used all ${MAX_COURSE_ATTEMPTS} attempts allowed by auto-reset. Resetting adds one beyond that limit — this will be their ${ordinal(nextAttempt)} attempt`}
+                />
+              )}
               <div className="confirm-modal-actions">
                 <button className="confirm-modal-btn confirm-modal-btn--outlined" onClick={() => setResetTarget(null)}>
                   Cancel
                 </button>
-                <button className="confirm-modal-btn confirm-modal-btn--primary" onClick={() => confirmReset(resetTarget.id)}>
+                <button className="confirm-modal-btn confirm-modal-btn--warning" onClick={() => confirmReset(resetTarget.id)}>
                   Reset Progress
                 </button>
               </div>
             </>
-          )}
+            )
+          })()}
         </ConfirmModal>
       </main>
     </div>

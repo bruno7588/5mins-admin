@@ -1137,6 +1137,16 @@
   background: var(--danger-600);
 }
 
+/* Filled warning (amber) — caution actions with consequences */
+.confirm-modal-btn--warning {
+  background: var(--warning-500);
+  color: var(--neutral-0);
+}
+
+.confirm-modal-btn--warning:hover {
+  background: var(--warning-600);
+}
+
 .confirm-modal-btn:disabled {
   background: var(--button-background-disabled);
   color: var(--text-button-disabled);
