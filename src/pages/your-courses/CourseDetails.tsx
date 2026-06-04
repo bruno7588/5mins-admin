@@ -55,7 +55,7 @@ interface Learner {
 const STATUS_LABELS: Record<LearnerStatus, string> = {
   'not-started': 'Not Started',
   'in-progress': 'In Progress',
-  'quizzes-pending': 'Quizzes Pending',
+  'quizzes-pending': 'Retaking Quizzes',
   passed: 'Passed',
   failed: 'Failed',
 }
@@ -181,7 +181,7 @@ function StackedDate({ value }: { value: string | null }) {
 }
 
 function EnrolmentStatus({ status }: Learner) {
-  // "Quizzes Pending" = content is 100% done but one or more quizzes haven't hit the pass score.
+  // "Retaking Quizzes" = content is 100% done but one or more quizzes haven't hit the pass score.
   if (status !== 'quizzes-pending') {
     return <span className={`cd-status cd-status--${status}`}>{STATUS_LABELS[status]}</span>
   }
@@ -189,7 +189,6 @@ function EnrolmentStatus({ status }: Learner) {
   const badge = (
     <span className={`cd-status cd-status--${status}`}>
       {STATUS_LABELS[status]}
-      <InfoMark size={16} color="currentColor" />
     </span>
   )
 

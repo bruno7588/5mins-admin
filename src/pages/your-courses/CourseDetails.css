@@ -98,6 +98,11 @@
   height: 32px;
 }
 
+/* Row actions (⋯) menu trigger — hover uses input-background */
+.cd-cell--actions .cd-icon-btn:hover {
+  background: var(--input-background);
+}
+
 .cd-link-icon {
   transform: rotate(-45deg);
 }
