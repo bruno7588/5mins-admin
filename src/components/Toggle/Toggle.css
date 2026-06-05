@@ -45,6 +45,25 @@
   transform: translateX(16px);
 }
 
+/* Small variant */
+.toggle--sm {
+  width: 28px;
+  height: 16px;
+}
+
+.toggle--sm .toggle__track {
+  border-radius: 8px;
+}
+
+.toggle--sm .toggle__thumb {
+  width: 12px;
+  height: 12px;
+}
+
+.toggle--sm.toggle--on .toggle__thumb {
+  transform: translateX(12px);
+}
+
 .toggle--disabled {
   cursor: not-allowed;
 }

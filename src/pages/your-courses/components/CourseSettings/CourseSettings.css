@@ -85,7 +85,7 @@
 
 .cs-card-title {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-primary);
   line-height: 1.5;
 }
@@ -113,6 +113,31 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-m);
+}
+
+/* The Pass Score block: a free-standing pass-score stepper followed by the
+   re-attempts / auto-reset settings, each in its own grouped panel. */
+.cs-passscore-group {
+  margin-top: var(--space-ml);
+  gap: var(--space-ml);
+}
+
+/* A grouped sub-setting panel (toggle + body) nested under Pass Score. */
+.cs-panel {
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--input-background);
+  border-radius: var(--radius-sm);
+}
+
+/* Align the small toggle with the panel title's cap height. */
+.cs-panel > .toggle {
+  margin-top: var(--space-xs);
+}
+
+/* Match the toggles to the checkbox's amber "on" colour (rather than the default green). */
+.cs-panel .toggle--on .toggle__track {
+  background: #f5a623;
 }
 
 /* Emphasised "Failed" inside helper copy */

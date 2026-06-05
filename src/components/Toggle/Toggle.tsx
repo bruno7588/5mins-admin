@@ -4,14 +4,16 @@ import './Toggle.css'
 type ToggleProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
   label?: React.ReactNode
   labelPosition?: 'left' | 'right'
+  size?: 'md' | 'sm'
 }
 
 const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
-  ({ label, labelPosition = 'right', checked, disabled, id, className, ...props }, ref) => {
+  ({ label, labelPosition = 'right', size = 'md', checked, disabled, id, className, ...props }, ref) => {
     const reactId = useId()
     const controlId = id ?? `toggle-${reactId}`
     const wrapperClass = [
       'toggle',
+      size === 'sm' ? 'toggle--sm' : '',
       checked ? 'toggle--on' : '',
       disabled ? 'toggle--disabled' : '',
     ]

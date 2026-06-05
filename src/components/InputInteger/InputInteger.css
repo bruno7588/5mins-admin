@@ -48,6 +48,22 @@
   border-color: var(--text-error);
 }
 
+/* Wraps the value + optional unit suffix so they read as one token ("80%"). */
+.input-integer__field {
+  display: inline-flex;
+  align-items: center;
+}
+
+.input-integer__suffix {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.input-integer--disabled .input-integer__suffix {
+  color: var(--text-disabled);
+}
+
 .input-integer__value {
   width: 32px;
   min-width: 26px;

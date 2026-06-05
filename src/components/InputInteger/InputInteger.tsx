@@ -14,6 +14,8 @@ interface InputIntegerProps {
   disabled?: boolean
   className?: string
   ariaLabel?: string
+  /** Static unit shown right after the value, inside the control (e.g. "%"). */
+  suffix?: string
 }
 
 /**
@@ -32,6 +34,7 @@ function InputInteger({
   disabled = false,
   className,
   ariaLabel,
+  suffix,
 }: InputIntegerProps) {
   const id = useId()
   const atMin = min != null && value <= min
@@ -92,17 +95,21 @@ function InputInteger({
         >
           <Minus size={20} color="currentColor" variant="Linear" />
         </button>
-        <input
-          className="input-integer__value"
-          id={id}
-          type="text"
-          inputMode="numeric"
-          value={draft ?? String(value)}
-          onChange={handleType}
-          onBlur={handleBlur}
-          disabled={disabled}
-          aria-label={ariaLabel ?? label}
-        />
+        <span className="input-integer__field">
+          <input
+            className="input-integer__value"
+            id={id}
+            type="text"
+            inputMode="numeric"
+            value={draft ?? String(value)}
+            onChange={handleType}
+            onBlur={handleBlur}
+            disabled={disabled}
+            aria-label={ariaLabel ?? label}
+            style={suffix ? { width: `${String(draft ?? value).length}ch`, minWidth: 0 } : undefined}
+          />
+          {suffix && <span className="input-integer__suffix">{suffix}</span>}
+        </span>
         <button
           type="button"
           className="input-integer__step"
