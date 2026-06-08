@@ -78,47 +78,6 @@ function CourseSettings() {
 
   const sections: SettingSection[] = [
     {
-      heading: 'Data privacy',
-      items: [
-        {
-          key: 'managersSeeAll',
-          title: 'Allow Managers / Experts to see all enrolments',
-          description:
-            'Managers and Experts can view all course enrollments in Knowledge Hub page. When unchecked, they only see their team members and learners they assigned. This setting controls privacy for this course only.',
-        },
-      ],
-    },
-    {
-      heading: 'Course organisation',
-      items: [
-        {
-          key: 'complianceCourse',
-          title: 'Compliance course',
-          description:
-            'When selected, this course will be treated as a compliance course and included in Reports as well as Learning records.',
-        },
-        {
-          key: 'addToCategory',
-          title: 'Add to category',
-          description: (
-            <>
-              Add this course to a relevant category (e.g., Compliance, Marketing). These courses would show up in
-              the &ldquo;Your Workspace&rdquo; page. You can edit these categories from{' '}
-              <a
-                className="cs-link"
-                href="https://app.5mins.ai/admin/account-settings?tab=5"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Account &amp; Settings
-              </a>{' '}
-              page.
-            </>
-          ),
-        },
-      ],
-    },
-    {
       heading: 'Course completion',
       items: [
         {
@@ -235,6 +194,36 @@ function CourseSettings() {
       ],
     },
     {
+      heading: 'Course organisation',
+      items: [
+        {
+          key: 'complianceCourse',
+          title: 'Compliance course',
+          description:
+            'When selected, this course will be treated as a compliance course and included in Reports as well as Learning records.',
+        },
+        {
+          key: 'addToCategory',
+          title: 'Add to category',
+          description: (
+            <>
+              Add this course to a relevant category (e.g., Compliance, Marketing). These courses would show up in
+              the &ldquo;Your Workspace&rdquo; page. You can edit these categories from{' '}
+              <a
+                className="cs-link"
+                href="https://app.5mins.ai/admin/account-settings?tab=5"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Account &amp; Settings
+              </a>{' '}
+              page.
+            </>
+          ),
+        },
+      ],
+    },
+    {
       heading: 'Video playback',
       items: [
         {
@@ -251,6 +240,17 @@ function CourseSettings() {
           key: 'backgroundPlayback',
           title: 'Enable video playback in background',
           description: 'Allow learners to keep videos playing while viewing other tabs.',
+        },
+      ],
+    },
+    {
+      heading: 'Data privacy',
+      items: [
+        {
+          key: 'managersSeeAll',
+          title: 'Allow Managers / Experts to see all enrolments',
+          description:
+            'Managers and Experts can view all course enrollments in Knowledge Hub page. When unchecked, they only see their team members and learners they assigned. This setting controls privacy for this course only.',
         },
       ],
     },
