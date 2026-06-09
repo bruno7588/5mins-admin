@@ -177,6 +177,7 @@ function LearningRecords() {
   const [activeFilters, setActiveFilters] = useState<string[]>([])
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
   const [presetsOpen, setPresetsOpen] = useState(false)
+  const [presetsListOpen, setPresetsListOpen] = useState(false)
   const [presets, setPresets] = useState<FilterPreset[]>(() => readPresets())
   const [reportsOpen, setReportsOpen] = useState(false)
   const [reports, setReports] = useState<SavedReport[]>(() => readReports())
@@ -186,6 +187,7 @@ function LearningRecords() {
   const headerAddRef = useRef<HTMLDivElement>(null)
   const bottomAddRef = useRef<HTMLDivElement>(null)
   const presetsWrapRef = useRef<HTMLDivElement>(null)
+  const overflowWrapRef = useRef<HTMLDivElement>(null)
   const reportsWrapRef = useRef<HTMLDivElement>(null)
   const { toasts, show: showToast } = useToast()
 
@@ -224,6 +226,7 @@ function LearningRecords() {
     setFilterValues(values)
     setFiltersExpanded(true)
     setPresetsOpen(false)
+    setPresetsListOpen(false)
     showToast('success', `Applied “${preset.name}”`)
   }, [showToast])
 
@@ -238,7 +241,8 @@ function LearningRecords() {
       }
       setPresets(savePreset(preset))
       setPresetsOpen(false)
-      showToast('success', 'Preset saved')
+      setPresetsListOpen(false)
+      showToast('success', 'View saved')
     },
     [activeFilters, filterValues, showToast],
   )
@@ -246,7 +250,7 @@ function LearningRecords() {
   const deletePreset = useCallback(
     (id: string) => {
       setPresets(removePreset(id))
-      showToast('success', 'Preset deleted')
+      showToast('success', 'View deleted')
     },
     [showToast],
   )
@@ -261,7 +265,7 @@ function LearningRecords() {
         const p = prev.find((x) => x.id === id)
         return p ? savePreset({ ...p, name }) : prev
       })
-      showToast('success', 'Preset renamed')
+      showToast('success', 'View renamed')
     },
     [showToast],
   )
@@ -277,7 +281,7 @@ function LearningRecords() {
           createdAt: new Date().toISOString(),
         }),
       )
-      showToast('success', 'Preset duplicated')
+      showToast('success', 'View duplicated')
     },
     [showToast],
   )
@@ -293,12 +297,35 @@ function LearningRecords() {
     [activeFilters, filterValues],
   )
 
-  // Presets shown as chips in the header: user presets (pinned first), then
-  // suggested defaults to fill — capped at 4.
-  const headerPresets = [
+  // Presets for the header: user presets (pinned first), then suggested defaults.
+  // Show the first 3 as chips; the rest collapse into a "+N Presets" chip.
+  const allHeaderPresets = [
     ...[...presets].sort((a, b) => Number(!!b.pinned) - Number(!!a.pinned)),
     ...DEFAULT_PRESETS,
-  ].slice(0, 4)
+  ]
+  const visiblePresets = allHeaderPresets.slice(0, 3)
+  const presetsOverflow = allHeaderPresets.length - visiblePresets.length
+
+  const renderPresetsMenu = (
+    open: boolean,
+    setOpen: (v: boolean) => void,
+    ref: typeof presetsWrapRef,
+  ) => (
+    <PresetsMenu
+      open={open}
+      onClose={() => setOpen(false)}
+      anchorRef={ref}
+      presets={presets}
+      canSave={activeFilters.length > 0}
+      isActive={isPresetActive}
+      onApply={applyPreset}
+      onSave={saveCurrentAsPreset}
+      onDelete={deletePreset}
+      onTogglePin={togglePin}
+      onRename={renamePreset}
+      onDuplicate={duplicatePreset}
+    />
+  )
 
   /* ─── Saved reports ─── */
   const currentFilterEntries: FilterEntry[] = activeFilters.map((id) => ({
@@ -453,10 +480,10 @@ function LearningRecords() {
                 <span className="lrp-filters-badge">{activeFilters.length}</span>
               </button>
 
-              {/* Presets shown as quick-apply chips (DS Chip component) */}
-              {headerPresets.length > 0 && (
-                <div className="lrp-presets-wrap">
-                  {headerPresets.map((p) => (
+              {/* Presets as quick-apply chips; overflow collapses into "+N Presets" */}
+              {visiblePresets.length > 0 && (
+                <div className="lrp-presets-wrap" ref={overflowWrapRef}>
+                  {visiblePresets.map((p) => (
                     <Chip
                       key={p.id}
                       label={p.name}
@@ -464,6 +491,19 @@ function LearningRecords() {
                       onClick={() => applyPreset(p)}
                     />
                   ))}
+                  {presetsOverflow > 0 && (
+                    <button
+                      type="button"
+                      className="lrp-overflow-chip"
+                      aria-haspopup="dialog"
+                      aria-expanded={presetsListOpen}
+                      onClick={() => setPresetsListOpen((o) => !o)}
+                    >
+                      +{presetsOverflow} Views
+                      <ArrowDown2 size={16} color="var(--text-tertiary)" variant="Linear" />
+                    </button>
+                  )}
+                  {renderPresetsMenu(presetsListOpen, setPresetsListOpen, overflowWrapRef)}
                 </div>
               )}
 
@@ -568,22 +608,9 @@ function LearningRecords() {
                       aria-expanded={presetsOpen}
                       onClick={() => setPresetsOpen((o) => !o)}
                     >
-                      Save Preset
+                      Save View
                     </button>
-                    <PresetsMenu
-                      open={presetsOpen}
-                      onClose={() => setPresetsOpen(false)}
-                      anchorRef={presetsWrapRef}
-                      presets={presets}
-                      canSave={activeFilters.length > 0}
-                      isActive={isPresetActive}
-                      onApply={applyPreset}
-                      onSave={saveCurrentAsPreset}
-                      onDelete={deletePreset}
-                      onTogglePin={togglePin}
-                      onRename={renamePreset}
-                      onDuplicate={duplicatePreset}
-                    />
+                    {renderPresetsMenu(presetsOpen, setPresetsOpen, presetsWrapRef)}
                   </div>
                   <button
                     type="button"

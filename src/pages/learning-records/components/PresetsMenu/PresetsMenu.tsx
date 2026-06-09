@@ -111,13 +111,13 @@ function PresetsMenu({
   }
 
   return (
-    <div className="pm" ref={ref} role="dialog" aria-label="Filter presets">
+    <div className="pm" ref={ref} role="dialog" aria-label="Saved views">
       <div className="pm-search">
         <SearchNormal1 size={20} color="var(--text-tertiary)" variant="Linear" />
         <input
           type="text"
           className="pm-search-input"
-          placeholder="Search presets"
+          placeholder="Search views"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           autoFocus
@@ -150,7 +150,7 @@ function PresetsMenu({
         {mine.length > 0 && (
           <div className="pm-group">
             {suggested.length > 0 && <div className="pm-divider" />}
-            <div className="pm-section">Your presets</div>
+            <div className="pm-section">Your views</div>
             {mine.map((p) => (
               <Fragment key={p.id}>
                 {editingId === p.id ? (
@@ -226,7 +226,7 @@ function PresetsMenu({
           </div>
         )}
 
-        {isEmpty && <div className="pm-empty">No presets match “{query}”.</div>}
+        {isEmpty && <div className="pm-empty">No views match “{query}”.</div>}
       </div>
 
       {/* Save current filters */}
@@ -236,7 +236,7 @@ function PresetsMenu({
             <input
               type="text"
               className="pm-save-input"
-              placeholder="Preset name"
+              placeholder="View name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => {
@@ -273,7 +273,7 @@ function PresetsMenu({
             onClick={() => setSaving(true)}
           >
             <Add size={20} color={canSave ? 'var(--primary-600)' : 'var(--text-disabled)'} variant="Linear" />
-            Save Current Filters As Preset
+            Save Current Filters As View
           </button>
         )}
       </div>
