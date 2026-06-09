@@ -1,0 +1,134 @@
+/* ===== Filter Listbox (light overlay) ===== */
+.flb {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 30;
+  width: 440px;
+  max-height: 540px;
+  display: flex;
+  flex-direction: column;
+  background: var(--neutral-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: -4px 0 24px 0 rgba(32, 34, 42, 0.12);
+  padding: var(--space-s);
+  overflow: hidden;
+}
+
+/* Search */
+.flb-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-sm);
+  border-radius: var(--radius-s);
+  background: var(--input-background);
+  flex-shrink: 0;
+}
+
+.flb-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.flb-search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Scrollable list */
+.flb-list {
+  margin-top: var(--space-xs);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.flb-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.flb-section {
+  padding: var(--space-s) var(--space-sm) var(--space-xs);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+.flb-divider {
+  height: 1px;
+  margin: var(--space-s) var(--space-sm);
+  background: var(--border);
+}
+
+/* List item */
+.flb-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-s);
+  width: 100%;
+  padding: var(--space-s) var(--space-sm);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-s);
+  text-align: left;
+  cursor: pointer;
+  transition: background 100ms ease;
+}
+
+.flb-item--compact {
+  align-items: center;
+}
+
+.flb-item:hover {
+  background: var(--neutral-50);
+}
+
+.flb-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.flb-item--compact .flb-item-icon {
+  margin-top: 0;
+}
+
+.flb-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.flb-item-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.flb-item-desc {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.flb-empty {
+  padding: var(--space-m) var(--space-sm);
+  font-size: 14px;
+  color: var(--text-tertiary);
+  text-align: center;
+}

@@ -1,0 +1,197 @@
+/* ReportDrawer — form-specific styles (shell uses shared .side-drawer classes) */
+
+.rd-header-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.rd-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.rd-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.rd-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+}
+
+/* Status banner */
+.rd-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-m);
+  border-radius: var(--radius-sm);
+  background: var(--input-background);
+}
+
+.rd-banner-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.rd-banner-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+
+.rd-banner-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.rd-banner-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.rd-banner-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  margin-left: auto;
+}
+
+.rd-banner-status {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.rd-banner-status--on {
+  color: var(--success-500);
+}
+
+/* Generic field block */
+.rd-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.rd-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.rd-hint {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+/* Filter basis chips */
+.rd-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s);
+}
+
+.rd-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px var(--space-sm);
+  border-radius: var(--radius-full);
+  background: rgba(0, 206, 230, 0.16);
+  font-size: 14px;
+  color: var(--primary-600);
+  white-space: nowrap;
+}
+
+/* Recipients */
+.rd-recipients {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.rd-recipient-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+}
+
+.rd-recipient-input {
+  flex: 1;
+  min-width: 0;
+  height: 41px;
+  padding: var(--space-s) var(--space-m);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  outline: none;
+  background: var(--input-background);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.rd-recipient-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.rd-recipient-input:focus {
+  border-color: var(--primary-600);
+}
+
+.rd-recipient-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.rd-recipient-remove:hover {
+  background: var(--cards-background-hover);
+  color: var(--text-primary);
+}
+
+.rd-add-email {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  align-self: flex-start;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary-600);
+  line-height: 1.5;
+}
+
+/* Disabled primary CTA (shared class has no disabled style) */
+.side-drawer__btn-primary:disabled {
+  background: var(--button-background-disabled, var(--neutral-300));
+  color: var(--text-button-disabled, var(--text-tertiary));
+  cursor: not-allowed;
+}

@@ -22,6 +22,7 @@ import ScormCreateCourse from './pages/scorm-content/CreateCourse'
 import MyTeam from './pages/my-team/MyTeam'
 import Workspace from './pages/workspace/Workspace'
 import Events from './pages/events/Events'
+import LearningRecords from './pages/learning-records/LearningRecords'
 
 function App() {
   return (
@@ -66,6 +67,7 @@ function App() {
                 <Route path="/your-courses/list" element={<YourCoursesList />} />
                 <Route path="/your-courses/course" element={<CourseDetails />} />
                 <Route path="/people" element={<People />} />
+                <Route path="/learning-records" element={<LearningRecords />} />
                 <Route path="/user-fields" element={<UserFields />} />
                 <Route path="/roles" element={<Roles />} />
                 <Route path="/automations" element={<Automations />} />

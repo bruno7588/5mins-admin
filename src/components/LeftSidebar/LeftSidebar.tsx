@@ -165,9 +165,16 @@ function LeftSidebar() {
         </button>
 
         {/* Learning Records */}
-        <button className="sidebar-item">
+        <button
+          className={`sidebar-item${activePage === '/learning-records' ? ' sidebar-item--active' : ''}`}
+          onClick={() => navigate('/learning-records')}
+        >
           <span className="sidebar-item-icon">
-            <DocumentText size={iconSize} color={iconColor} variant="Linear" />
+            <DocumentText
+              size={iconSize}
+              color={activePage === '/learning-records' ? 'var(--secondary-600)' : iconColor}
+              variant={activePage === '/learning-records' ? 'Bold' : 'Linear'}
+            />
           </span>
           <span className="sidebar-item-label">Learning Records</span>
         </button>
