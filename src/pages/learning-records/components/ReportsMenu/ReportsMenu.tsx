@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
-import { Add, SearchNormal1 } from 'iconsax-react'
+import { useEffect, useRef, type RefObject } from 'react'
+import { Routing2 } from 'iconsax-react'
+import Toggle from '../../../../components/Toggle/Toggle'
 import { frequencyLabel, type SavedReport } from '../../../../utils/lrSavedFilters'
 import './ReportsMenu.css'
 
@@ -10,17 +11,16 @@ interface ReportsMenuProps {
   reports: SavedReport[]
   onCreate: () => void
   onEdit: (report: SavedReport) => void
-  onDelete: (id: string) => void
+  /** Turn a report's automated delivery on/off (admins can't delete from here). */
+  onToggle: (id: string, value: boolean) => void
 }
 
 function summary(r: SavedReport): string {
-  const cadence = r.automate ? frequencyLabel(r.frequency) : 'Not automated'
   const n = r.recipients.length
-  return `${cadence} · ${n} recipient${n === 1 ? '' : 's'}`
+  return `${frequencyLabel(r.frequency)} · ${n} recipient${n === 1 ? '' : 's'}`
 }
 
-function ReportsMenu({ open, onClose, anchorRef, reports, onCreate, onEdit, onDelete }: ReportsMenuProps) {
-  const [query, setQuery] = useState('')
+function ReportsMenu({ open, onClose, anchorRef, reports, onCreate, onEdit, onToggle }: ReportsMenuProps) {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -33,66 +33,35 @@ function ReportsMenu({ open, onClose, anchorRef, reports, onCreate, onEdit, onDe
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [open, onClose, anchorRef])
 
-  useEffect(() => {
-    if (open) setQuery('')
-  }, [open])
-
-  const q = query.trim().toLowerCase()
-  const filtered = useMemo(
-    () => reports.filter((r) => r.name.toLowerCase().includes(q)),
-    [reports, q],
-  )
-
   if (!open) return null
 
   return (
-    <div className="rm" ref={ref} role="dialog" aria-label="Saved reports">
-      <div className="rm-search">
-        <SearchNormal1 size={20} color="var(--text-tertiary)" variant="Linear" />
-        <input
-          type="text"
-          className="rm-search-input"
-          placeholder="Search reports"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          autoFocus
-        />
-      </div>
-
+    <div className="rm" ref={ref} role="dialog" aria-label="Automated reports">
       <div className="rm-list">
-        {filtered.map((r) => (
+        {reports.map((r) => (
           <div className="rm-item" key={r.id}>
             <button type="button" className="rm-item-main" onClick={() => onEdit(r)}>
-              <span className={`rm-dot${r.automate ? ' rm-dot--on' : ''}`} aria-hidden="true" />
-              <span className="rm-item-text">
-                <span className="rm-item-title">{r.name}</span>
-                <span className="rm-item-desc">{summary(r)}</span>
-              </span>
+              <span className="rm-item-title">{r.name}</span>
+              <span className="rm-item-desc">{summary(r)}</span>
             </button>
-            <button
-              type="button"
-              className="rm-item-remove"
-              aria-label={`Delete ${r.name}`}
-              onClick={() => onDelete(r.id)}
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M11 5L5 11M5 5L11 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-            </button>
+            <Toggle
+              size="sm"
+              checked={r.automate}
+              onChange={(e) => onToggle(r.id, e.target.checked)}
+              aria-label={`${r.automate ? 'Turn off' : 'Turn on'} ${r.name}`}
+            />
           </div>
         ))}
 
-        {filtered.length === 0 && (
-          <div className="rm-empty">
-            {reports.length === 0 ? 'No saved reports yet.' : `No reports match “${query}”.`}
-          </div>
-        )}
+        {reports.length === 0 && <div className="rm-empty">No automated reports yet.</div>}
       </div>
+
+      <div className="rm-divider" />
 
       <div className="rm-footer">
         <button type="button" className="rm-create" onClick={onCreate}>
-          <Add size={20} color="var(--primary-600)" variant="Linear" />
-          Create Report
+          Automate Report
+          <Routing2 size={20} color="var(--neutral-0)" variant="Linear" />
         </button>
       </div>
     </div>

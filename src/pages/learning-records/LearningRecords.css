@@ -50,7 +50,41 @@
   gap: var(--space-l);
 }
 
-/* Automate Reports control */
+/* Right-side header actions */
+.lrp-head-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-m);
+  flex-shrink: 0;
+}
+
+/* Download Report — DS Text / Primary / Medium (no bg/border, cyan text) */
+.lrp-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 120ms ease;
+}
+
+.lrp-download-btn:hover {
+  color: var(--primary-700);
+}
+
+.lrp-download-btn:active {
+  color: var(--primary-800);
+}
+
+/* Automate Reports — DS Outlined / Primary / Medium */
 .lrp-reports-wrap {
   position: relative;
   display: inline-flex;
@@ -60,38 +94,25 @@
 .lrp-reports-btn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
-  height: 36px;
-  padding: 0 var(--space-m);
-  border: 1px solid var(--border);
+  gap: var(--space-s);
+  padding: 10px var(--space-ml);
+  border: 1px solid var(--primary-600);
   border-radius: var(--radius-s);
   background: transparent;
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--primary-600);
   line-height: 1.5;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 120ms ease, border-color 120ms ease;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
 }
 
 .lrp-reports-btn:hover {
-  background: var(--cards-background-hover);
-}
-
-.lrp-reports-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: var(--radius-full);
-  background: var(--input-background);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
+  background: var(--primary-100);
+  color: var(--primary-700);
+  border-color: var(--primary-700);
 }
 
 .lrp-tab {
@@ -236,6 +257,11 @@
   font-weight: 700;
   color: var(--primary-600);
   line-height: 1.5;
+}
+
+.lrp-filter-save-preset:disabled {
+  color: var(--text-disabled);
+  cursor: not-allowed;
 }
 
 /* Collapsed-only cluster (Add+ and pills) — fades as the container expands */

@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
-import { Add, Copy, Edit2, MagicStar, SearchNormal1, Star1, Trash } from 'iconsax-react'
+import { Copy, Edit2, MagicStar, SearchNormal1, Star1, Trash } from 'iconsax-react'
 import MoreIcon from '../../../../components/icons/MoreIcon'
 import type { FilterPreset } from '../../../../utils/lrSavedFilters'
 import { DEFAULT_PRESETS } from '../../../../utils/lrSavedFilters'
@@ -11,12 +11,9 @@ interface PresetsMenuProps {
   anchorRef: RefObject<HTMLElement | null>
   /** User-saved presets (defaults are added internally). */
   presets: FilterPreset[]
-  /** True when there are active filters that can be saved. */
-  canSave: boolean
   /** Highlights the preset currently applied to the table. */
   isActive: (preset: FilterPreset) => boolean
   onApply: (preset: FilterPreset) => void
-  onSave: (name: string, description: string) => void
   onDelete: (id: string) => void
   onTogglePin: (id: string) => void
   onRename: (id: string, name: string) => void
@@ -34,19 +31,14 @@ function PresetsMenu({
   onClose,
   anchorRef,
   presets,
-  canSave,
   isActive,
   onApply,
-  onSave,
   onDelete,
   onTogglePin,
   onRename,
   onDuplicate,
 }: PresetsMenuProps) {
   const [query, setQuery] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
   const [menuId, setMenuId] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
@@ -66,9 +58,6 @@ function PresetsMenu({
   useEffect(() => {
     if (open) {
       setQuery('')
-      setSaving(false)
-      setName('')
-      setDescription('')
       setMenuId(null)
       setEditingId(null)
     }
@@ -88,15 +77,6 @@ function PresetsMenu({
   if (!open) return null
 
   const isEmpty = suggested.length === 0 && mine.length === 0
-
-  function commitSave() {
-    const trimmed = name.trim()
-    if (!trimmed) return
-    onSave(trimmed, description.trim())
-    setSaving(false)
-    setName('')
-    setDescription('')
-  }
 
   function startRename(p: FilterPreset) {
     setMenuId(null)
@@ -227,55 +207,6 @@ function PresetsMenu({
         )}
 
         {isEmpty && <div className="pm-empty">No views match “{query}”.</div>}
-      </div>
-
-      {/* Save current filters */}
-      <div className="pm-footer">
-        {saving ? (
-          <div className="pm-save-form">
-            <input
-              type="text"
-              className="pm-save-input"
-              placeholder="View name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') commitSave()
-                if (e.key === 'Escape') setSaving(false)
-              }}
-              autoFocus
-            />
-            <input
-              type="text"
-              className="pm-save-input"
-              placeholder="Description (optional)"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') commitSave()
-                if (e.key === 'Escape') setSaving(false)
-              }}
-            />
-            <div className="pm-save-actions">
-              <button type="button" className="pm-save-confirm" disabled={!name.trim()} onClick={commitSave}>
-                Save
-              </button>
-              <button type="button" className="pm-save-cancel" onClick={() => setSaving(false)}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        ) : (
-          <button
-            type="button"
-            className="pm-save-trigger"
-            disabled={!canSave}
-            onClick={() => setSaving(true)}
-          >
-            <Add size={20} color={canSave ? 'var(--primary-600)' : 'var(--text-disabled)'} variant="Linear" />
-            Save Current Filters As View
-          </button>
-        )}
       </div>
     </div>
   )

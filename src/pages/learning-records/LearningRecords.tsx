@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
-import { Add, ArrowDown2, ArrowLeft2, ArrowRight2, Notification, Sort } from 'iconsax-react'
+import { Add, ArrowDown2, ArrowLeft2, ArrowRight2, DocumentDownload, Sort } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import MoreIcon from '../../components/icons/MoreIcon'
 import Chip from '../../components/Chip/Chip'
@@ -8,6 +8,7 @@ import Collapse from '../../components/Collapse/Collapse'
 import ToastContainer, { useToast } from '../../components/Toast/Toast'
 import FilterListbox, { FILTER_BY_ID } from './components/FilterListbox/FilterListbox'
 import PresetsMenu from './components/PresetsMenu/PresetsMenu'
+import SaveViewDialog from './components/SaveViewDialog/SaveViewDialog'
 import ReportsMenu from './components/ReportsMenu/ReportsMenu'
 import ReportDrawer from './components/ReportDrawer/ReportDrawer'
 import {
@@ -18,7 +19,6 @@ import {
   togglePresetPinned,
   readReports,
   saveReport,
-  removeReport,
   type FilterPreset,
   type FilterEntry,
   type SavedReport,
@@ -176,8 +176,8 @@ function LearningRecords() {
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [activeFilters, setActiveFilters] = useState<string[]>([])
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
-  const [presetsOpen, setPresetsOpen] = useState(false)
   const [presetsListOpen, setPresetsListOpen] = useState(false)
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false)
   const [presets, setPresets] = useState<FilterPreset[]>(() => readPresets())
   const [reportsOpen, setReportsOpen] = useState(false)
   const [reports, setReports] = useState<SavedReport[]>(() => readReports())
@@ -186,7 +186,6 @@ function LearningRecords() {
   const scrollRef = useRef<HTMLDivElement>(null)
   const headerAddRef = useRef<HTMLDivElement>(null)
   const bottomAddRef = useRef<HTMLDivElement>(null)
-  const presetsWrapRef = useRef<HTMLDivElement>(null)
   const overflowWrapRef = useRef<HTMLDivElement>(null)
   const reportsWrapRef = useRef<HTMLDivElement>(null)
   const { toasts, show: showToast } = useToast()
@@ -225,7 +224,6 @@ function LearningRecords() {
     })
     setFilterValues(values)
     setFiltersExpanded(true)
-    setPresetsOpen(false)
     setPresetsListOpen(false)
     showToast('success', `Applied “${preset.name}”`)
   }, [showToast])
@@ -240,7 +238,7 @@ function LearningRecords() {
         createdAt: new Date().toISOString(),
       }
       setPresets(savePreset(preset))
-      setPresetsOpen(false)
+      setSaveDialogOpen(false)
       setPresetsListOpen(false)
       showToast('success', 'View saved')
     },
@@ -309,17 +307,15 @@ function LearningRecords() {
   const renderPresetsMenu = (
     open: boolean,
     setOpen: (v: boolean) => void,
-    ref: typeof presetsWrapRef,
+    ref: typeof overflowWrapRef,
   ) => (
     <PresetsMenu
       open={open}
       onClose={() => setOpen(false)}
       anchorRef={ref}
       presets={presets}
-      canSave={activeFilters.length > 0}
       isActive={isPresetActive}
       onApply={applyPreset}
-      onSave={saveCurrentAsPreset}
       onDelete={deletePreset}
       onTogglePin={togglePin}
       onRename={renamePreset}
@@ -362,10 +358,13 @@ function LearningRecords() {
     [editingReport, showToast],
   )
 
-  const handleDeleteReport = useCallback(
-    (id: string) => {
-      setReports(removeReport(id))
-      showToast('success', 'Report deleted')
+  const toggleReportAutomate = useCallback(
+    (id: string, value: boolean) => {
+      setReports((prev) => {
+        const r = prev.find((x) => x.id === id)
+        return r ? saveReport({ ...r, automate: value }) : prev
+      })
+      showToast('success', value ? 'Reports turned on' : 'Reports turned off')
     },
     [showToast],
   )
@@ -437,29 +436,39 @@ function LearningRecords() {
                 ))}
               </div>
 
-              {/* Automate Reports — saved report presets + email delivery */}
-              <div className="lrp-reports-wrap" ref={reportsWrapRef}>
+              <div className="lrp-head-actions">
+                {/* Download the current view as a report */}
                 <button
                   type="button"
-                  className="lrp-reports-btn"
-                  aria-haspopup="dialog"
-                  aria-expanded={reportsOpen}
-                  onClick={() => setReportsOpen((o) => !o)}
+                  className="lrp-download-btn"
+                  onClick={() => showToast('success', 'Report downloaded')}
                 >
-                  <Notification size={18} color="var(--text-secondary)" variant="Linear" />
-                  Automate Reports
-                  {reports.length > 0 && <span className="lrp-reports-count">{reports.length}</span>}
-                  <ArrowDown2 size={16} color="var(--text-tertiary)" variant="Linear" />
+                  Download Report
+                  <DocumentDownload size={20} color="currentColor" variant="Linear" />
                 </button>
-                <ReportsMenu
-                  open={reportsOpen}
-                  onClose={() => setReportsOpen(false)}
-                  anchorRef={reportsWrapRef}
-                  reports={reports}
-                  onCreate={openCreateReport}
-                  onEdit={openEditReport}
-                  onDelete={handleDeleteReport}
-                />
+
+                {/* Automate Reports — saved report presets + email delivery */}
+                <div className="lrp-reports-wrap" ref={reportsWrapRef}>
+                  <button
+                    type="button"
+                    className="lrp-reports-btn"
+                    aria-haspopup="dialog"
+                    aria-expanded={reportsOpen}
+                    onClick={() => setReportsOpen((o) => !o)}
+                  >
+                    Automate Reports{reports.length > 0 ? ` (${reports.length})` : ''}
+                    <ArrowDown2 size={16} color="currentColor" variant="Linear" />
+                  </button>
+                  <ReportsMenu
+                    open={reportsOpen}
+                    onClose={() => setReportsOpen(false)}
+                    anchorRef={reportsWrapRef}
+                    reports={reports}
+                    onCreate={openCreateReport}
+                    onEdit={openEditReport}
+                    onToggle={toggleReportAutomate}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -600,18 +609,15 @@ function LearningRecords() {
                 <div className="lrp-filter-actions">
                   {/* Add + lives in the bottom actions when expanded */}
                   {renderAddButton(bottomAddRef, filtersOpen && filtersExpanded)}
-                  <div className="lrp-presets-wrap" ref={presetsWrapRef}>
-                    <button
-                      type="button"
-                      className="lrp-filter-save-preset"
-                      aria-haspopup="dialog"
-                      aria-expanded={presetsOpen}
-                      onClick={() => setPresetsOpen((o) => !o)}
-                    >
-                      Save View
-                    </button>
-                    {renderPresetsMenu(presetsOpen, setPresetsOpen, presetsWrapRef)}
-                  </div>
+                  <button
+                    type="button"
+                    className="lrp-filter-save-preset"
+                    aria-haspopup="dialog"
+                    disabled={activeFilters.length === 0}
+                    onClick={() => setSaveDialogOpen(true)}
+                  >
+                    Save View
+                  </button>
                   <button
                     type="button"
                     className="lrp-filter-clear"
@@ -745,6 +751,17 @@ function LearningRecords() {
         initial={editingReport}
         currentFilters={currentFilterEntries}
         filterLabel={entryLabel}
+      />
+
+      <SaveViewDialog
+        open={saveDialogOpen}
+        onClose={() => setSaveDialogOpen(false)}
+        onSave={(name) => saveCurrentAsPreset(name, '')}
+        filters={currentFilterEntries.map((e) => ({
+          key: e.id,
+          label: entryLabel(e),
+          Icon: FILTER_BY_ID[e.id]?.Icon,
+        }))}
       />
 
       <ToastContainer toasts={toasts} />
