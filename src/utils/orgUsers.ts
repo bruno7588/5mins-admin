@@ -1,0 +1,45 @@
+/**
+ * Registered / enrolled users in the org — source for recipient autocomplete
+ * on scheduled reports. Prototype seed data (mirrors the People page records,
+ * extended with a few more so the typeahead feels populated).
+ */
+export interface OrgUser {
+  name: string
+  email: string
+  /** Two-letter initials for the avatar chip. */
+  initials: string
+  role?: string
+}
+
+export const ORG_USERS: OrgUser[] = [
+  { name: 'Anthonny Wallace', email: 'anthonny@example.com', initials: 'AW', role: 'Customer Support Specialist' },
+  { name: 'Brenda Kwasaki', email: 'brenda@example.com', initials: 'BK', role: 'Operations Manager' },
+  { name: 'Carlos Mendes', email: 'carlos@example.com', initials: 'CM', role: 'Software Engineer' },
+  { name: 'Diana Ross', email: 'diana.ross@company.com', initials: 'DR', role: 'Marketing Lead' },
+  { name: 'Erik Johansson', email: 'erik.j@example.com', initials: 'EJ', role: 'Data Analyst' },
+  { name: 'Fiona Chen', email: 'fiona.chen@example.com', initials: 'FC', role: 'UX Designer' },
+  { name: 'Gabriel Santos', email: 'gabriel.s@example.com', initials: 'GS', role: 'Sales Representative' },
+  { name: 'Hannah Lee', email: 'hannah.lee@example.com', initials: 'HL', role: 'People Operations' },
+  { name: 'Ibrahim Khan', email: 'ibrahim.khan@example.com', initials: 'IK', role: 'Compliance Officer' },
+  { name: 'Julia Romano', email: 'julia.romano@example.com', initials: 'JR', role: 'Finance Manager' },
+  { name: 'Kenji Watanabe', email: 'kenji.w@example.com', initials: 'KW', role: 'Product Manager' },
+  { name: 'Laura Pereira', email: 'laura.pereira@example.com', initials: 'LP', role: 'L&D Coordinator' },
+]
+
+const norm = (s: string) => s.trim().toLowerCase()
+
+/** Filter org users by a free-text query over name + email. */
+export function searchOrgUsers(query: string, exclude: string[] = []): OrgUser[] {
+  const q = norm(query)
+  const taken = new Set(exclude.map(norm))
+  return ORG_USERS.filter((u) => {
+    if (taken.has(norm(u.email))) return false
+    if (!q) return true
+    return norm(u.name).includes(q) || norm(u.email).includes(q)
+  })
+}
+
+/** Look up a known user by email (to show their name on a recipient chip). */
+export function orgUserByEmail(email: string): OrgUser | undefined {
+  return ORG_USERS.find((u) => norm(u.email) === norm(email))
+}

@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react'
-import { Add } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import InputField from '../../../../components/InputField/InputField'
 import Dropdown from '../../../../components/Dropdown/Dropdown'
 import Toggle from '../../../../components/Toggle/Toggle'
+import RecipientsField from './RecipientsField'
 import { FILTER_BY_ID, filterOptions } from '../FilterListbox/FilterListbox'
 import {
   REPORT_FREQUENCIES,
-  nextReportLabel,
+  WEEKDAYS,
+  MONTHLY_MODES,
+  DELIVERY_TIMES,
+  TIMEZONES,
+  defaultTimezone,
+  nextReportPreview,
   type FilterEntry,
   type SavedReport,
 } from '../../../../utils/lrSavedFilters'
@@ -24,9 +29,18 @@ interface SaveReportDrawerProps {
 }
 
 const FREQ_OPTIONS = REPORT_FREQUENCIES.map((f) => ({ value: f.value, label: f.label }))
+const WEEKDAY_OPTIONS = WEEKDAYS.map((d) => ({ value: d.value, label: d.label }))
+const MONTHLY_OPTIONS = MONTHLY_MODES.map((m) => ({ value: m.value, label: m.label, description: m.description }))
+const TIME_OPTIONS = DELIVERY_TIMES.map((t) => ({ value: t.value, label: t.label }))
+const TZ_OPTIONS = TIMEZONES.map((t) => ({ value: t.value, label: t.label }))
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const isValidEmail = (v: string) => EMAIL_RE.test(v.trim())
+/** Today as yyyy-mm-dd, for seeding the biweekly start date. */
+function todayISO(): string {
+  const d = new Date()
+  const m = `${d.getMonth() + 1}`.padStart(2, '0')
+  const day = `${d.getDate()}`.padStart(2, '0')
+  return `${d.getFullYear()}-${m}-${day}`
+}
 
 function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters }: SaveReportDrawerProps) {
   const isEditing = !!initial
@@ -36,35 +50,47 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters }: Sa
   const [name, setName] = useState('')
   const [scheduled, setScheduled] = useState(false)
   const [frequency, setFrequency] = useState('monthly')
-  const [recipients, setRecipients] = useState<string[]>([''])
+  const [recipients, setRecipients] = useState<string[]>([])
   const [filters, setFilters] = useState<FilterEntry[]>([])
+  // Cadence detail
+  const [weekday, setWeekday] = useState('mon')
+  const [startDate, setStartDate] = useState('')
+  const [monthlyMode, setMonthlyMode] = useState('first-working-day')
+  const [deliverTime, setDeliverTime] = useState('09:00')
+  const [timezone, setTimezone] = useState('UTC')
   // Stable id/createdAt so the step-1 save and the step-2 schedule update the same report.
   const [reportId, setReportId] = useState('')
   const [createdAt, setCreatedAt] = useState('')
-  // Indices the admin has interacted with (blurred) — gate error display so we
-  // don't flag a field red while it's still being typed.
-  const [touched, setTouched] = useState<Record<number, boolean>>({})
   const [triedSave, setTriedSave] = useState(false)
 
   useEffect(() => {
     if (!open) return
     setStep(1)
-    setTouched({})
     setTriedSave(false)
     if (initial) {
       setName(initial.name)
       setScheduled(initial.scheduled)
       setFrequency(initial.frequency || 'monthly')
-      setRecipients(initial.recipients.length ? initial.recipients : [''])
+      setRecipients(initial.recipients ?? [])
       setFilters(initial.filters)
+      setWeekday(initial.weekday || 'mon')
+      setStartDate(initial.startDate || todayISO())
+      setMonthlyMode(initial.monthlyMode || 'first-working-day')
+      setDeliverTime(initial.deliverTime || '09:00')
+      setTimezone(initial.timezone || defaultTimezone())
       setReportId(initial.id)
       setCreatedAt(initial.createdAt)
     } else {
       setName('')
       setScheduled(false)
       setFrequency('monthly')
-      setRecipients([''])
+      setRecipients([])
       setFilters(currentFilters)
+      setWeekday('mon')
+      setStartDate(todayISO())
+      setMonthlyMode('first-working-day')
+      setDeliverTime('09:00')
+      setTimezone(defaultTimezone())
       setReportId(`report-${Date.now()}`)
       setCreatedAt(new Date().toISOString())
     }
@@ -94,37 +120,7 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters }: Sa
   if (!open) return null
 
   const nameMissing = name.trim().length === 0
-  const trimmedRecipients = recipients.map((r) => r.trim())
-  const validRecipients = trimmedRecipients.filter(isValidEmail)
-  const hasInvalidRecipient = trimmedRecipients.some((r) => r.length > 0 && !isValidEmail(r))
-
-  // Per-field validation, gated on blur/save so we don't flag while typing.
-  function recipientValidation(i: number): { validation: 'none' | 'error'; helper?: string } {
-    const v = recipients[i].trim()
-    if (v.length > 0 && !isValidEmail(v) && (triedSave || touched[i])) {
-      return { validation: 'error', helper: 'Enter a valid email address.' }
-    }
-    // First field carries the "you need at least one recipient" error after a save attempt.
-    if (i === 0 && triedSave && validRecipients.length === 0 && v.length === 0) {
-      return { validation: 'error', helper: 'Add at least one recipient.' }
-    }
-    return { validation: 'none' }
-  }
-
-  function updateRecipient(i: number, value: string) {
-    setRecipients((prev) => prev.map((r, idx) => (idx === i ? value : r)))
-  }
-  function removeRecipient(i: number) {
-    setRecipients((prev) => (prev.length === 1 ? [''] : prev.filter((_, idx) => idx !== i)))
-    setTouched((prev) => {
-      const next = { ...prev }
-      delete next[i]
-      return next
-    })
-  }
-  function addRecipient() {
-    setRecipients((prev) => [...prev, ''])
-  }
+  const recipientsMissing = recipients.length === 0
 
   function buildReport(extra: Partial<SavedReport>): SavedReport {
     return {
@@ -134,6 +130,11 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters }: Sa
       scheduled: false,
       recipients: [],
       frequency,
+      weekday,
+      startDate,
+      monthlyMode,
+      deliverTime,
+      timezone,
       createdAt,
       ...extra,
     }
@@ -157,11 +158,11 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters }: Sa
 
   // Step 2: attach the schedule to the saved report.
   function handleSave() {
-    if (validRecipients.length === 0 || hasInvalidRecipient) {
+    if (recipientsMissing) {
       setTriedSave(true)
       return
     }
-    onSave(buildReport({ scheduled: true, recipients: validRecipients }))
+    onSave(buildReport({ scheduled: true, recipients }))
     handleClose()
   }
 
@@ -263,42 +264,62 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters }: Sa
                 onChange={setFrequency}
               />
 
-              {/* Recipients */}
+              {/* Cadence detail — depends on the frequency */}
+              {frequency === 'weekly' && (
+                <Dropdown
+                  label="On which day?"
+                  options={WEEKDAY_OPTIONS}
+                  value={weekday}
+                  onChange={setWeekday}
+                />
+              )}
+
+              {frequency === 'biweekly' && (
+                <InputField
+                  label="Starting from"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  helperText="The report repeats every 2 weeks from this date."
+                />
+              )}
+
+              {(frequency === 'monthly' || frequency === 'quarterly') && (
+                <Dropdown
+                  label={frequency === 'quarterly' ? 'When in the quarter?' : 'When in the month?'}
+                  options={MONTHLY_OPTIONS}
+                  value={monthlyMode}
+                  onChange={setMonthlyMode}
+                />
+              )}
+
+              {/* Delivery time + timezone */}
+              <div className="rd-field">
+                <label className="rd-label">Delivery time</label>
+                <div className="rd-time-row">
+                  <Dropdown
+                    options={TIME_OPTIONS}
+                    value={deliverTime}
+                    onChange={setDeliverTime}
+                    className="rd-time-time"
+                  />
+                  <Dropdown
+                    options={TZ_OPTIONS}
+                    value={timezone}
+                    onChange={setTimezone}
+                    className="rd-time-tz"
+                  />
+                </div>
+              </div>
+
+              {/* Recipients — autocompletes from registered users */}
               <div className="rd-field">
                 <label className="rd-label">Send reports to</label>
-                <div className="rd-recipients">
-                  {recipients.map((email, i) => {
-                    const rv = recipientValidation(i)
-                    return (
-                      <InputField
-                        key={i}
-                        type="email"
-                        placeholder="name@email.com"
-                        value={email}
-                        onChange={(e) => updateRecipient(i, e.target.value)}
-                        onBlur={() => setTouched((t) => ({ ...t, [i]: true }))}
-                        validation={rv.validation}
-                        helperText={rv.helper}
-                        iconRight={
-                          <button
-                            type="button"
-                            className="rd-recipient-remove"
-                            aria-label="Remove recipient"
-                            onClick={() => removeRecipient(i)}
-                          >
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                              <path d="M14 6L6 14M6 6L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                            </svg>
-                          </button>
-                        }
-                      />
-                    )
-                  })}
-                </div>
-                <button type="button" className="rd-add-email" onClick={addRecipient}>
-                  <Add size={20} color="var(--text-primary)" variant="Linear" />
-                  Add Email
-                </button>
+                <RecipientsField
+                  recipients={recipients}
+                  onChange={setRecipients}
+                  error={triedSave && recipientsMissing ? 'Add at least one recipient.' : undefined}
+                />
               </div>
 
               {/* Next report — summary of when it first sends */}
@@ -318,7 +339,9 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters }: Sa
                 </span>
                 <span className="rd-banner-text">
                   <span className="rd-banner-label">Next report</span>
-                  <span className="rd-banner-value">{nextReportLabel(frequency)}</span>
+                  <span className="rd-banner-value">
+                    {nextReportPreview({ frequency, weekday, startDate, monthlyMode, deliverTime, timezone })}
+                  </span>
                 </span>
               </div>
           </div>

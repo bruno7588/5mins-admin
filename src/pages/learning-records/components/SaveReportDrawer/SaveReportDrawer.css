@@ -165,46 +165,154 @@
   align-items: center;
 }
 
-/* Recipients */
-.rd-recipients {
+/* Delivery time + timezone row */
+.rd-time-row {
   display: flex;
-  flex-direction: column;
   gap: var(--space-s);
+  align-items: flex-start;
 }
 
-.rd-recipient-remove {
+.rd-time-time {
+  flex: 0 0 40%;
+}
+
+.rd-time-tz {
+  flex: 1 1 60%;
+  min-width: 0;
+}
+
+/* Recipients combobox (RecipientsField) */
+.rcp-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.rcp {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 1px solid var(--input-border, var(--border));
+  border-radius: var(--radius-s);
+  background: var(--input-background);
+  cursor: text;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.rcp:focus-within {
+  border-color: var(--secondary-500);
+}
+
+.rcp--error {
+  border-color: var(--danger-500);
+}
+
+.rcp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  max-width: 100%;
+  padding: 6px 6px 6px 10px;
+  border-radius: var(--radius-full);
+  background: var(--cards-background-hover, var(--neutral-50));
+  font-size: 14px;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.rcp-chip-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rcp-chip-remove {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
   border-radius: var(--radius-full);
   background: transparent;
-  border: none;
   cursor: pointer;
   color: var(--text-tertiary);
   transition: background 120ms ease, color 120ms ease;
 }
 
-.rd-recipient-remove:hover {
-  background: var(--cards-background-hover);
+.rcp-chip-remove:hover {
+  background: var(--neutral-200);
   color: var(--text-primary);
 }
 
-.rd-add-email {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xs);
-  align-self: flex-start;
-  padding: 0;
-  background: transparent;
+.rcp-input {
+  flex: 1 1 120px;
+  min-width: 120px;
   border: none;
-  cursor: pointer;
+  outline: none;
+  background: transparent;
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
-  font-weight: 700;
   color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.rcp-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Suggestions menu */
+.rcp-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  margin: 0;
+  padding: var(--space-xs);
+  list-style: none;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--cards-background, var(--neutral-0));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  box-shadow: -4px 8px 24px 0 rgba(32, 34, 42, 0.12);
+}
+
+.rcp-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: var(--space-s);
+  border: none;
+  border-radius: var(--radius-xs, 8px);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.rcp-option.is-active {
+  background: var(--cards-background-hover, var(--neutral-50));
+}
+
+.rcp-option-email {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rcp-helper {
+  font-size: 14px;
+  color: var(--danger-500);
   line-height: 1.5;
 }
 
