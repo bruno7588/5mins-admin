@@ -191,18 +191,18 @@ export function nextReportDate(report: Partial<SavedReport>, from: Date = new Da
   return d
 }
 
-/** Human-readable "next report" line, e.g. "Mon, Jul 6, 2026 · 9:00 AM UTC". */
+/** Human-readable "next report" line, e.g. "Monday, January 5, 2026, at 9:00 AM, London GMT/BST". */
 export function nextReportPreview(report: Partial<SavedReport>): string {
   const d = nextReportDate(report)
   const date = d.toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
+    weekday: 'long',
+    month: 'long',
     day: 'numeric',
     year: 'numeric',
   })
   const time = deliveryTimeLabel(report.deliverTime ?? '09:00')
   const tz = report.timezone ?? 'UTC'
-  return `${date} · ${time} ${tz === 'UTC' ? 'UTC' : timezoneLabel(tz)}`
+  return `${date}, at ${time}, ${tz === 'UTC' ? 'UTC' : timezoneLabel(tz)}`
 }
 
 /** Human-readable "next report" date based on cadence (legacy, frequency-only). */

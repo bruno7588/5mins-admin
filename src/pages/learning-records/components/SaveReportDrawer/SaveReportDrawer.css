@@ -165,20 +165,11 @@
   align-items: center;
 }
 
-/* Delivery time + timezone row */
-.rd-time-row {
-  display: flex;
-  gap: var(--space-s);
-  align-items: flex-start;
-}
-
-.rd-time-time {
-  flex: 0 0 40%;
-}
-
-.rd-time-tz {
-  flex: 1 1 60%;
-  min-width: 0;
+/* Schedule grid — 2 columns: Frequency / cadence, Time / Timezone */
+.rd-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-l) var(--space-sm);
 }
 
 /* Recipients combobox (RecipientsField) */
@@ -198,7 +189,7 @@
   padding: 8px 12px;
   border: 1px solid var(--input-border, var(--border));
   border-radius: var(--radius-s);
-  background: var(--input-background);
+  background: transparent;
   cursor: text;
   transition: border-color 120ms ease, box-shadow 120ms ease;
 }

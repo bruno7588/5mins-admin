@@ -256,60 +256,60 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters }: Sa
           </div>
           ) : (
           <div className="rd-form">
-              {/* Frequency */}
-              <Dropdown
-                label="How often should we email the report?"
-                options={FREQ_OPTIONS}
-                value={frequency}
-                onChange={setFrequency}
-              />
-
-              {/* Cadence detail — depends on the frequency */}
-              {frequency === 'weekly' && (
+              {/* Schedule grid — Frequency / cadence detail on row 1, Time / Timezone on row 2 */}
+              <div className="rd-grid">
+                {/* Frequency */}
                 <Dropdown
-                  label="On which day?"
-                  options={WEEKDAY_OPTIONS}
-                  value={weekday}
-                  onChange={setWeekday}
+                  label="Frequency"
+                  options={FREQ_OPTIONS}
+                  value={frequency}
+                  onChange={setFrequency}
                 />
-              )}
 
-              {frequency === 'biweekly' && (
-                <InputField
-                  label="Starting from"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  helperText="The report repeats every 2 weeks from this date."
-                />
-              )}
+                {/* Cadence detail — depends on the frequency */}
+                {frequency === 'weekly' && (
+                  <Dropdown
+                    label="On which day?"
+                    options={WEEKDAY_OPTIONS}
+                    value={weekday}
+                    onChange={setWeekday}
+                  />
+                )}
 
-              {(frequency === 'monthly' || frequency === 'quarterly') && (
+                {frequency === 'biweekly' && (
+                  <InputField
+                    label="Starting from"
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    helperText="The report repeats every 2 weeks from this date."
+                  />
+                )}
+
+                {(frequency === 'monthly' || frequency === 'quarterly') && (
+                  <Dropdown
+                    label={frequency === 'quarterly' ? 'When in the quarter?' : 'When in the month?'}
+                    options={MONTHLY_OPTIONS}
+                    value={monthlyMode}
+                    onChange={setMonthlyMode}
+                  />
+                )}
+
+                {/* Time */}
                 <Dropdown
-                  label={frequency === 'quarterly' ? 'When in the quarter?' : 'When in the month?'}
-                  options={MONTHLY_OPTIONS}
-                  value={monthlyMode}
-                  onChange={setMonthlyMode}
+                  label="Time"
+                  options={TIME_OPTIONS}
+                  value={deliverTime}
+                  onChange={setDeliverTime}
                 />
-              )}
 
-              {/* Delivery time + timezone */}
-              <div className="rd-field">
-                <label className="rd-label">Delivery time</label>
-                <div className="rd-time-row">
-                  <Dropdown
-                    options={TIME_OPTIONS}
-                    value={deliverTime}
-                    onChange={setDeliverTime}
-                    className="rd-time-time"
-                  />
-                  <Dropdown
-                    options={TZ_OPTIONS}
-                    value={timezone}
-                    onChange={setTimezone}
-                    className="rd-time-tz"
-                  />
-                </div>
+                {/* Timezone */}
+                <Dropdown
+                  label="Timezone"
+                  options={TZ_OPTIONS}
+                  value={timezone}
+                  onChange={setTimezone}
+                />
               </div>
 
               {/* Recipients — autocompletes from registered users */}
@@ -358,7 +358,7 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters }: Sa
                 disabled={nameMissing}
                 onClick={handlePrimary}
               >
-                {scheduled ? 'Save & Schedule Report' : isEditing ? 'Update Report' : 'Save Report'}
+                {scheduled ? 'Save & Schedule Report' : isEditing ? 'Update Report' : 'Save New Report'}
               </button>
             ) : (
               <button type="button" className="side-drawer__btn-primary" onClick={handleSave}>
