@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 import { Add, ArrowDown2, ArrowLeft2, ArrowRight2, Note1, Sort } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import MoreIcon from '../../components/icons/MoreIcon'
+import CsvIcon from '../../components/icons/CsvIcon'
 import Dropdown from '../../components/Dropdown/Dropdown'
 import Collapse from '../../components/Collapse/Collapse'
 import Tooltip from '../../components/Tooltip/Tooltip'
@@ -195,6 +196,11 @@ function LearningRecords() {
     [showToast],
   )
 
+  // Quick export of the current table view, without saving a report (prototype).
+  const downloadCurrentView = useCallback(() => {
+    showToast('success', 'Downloading current view (CSV)')
+  }, [showToast])
+
   const openCreateReport = useCallback(() => {
     setEditingReport(null)
     setReportDrawerOpen(true)
@@ -206,6 +212,17 @@ function LearningRecords() {
       // live results), then open the drawer for name/schedule.
       applyReport(report)
       setEditingReport(report)
+      setReportsListOpen(false)
+      setReportDrawerOpen(true)
+    },
+    [applyReport],
+  )
+
+  // Schedule an unscheduled report: open the drawer with scheduling engaged.
+  const openScheduleReport = useCallback(
+    (report: SavedReport) => {
+      applyReport(report)
+      setEditingReport({ ...report, scheduled: true })
       setReportsListOpen(false)
       setReportDrawerOpen(true)
     },
@@ -291,6 +308,16 @@ function LearningRecords() {
               </div>
 
               <div className="lrp-head-actions">
+                {/* Quick export — download the current table view without saving a report */}
+                <button
+                  type="button"
+                  className="lrp-download-btn"
+                  onClick={downloadCurrentView}
+                >
+                  Download Report
+                  <CsvIcon size={20} color="currentColor" />
+                </button>
+
                 {/* Saved reports — opens the list side drawer; disabled until one exists */}
                 <Tooltip
                   icon={false}
@@ -305,17 +332,17 @@ function LearningRecords() {
                     disabled={reports.length === 0}
                     onClick={() => setReportsListOpen(true)}
                   >
+                    Reports ({reports.length})
                     <Note1
                       size={20}
                       color={reports.length === 0 ? 'var(--text-disabled)' : 'var(--text-primary)'}
                       variant="Linear"
                     />
-                    Reports ({reports.length})
                   </button>
                 </Tooltip>
                 {/* Save the current filter view as a report */}
                 <button type="button" className="lrp-save-report-btn" onClick={openCreateReport}>
-                  Save Report
+                  Save New Report
                 </button>
               </div>
             </div>
@@ -560,9 +587,10 @@ function LearningRecords() {
         open={reportsListOpen}
         onClose={() => setReportsListOpen(false)}
         reports={reports}
-        onApply={applyReport}
         onEdit={openEditReport}
+        onApply={applyReport}
         onDelete={deleteReport}
+        onSchedule={openScheduleReport}
         onToggle={toggleReport}
         onDownload={downloadReport}
       />

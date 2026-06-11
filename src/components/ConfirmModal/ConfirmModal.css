@@ -3,7 +3,8 @@
 .confirm-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 300;
+  /* Above side drawers (1000–1002) so drawer-spawned confirms show, below toasts (1100). */
+  z-index: 1050;
   background: rgba(15, 16, 20, 0.5);
   display: flex;
   align-items: center;

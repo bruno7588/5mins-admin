@@ -55,10 +55,7 @@ export function frequencyLabel(value: string): string {
  * to a filter count.
  */
 export function cadenceSummary(r: SavedReport): string {
-  if (!r.scheduled) {
-    const n = r.filters.length
-    return n === 0 ? 'No filters' : `${n} filter${n === 1 ? '' : 's'}`
-  }
+  if (!r.scheduled) return 'No schedule'
   let recurrence: string
   if (r.frequency === 'weekly') {
     recurrence = `Weekly on ${weekdayLabel(r.weekday ?? 'mon')}`
@@ -260,16 +257,61 @@ export function nextReportLabel(frequency: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-const REPORTS_KEY = '5mins.lr-reports-v2'
+const REPORTS_KEY = '5mins.lr-reports-v3'
+
+/**
+ * Seed reports shown on a fresh load — one per row state: an active schedule,
+ * a paused schedule, and an unscheduled report (renders the "Schedule" CTA).
+ */
+export const DEFAULT_REPORTS: SavedReport[] = [
+  {
+    id: 'report-seed-scheduled',
+    name: 'Compliance overdue teams',
+    filters: [
+      { id: 'status', value: 'overdue' },
+      { id: 'category', value: 'compliance' },
+    ],
+    scheduled: true,
+    enabled: true,
+    recipients: ['anthonny@example.com', 'brenda@example.com'],
+    frequency: 'monthly',
+    monthlyMode: 'first-working-day',
+    deliverTime: '09:00',
+    timezone: 'UTC',
+    createdAt: '2026-01-05T09:00:00.000Z',
+  },
+  {
+    id: 'report-seed-paused',
+    name: 'Quarterly leadership digest',
+    filters: [{ id: 'category', value: 'compliance' }],
+    scheduled: true,
+    enabled: false,
+    recipients: ['carlos@example.com'],
+    frequency: 'quarterly',
+    monthlyMode: 'first-working-day',
+    deliverTime: '09:00',
+    timezone: 'Europe/London',
+    createdAt: '2026-02-12T09:00:00.000Z',
+  },
+  {
+    id: 'report-seed-unscheduled',
+    name: 'New hires – week 1',
+    filters: [{ id: 'enrolment-history', value: 'current' }],
+    scheduled: false,
+    recipients: [],
+    frequency: 'monthly',
+    createdAt: '2026-03-01T09:00:00.000Z',
+  },
+]
 
 export function readReports(): SavedReport[] {
   try {
     const raw = localStorage.getItem(REPORTS_KEY)
-    if (!raw) return []
+    if (!raw) return DEFAULT_REPORTS
     const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? (parsed as SavedReport[]) : []
+    return Array.isArray(parsed) ? (parsed as SavedReport[]) : DEFAULT_REPORTS
   } catch {
-    return []
+    return DEFAULT_REPORTS
   }
 }
 

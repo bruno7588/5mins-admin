@@ -58,6 +58,30 @@
   flex-shrink: 0;
 }
 
+/* Download Report — ghost text action (label + CSV icon) */
+.lrp-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-shrink: 0;
+  padding: 10px var(--space-sm);
+  border: none;
+  border-radius: var(--radius-s);
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+
+.lrp-download-btn:hover {
+  color: var(--text-button-hover);
+}
+
 /* Reports (N) — DS Outlined / Neutral / Medium (note icon + label) */
 .lrp-reports-btn {
   display: inline-flex;

@@ -33,44 +33,52 @@
 .rl-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 .rl-item {
   display: flex;
   align-items: center;
-  gap: var(--space-s);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  transition: border-color 120ms ease, background 120ms ease;
+  transition: background 120ms ease;
 }
 
 .rl-item:hover {
-  border-color: var(--border-hover);
-  background: var(--neutral-25, var(--neutral-50));
+  background: var(--page-background-hover);
 }
 
 .rl-item-main {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 2px;
   flex: 1;
   min-width: 0;
-  padding: var(--space-sm) var(--space-m);
-  border: none;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
+  padding: var(--space-s) var(--space-sm);
 }
 
+/* Only the report name is clickable (opens Edit), not the whole row. */
 .rl-item-title {
+  max-width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
   line-height: 1.5;
+  text-align: left;
+  cursor: pointer;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: color 120ms ease;
+}
+
+.rl-item-title:hover {
+  color: var(--text-button-hover);
 }
 
 .rl-item-desc {
@@ -83,17 +91,46 @@
   white-space: nowrap;
 }
 
-/* Paused schedule — dim the text block but keep the controls fully usable. */
-.rl-item--off .rl-item-main {
-  opacity: 0.55;
+/* "No schedule" — dimmed subtitle for unscheduled reports. */
+.rl-item-desc--muted {
+  color: var(--text-disabled);
+}
+
+/* Outline "Schedule" CTA shown in place of the toggle on unscheduled rows.
+   DS Outlined / Primary / Small (primary-500 text fails WCAG, so primary-600). */
+.rl-schedule-btn {
+  flex-shrink: 0;
+  padding: var(--space-s) var(--space-m);
+  border: 1px solid var(--primary-600);
+  border-radius: var(--radius-s);
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--primary-600);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.rl-schedule-btn:hover {
+  background: var(--primary-100);
+  color: var(--primary-700);
+  border-color: var(--primary-700);
+}
+
+.rl-schedule-btn:active {
+  background: var(--primary-200);
+  color: var(--primary-800);
+  border-color: var(--primary-800);
 }
 
 .rl-item-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-s);
   flex-shrink: 0;
-  padding-right: var(--space-s);
+  padding-right: var(--space-sm);
 }
 
 .rl-icon-btn {
@@ -111,6 +148,22 @@
 
 .rl-icon-btn:hover {
   background: var(--neutral-100, #e3e5e9);
+}
+
+/* Scheduled / Paused toggle + helper label */
+.rl-toggle {
+  gap: var(--space-s);
+}
+
+.rl-toggle .toggle-row__label {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.rl-item--off .rl-toggle .toggle-row__label {
+  color: var(--text-disabled);
 }
 
 /* Kebab "more" menu */

@@ -51,6 +51,7 @@
 
   /* Semantic aliases */
   --page-background: var(--neutral-25);
+  --page-background-hover: var(--neutral-50);
   --cards-background: var(--neutral-0);
   --cards-background-hover: var(--neutral-50);
   --input-background: rgba(191, 194, 204, 0.16);
