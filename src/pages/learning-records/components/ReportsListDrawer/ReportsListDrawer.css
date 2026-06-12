@@ -133,24 +133,40 @@
   flex-shrink: 0;
 }
 
-/* Recipient avatars (info row, scheduled reports) */
+/* Recipient avatar group — Figma Library "Avatar group / 24px" (10589:3574):
+   24px circles overlapping 8px, each ringed with the surface colour so the
+   stack reads as separate chips. */
 .rl-recipients {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  padding-left: 8px; /* offsets the first avatar's negative margin */
+}
+
+/* Overlap each avatar (each wrapped in a hover-email tooltip) by 8px; the last
+   one closes the stack. */
+.rl-recipients > * {
+  margin-right: -8px;
+}
+
+.rl-recipients > :last-child {
+  margin-right: 0;
+}
+
+/* Tooltip wrapper around each avatar — must not add its own box beyond 24px. */
+.rl-avatar-tip {
+  display: inline-flex;
 }
 
 .rl-avatar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   flex-shrink: 0;
   width: 24px;
   height: 24px;
-  margin-left: -8px;
   border-radius: var(--radius-full);
-  border: 1.5px solid var(--cards-background);
+  border: 1px solid var(--cards-background);
   background: var(--neutral-300, #cbd5e1);
   color: #fff;
   font-size: 10px;
@@ -164,9 +180,80 @@
   border-color: var(--cards-background-hover);
 }
 
+/* "+N remaining" — quieter fill, smaller regular numerals per the Figma.
+   Rendered as a button: clicking opens the full recipients modal. */
 .rl-avatar--more {
+  padding: 0;
   background: var(--cards-background-hover);
   color: var(--text-tertiary);
+  font-family: 'Poppins', sans-serif;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.rl-avatar--more:hover {
+  background: var(--neutral-200);
+  color: var(--text-secondary);
+}
+
+/* "Report sent to" modal — full recipient list (Figma 11643:136449) */
+.recipients-modal {
+  position: relative;
+  width: 400px;
+  gap: var(--space-m);
+}
+
+.recipients-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.recipients-modal-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  width: 100%;
+}
+
+.recipients-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.recipients-modal-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  border-radius: var(--radius-x, 4px);
+}
+
+.recipients-modal-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.recipients-modal-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-sm) 0;
+}
+
+.recipients-modal-email {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-primary);
+  line-height: 1.5;
+  word-break: break-word;
 }
 
 /* Icon-only actions (download, kebab) — circular hover bg per DS. */

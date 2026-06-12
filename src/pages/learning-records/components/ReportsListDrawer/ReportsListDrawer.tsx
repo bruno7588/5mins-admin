@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
-import { Calendar, Clock, ArrowRight, Edit2, Eye, Danger, Trash } from 'iconsax-react'
+import { Calendar, Clock, ArrowRight, Copy, Eye, Danger, Trash } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal'
 import MoreIcon from '../../../../components/icons/MoreIcon'
+import Tooltip from '../../../../components/Tooltip/Tooltip'
 import CsvIcon from '../../../../components/icons/CsvIcon'
 import { cadenceRecurrence, cadenceTime, type SavedReport } from '../../../../utils/lrSavedFilters'
 import { orgUserByEmail } from '../../../../utils/orgUsers'
 import './ReportsListDrawer.css'
 
-const MAX_AVATARS = 4
+const MAX_AVATARS = 3
 
 /** Two-letter initials from an email's local part (e.g. lewis-ferrari → LF). */
 function emailInitials(email: string): string {
@@ -18,27 +19,36 @@ function emailInitials(email: string): string {
   return letters.toUpperCase()
 }
 
-/** Overlapping recipient avatars (photo or initials), with a +N overflow chip. */
-function RecipientAvatars({ emails }: { emails: string[] }) {
+/** A single 24px avatar — the recipient's photo, or their initials. */
+function AvatarCircle({ email }: { email: string }) {
+  const user = orgUserByEmail(email)
+  if (user?.avatar) return <img className="rl-avatar rl-avatar--photo" src={user.avatar} alt="" />
+  return <span className="rl-avatar">{user ? user.initials : emailInitials(email)}</span>
+}
+
+/**
+ * Overlapping recipient avatars. Each shows the email on hover; a "+N" chip
+ * (when there are more than MAX_AVATARS) opens the full recipients modal.
+ */
+function RecipientAvatars({ emails, onMore }: { emails: string[]; onMore?: () => void }) {
   const shown = emails.slice(0, MAX_AVATARS)
   const overflow = emails.length - shown.length
   return (
     <div className="rl-recipients" aria-label={`${emails.length} recipient${emails.length === 1 ? '' : 's'}`}>
-      {shown.map((email) => {
-        const user = orgUserByEmail(email)
-        if (user?.avatar) {
-          return <img key={email} className="rl-avatar rl-avatar--photo" src={user.avatar} alt="" title={email} />
-        }
-        return (
-          <span key={email} className="rl-avatar" title={email}>
-            {user ? user.initials : emailInitials(email)}
-          </span>
-        )
-      })}
+      {shown.map((email) => (
+        <Tooltip key={email} text={email} position="Bottom" alignment="Start" icon={false} className="rl-avatar-tip">
+          <AvatarCircle email={email} />
+        </Tooltip>
+      ))}
       {overflow > 0 && (
-        <span className="rl-avatar rl-avatar--more" title={emails.slice(MAX_AVATARS).join(', ')}>
+        <button
+          type="button"
+          className="rl-avatar rl-avatar--more"
+          onClick={onMore}
+          aria-label={`Show all ${emails.length} recipients`}
+        >
           +{overflow}
-        </span>
+        </button>
       )}
     </div>
   )
@@ -50,6 +60,8 @@ interface ReportsListDrawerProps {
   reports: SavedReport[]
   /** Open the Save Report drawer in edit mode. */
   onEdit: (r: SavedReport) => void
+  /** Open the edit flow on a fresh copy of the report. */
+  onDuplicate: (r: SavedReport) => void
   /** Apply the report's filters to the table (and close the drawer). */
   onApply: (r: SavedReport) => void
   onDelete: (id: string) => void
@@ -62,6 +74,7 @@ function ReportsListDrawer({
   onClose,
   reports,
   onEdit,
+  onDuplicate,
   onApply,
   onDelete,
   onDownload,
@@ -69,6 +82,8 @@ function ReportsListDrawer({
   const [closing, setClosing] = useState(false)
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<SavedReport | null>(null)
+  // Report whose full recipient list is shown in the "Report sent to" modal.
+  const [recipientsReport, setRecipientsReport] = useState<SavedReport | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
 
   const handleClose = () => {
@@ -118,7 +133,7 @@ function ReportsListDrawer({
           <div className="side-drawer__headline">
             <div className="rl-header-text">
               <h2 id="reports-list-title" className="rl-title">Reports</h2>
-              <p className="rl-subtitle">Reports are saved from the current filtered table view.</p>
+              <p className="rl-subtitle">Saved views you can export as CSV or email on a schedule.</p>
             </div>
             <CloseButton onClick={handleClose} />
           </div>
@@ -158,21 +173,25 @@ function ReportsListDrawer({
                   <div className="rl-item-info">
                     <div className="rl-item-badges">
                       {r.scheduled ? (
-                        r.recipients.length > 0 && <RecipientAvatars emails={r.recipients} />
+                        r.recipients.length > 0 && (
+                          <RecipientAvatars emails={r.recipients} onMore={() => setRecipientsReport(r)} />
+                        )
                       ) : (
                         <span className="rl-meta rl-meta--muted">No schedule</span>
                       )}
                     </div>
 
                     <div className="rl-item-actions">
-                      <button
-                        type="button"
-                        className="rl-icon-btn"
-                        aria-label={`Download ${r.name}`}
-                        onClick={() => onDownload(r)}
-                      >
-                        <CsvIcon size={20} color="var(--text-secondary)" />
-                      </button>
+                      <Tooltip text="Download report" position="Top" icon={false}>
+                        <button
+                          type="button"
+                          className="rl-icon-btn"
+                          aria-label={`Download ${r.name}`}
+                          onClick={() => onDownload(r)}
+                        >
+                          <CsvIcon size={20} color="var(--text-secondary)" />
+                        </button>
+                      </Tooltip>
 
                       <div
                         className="rl-more-wrapper"
@@ -196,11 +215,11 @@ function ReportsListDrawer({
                               className="rl-menu-item"
                               onClick={() => {
                                 setMenuOpenId(null)
-                                onEdit(r)
+                                onDuplicate(r)
                               }}
                             >
-                              <Edit2 size={18} color="var(--text-secondary)" variant="Linear" />
-                              Edit Report
+                              <Copy size={18} color="var(--text-secondary)" variant="Linear" />
+                              Duplicate
                             </button>
                             <button
                               type="button"
@@ -231,14 +250,16 @@ function ReportsListDrawer({
                         )}
                       </div>
 
-                      <button
-                        type="button"
-                        className="rl-open-btn"
-                        aria-label={`Open ${r.name}`}
-                        onClick={() => onEdit(r)}
-                      >
-                        <ArrowRight size={16} color="var(--text-secondary)" variant="Linear" />
-                      </button>
+                      <Tooltip text="Edit report" position="Top" alignment="End" icon={false}>
+                        <button
+                          type="button"
+                          className="rl-open-btn"
+                          aria-label={`Edit ${r.name}`}
+                          onClick={() => onEdit(r)}
+                        >
+                          <ArrowRight size={16} color="var(--text-secondary)" variant="Linear" />
+                        </button>
+                      </Tooltip>
                     </div>
                   </div>
                 </div>
@@ -276,6 +297,33 @@ function ReportsListDrawer({
               >
                 Delete Report
               </button>
+            </div>
+          </>
+        )}
+      </ConfirmModal>
+
+      {/* Full recipient list — opened from the "+N" avatar (Figma 11643:136449). */}
+      <ConfirmModal
+        open={!!recipientsReport}
+        onClose={() => setRecipientsReport(null)}
+        className="recipients-modal"
+      >
+        {recipientsReport && (
+          <>
+            <div className="recipients-modal-close">
+              <CloseButton onClick={() => setRecipientsReport(null)} />
+            </div>
+            <div className="recipients-modal-header">
+              <h2 className="recipients-modal-title">Report sent to</h2>
+              <div className="recipients-modal-divider" />
+            </div>
+            <div className="recipients-modal-list">
+              {recipientsReport.recipients.map((email) => (
+                <div className="recipients-modal-item" key={email}>
+                  <AvatarCircle email={email} />
+                  <span className="recipients-modal-email">{email}</span>
+                </div>
+              ))}
             </div>
           </>
         )}

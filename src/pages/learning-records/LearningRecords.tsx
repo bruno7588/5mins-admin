@@ -209,6 +209,24 @@ function LearningRecords() {
     [applyReport],
   )
 
+  // Duplicate — open the edit flow on a fresh copy (new id, so saving creates a
+  // new report rather than overwriting the original).
+  const duplicateReport = useCallback(
+    (report: SavedReport) => {
+      const copy: SavedReport = {
+        ...report,
+        id: `report-${Date.now()}`,
+        name: `${report.name} (copy)`,
+        createdAt: new Date().toISOString(),
+      }
+      applyReport(copy)
+      setEditingReport(copy)
+      setReportsListOpen(false)
+      setReportDrawerOpen(true)
+    },
+    [applyReport],
+  )
+
   // Persist (upsert). The drawer drives closing — step 1 saves and may continue to
   // the schedule step, so we don't close here.
   const handleSaveReport = useCallback(
@@ -568,6 +586,7 @@ function LearningRecords() {
         onClose={() => setReportsListOpen(false)}
         reports={reports}
         onEdit={openEditReport}
+        onDuplicate={duplicateReport}
         onApply={applyReport}
         onDelete={deleteReport}
         onDownload={downloadReport}
@@ -579,6 +598,7 @@ function LearningRecords() {
         onSave={handleSaveReport}
         initial={editingReport}
         currentFilters={currentFilterEntries}
+        onDownload={downloadReport}
       />
 
       <ToastContainer toasts={toasts} />
