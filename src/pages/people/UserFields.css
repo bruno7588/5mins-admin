@@ -187,7 +187,7 @@
 }
 
 .uf-table-icon-btn--danger:hover {
-  color: var(--danger-400);
+  color: var(--text-error);
 }
 
 /* Tooltip on icon buttons */

@@ -298,12 +298,21 @@
   border: none;
   border-radius: var(--radius-full);
   cursor: pointer;
-  transition: background 150ms ease;
+  transition: background 150ms ease, color 150ms ease;
 }
 
 .fce-card-action:hover,
 .fce-card-action--active {
   background: var(--input-background);
+}
+
+/* Destructive action: neutral at rest, red on hover */
+.fce-card-action--danger {
+  color: var(--text-primary);
+}
+
+.fce-card-action--danger:hover {
+  color: var(--text-error);
 }
 
 /* Add image popover menu */

@@ -628,7 +628,7 @@ function FlashcardEditor({ open, onClose, onPublish, mode = 'create', initialLes
                             <button type="button" className="fce-card-action" aria-label="Duplicate card" onClick={handleDuplicate}><Copy size={20} color="var(--text-primary)" variant="Linear" /></button>
                           </Tooltip>
                           <Tooltip text="Delete card" position="Top" icon={false}>
-                            <button type="button" className="fce-card-action" aria-label="Delete card" onClick={handleDelete}><Trash size={20} color="var(--text-primary)" variant="Linear" /></button>
+                            <button type="button" className="fce-card-action fce-card-action--danger" aria-label="Delete card" onClick={handleDelete}><Trash size={20} color="currentColor" variant="Linear" /></button>
                           </Tooltip>
                         </div>
                       )}
