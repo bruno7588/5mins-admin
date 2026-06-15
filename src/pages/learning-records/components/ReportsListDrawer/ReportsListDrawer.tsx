@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
-import { Calendar, Clock, ArrowRight, Copy, Eye, Danger, Trash } from 'iconsax-react'
+import { useEffect, useState } from 'react'
+import { Calendar, Clock, ArrowRight } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal'
-import MoreIcon from '../../../../components/icons/MoreIcon'
 import Tooltip from '../../../../components/Tooltip/Tooltip'
 import CsvIcon from '../../../../components/icons/CsvIcon'
 import { cadenceRecurrence, cadenceTime, type SavedReport } from '../../../../utils/lrSavedFilters'
@@ -60,11 +59,6 @@ interface ReportsListDrawerProps {
   reports: SavedReport[]
   /** Open the Save Report drawer in edit mode. */
   onEdit: (r: SavedReport) => void
-  /** Open the edit flow on a fresh copy of the report. */
-  onDuplicate: (r: SavedReport) => void
-  /** Apply the report's filters to the table (and close the drawer). */
-  onApply: (r: SavedReport) => void
-  onDelete: (id: string) => void
   /** Download the report now. */
   onDownload: (r: SavedReport) => void
 }
@@ -74,17 +68,11 @@ function ReportsListDrawer({
   onClose,
   reports,
   onEdit,
-  onDuplicate,
-  onApply,
-  onDelete,
   onDownload,
 }: ReportsListDrawerProps) {
   const [closing, setClosing] = useState(false)
-  const [menuOpenId, setMenuOpenId] = useState<string | null>(null)
-  const [confirmDelete, setConfirmDelete] = useState<SavedReport | null>(null)
-  // Report whose full recipient list is shown in the "Report sent to" modal.
+  // Report whose full recipient list is shown in the "Recipients" modal.
   const [recipientsReport, setRecipientsReport] = useState<SavedReport | null>(null)
-  const menuRef = useRef<HTMLDivElement>(null)
 
   const handleClose = () => {
     setClosing(true)
@@ -103,16 +91,6 @@ function ReportsListDrawer({
     return () => document.removeEventListener('keydown', onKey)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
-
-  // Close the kebab menu on outside click.
-  useEffect(() => {
-    if (menuOpenId === null) return
-    const onClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpenId(null)
-    }
-    document.addEventListener('mousedown', onClickOutside)
-    return () => document.removeEventListener('mousedown', onClickOutside)
-  }, [menuOpenId])
 
   if (!open) return null
 
@@ -196,63 +174,6 @@ function ReportsListDrawer({
                         </button>
                       </Tooltip>
 
-                      <div
-                        className="rl-more-wrapper"
-                        ref={menuOpenId === r.id ? menuRef : undefined}
-                      >
-                        <button
-                          type="button"
-                          className="rl-icon-btn"
-                          aria-label={`More options for ${r.name}`}
-                          aria-haspopup="menu"
-                          aria-expanded={menuOpenId === r.id}
-                          onClick={() => setMenuOpenId(menuOpenId === r.id ? null : r.id)}
-                        >
-                          <MoreIcon size={20} color="var(--text-secondary)" />
-                        </button>
-                        {menuOpenId === r.id && (
-                          <div className="rl-menu" role="menu">
-                            <button
-                              type="button"
-                              role="menuitem"
-                              className="rl-menu-item"
-                              onClick={() => {
-                                setMenuOpenId(null)
-                                onDuplicate(r)
-                              }}
-                            >
-                              <Copy size={18} color="var(--text-secondary)" variant="Linear" />
-                              Duplicate
-                            </button>
-                            <button
-                              type="button"
-                              role="menuitem"
-                              className="rl-menu-item"
-                              onClick={() => {
-                                setMenuOpenId(null)
-                                onApply(r)
-                                handleClose()
-                              }}
-                            >
-                              <Eye size={18} color="var(--text-secondary)" variant="Linear" />
-                              View in Table
-                            </button>
-                            <button
-                              type="button"
-                              role="menuitem"
-                              className="rl-menu-item rl-menu-item--danger"
-                              onClick={() => {
-                                setMenuOpenId(null)
-                                setConfirmDelete(r)
-                              }}
-                            >
-                              <Trash size={18} color="var(--danger-500)" variant="Linear" />
-                              Delete
-                            </button>
-                          </div>
-                        )}
-                      </div>
-
                       <Tooltip text="Edit report" position="Top" alignment="End" icon={false}>
                         <button
                           type="button"
@@ -271,39 +192,6 @@ function ReportsListDrawer({
           )}
         </div>
       </aside>
-
-      <ConfirmModal open={!!confirmDelete} onClose={() => setConfirmDelete(null)}>
-        {confirmDelete && (
-          <>
-            <div className="confirm-modal-header confirm-modal-header--center">
-              <div className="confirm-modal-icon">
-                <Danger size={72} color="var(--danger-500)" variant="Linear" />
-              </div>
-              <h2 className="confirm-modal-title">Delete report</h2>
-              <p className="confirm-modal-body">
-                “{confirmDelete.name}” will be removed{confirmDelete.scheduled ? ', and its scheduled emails will stop' : ''}. This can’t be undone.
-              </p>
-            </div>
-            <div className="confirm-modal-actions">
-              <button
-                className="confirm-modal-btn confirm-modal-btn--outlined"
-                onClick={() => setConfirmDelete(null)}
-              >
-                Cancel
-              </button>
-              <button
-                className="confirm-modal-btn confirm-modal-btn--danger"
-                onClick={() => {
-                  onDelete(confirmDelete.id)
-                  setConfirmDelete(null)
-                }}
-              >
-                Delete Report
-              </button>
-            </div>
-          </>
-        )}
-      </ConfirmModal>
 
       {/* Full recipient list — opened from the "+N" avatar (Figma 11643:136449). */}
       <ConfirmModal

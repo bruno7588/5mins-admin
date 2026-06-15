@@ -8,6 +8,9 @@ import Dropdown from '../../../../components/Dropdown/Dropdown'
 import Toggle from '../../../../components/Toggle/Toggle'
 import RecipientsField from './RecipientsField'
 import CsvIcon from '../../../../components/icons/CsvIcon'
+import MoreIcon from '../../../../components/icons/MoreIcon'
+import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal'
+import { Eye, Trash, Danger } from 'iconsax-react'
 import { FILTER_BY_ID, filterOptions } from '../FilterListbox/FilterListbox'
 import { orgUserByEmail, CURRENT_USER_EMAIL } from '../../../../utils/orgUsers'
 import {
@@ -34,8 +37,13 @@ interface SaveReportDrawerProps {
   currentFilters: FilterEntry[]
   /** Download the report being edited as CSV. */
   onDownload?: (report: SavedReport) => void
-  /** Seed from `initial` but present as a brand-new report (Duplicate flow). */
-  isDuplicate?: boolean
+  /** Apply the report's filters to the table (from the in-drawer actions menu). */
+  onViewInTable?: (report: SavedReport) => void
+  /** Delete the report being edited (from the in-drawer actions menu). */
+  onDelete?: (id: string) => void
+  /** Skip the slide-in/fade entrance — used when handing off from the reports
+   *  list so the panel swaps content in place instead of jumping. */
+  instant?: boolean
 }
 
 const FREQ_OPTIONS = REPORT_FREQUENCIES.map((f) => ({ value: f.value, label: f.label }))
@@ -180,11 +188,13 @@ function todayISO(): string {
   return `${d.getFullYear()}-${m}-${day}`
 }
 
-function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters, onDownload, isDuplicate }: SaveReportDrawerProps) {
-  // A duplicate is seeded from an existing report but saved as a new one, so it
-  // is framed as "Save a new report", not an edit.
-  const isEditing = !!initial && !isDuplicate
+function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters, onDownload, onViewInTable, onDelete, instant }: SaveReportDrawerProps) {
+  const isEditing = !!initial
   const [closing, setClosing] = useState(false)
+  // In-drawer actions menu (View Records / Delete) + delete confirmation.
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const [name, setName] = useState('')
   const [scheduled, setScheduled] = useState(false)
@@ -230,9 +240,7 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters, onDo
         setTimezone(initial.timezone || defaultTimezone())
         setReportId(initial.id)
         setCreatedAt(initial.createdAt)
-        // A duplicate is a new report authored by the current user, not a
-        // re-open of someone else's — so it inherits the current creator.
-        setCreatedBy(isDuplicate ? CURRENT_USER_EMAIL : initial.createdBy ?? CURRENT_USER_EMAIL)
+        setCreatedBy(initial.createdBy ?? CURRENT_USER_EMAIL)
       } else {
         setName('')
         setScheduled(false)
@@ -268,6 +276,16 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters, onDo
     return () => document.removeEventListener('keydown', onKey)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
+
+  // Close the actions menu on outside click.
+  useEffect(() => {
+    if (!menuOpen) return
+    const onClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false)
+    }
+    document.addEventListener('mousedown', onClickOutside)
+    return () => document.removeEventListener('mousedown', onClickOutside)
+  }, [menuOpen])
 
   if (!open) return null
 
@@ -318,12 +336,12 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters, onDo
   return (
     <>
       <div
-        className={`overlay-backdrop${closing ? ' overlay-backdrop--closing' : ''}`}
+        className={`overlay-backdrop${closing ? ' overlay-backdrop--closing' : instant ? ' overlay-backdrop--instant' : ''}`}
         onClick={handleClose}
         aria-hidden="true"
       />
       <aside
-        className={`side-drawer${closing ? ' side-drawer--closing' : ''}`}
+        className={`side-drawer${closing ? ' side-drawer--closing' : instant ? ' side-drawer--instant' : ''}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="save-report-drawer-title"
@@ -351,7 +369,56 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters, onDo
                 )
               })()}
             </div>
-            <CloseButton onClick={handleClose} />
+            <div className="rd-header-actions">
+              {isEditing && (onViewInTable || onDelete) && (
+                <div className="rd-more-wrapper" ref={menuRef}>
+                  <button
+                    type="button"
+                    className="rd-icon-btn"
+                    aria-label="Report actions"
+                    aria-haspopup="menu"
+                    aria-expanded={menuOpen}
+                    onClick={() => setMenuOpen((o) => !o)}
+                  >
+                    <MoreIcon size={20} color="var(--text-secondary)" />
+                  </button>
+                  {menuOpen && (
+                    <div className="rd-menu" role="menu">
+                      {onViewInTable && (
+                        <button
+                          type="button"
+                          role="menuitem"
+                          className="rd-menu-item"
+                          onClick={() => {
+                            setMenuOpen(false)
+                            if (initial) onViewInTable(initial)
+                            handleClose()
+                          }}
+                        >
+                          <Eye size={18} color="var(--text-secondary)" variant="Linear" />
+                          View Records
+                        </button>
+                      )}
+                      {onDelete && (
+                        <button
+                          type="button"
+                          role="menuitem"
+                          className="rd-menu-item rd-menu-item--danger"
+                          onClick={() => {
+                            setMenuOpen(false)
+                            setConfirmDelete(true)
+                          }}
+                        >
+                          <Trash size={18} color="var(--danger-500)" variant="Linear" />
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+              <CloseButton onClick={handleClose} />
+            </div>
           </div>
           <div className="modal__divider" />
         </div>
@@ -525,6 +592,40 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters, onDo
           </div>
         </div>
       </aside>
+
+      <ConfirmModal open={confirmDelete} onClose={() => setConfirmDelete(false)}>
+        {initial && (
+          <>
+            <div className="confirm-modal-header confirm-modal-header--center">
+              <div className="confirm-modal-icon">
+                <Danger size={72} color="var(--danger-500)" variant="Linear" />
+              </div>
+              <h2 className="confirm-modal-title">Delete report</h2>
+              <p className="confirm-modal-body">
+                “{initial.name}” will be removed{initial.scheduled ? ', and its scheduled emails will stop' : ''}. This can’t be undone.
+              </p>
+            </div>
+            <div className="confirm-modal-actions">
+              <button
+                className="confirm-modal-btn confirm-modal-btn--outlined"
+                onClick={() => setConfirmDelete(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="confirm-modal-btn confirm-modal-btn--danger"
+                onClick={() => {
+                  setConfirmDelete(false)
+                  onDelete?.(initial.id)
+                  handleClose()
+                }}
+              >
+                Delete Report
+              </button>
+            </div>
+          </>
+        )}
+      </ConfirmModal>
     </>
   )
 }

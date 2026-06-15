@@ -35,6 +35,12 @@
 @keyframes side-drawer-in  { from { transform: translateX(100%); } to { transform: translateX(0); } }
 @keyframes side-drawer-out { from { transform: translateX(0);    } to { transform: translateX(100%); } }
 
+/* Instant mount — used when a drawer hands off to another in place (e.g. the
+   reports list → edit screen), so the panel/backdrop swap content without a
+   slide-in/fade that would read as a jump. */
+.side-drawer--instant { animation: none; }
+.overlay-backdrop--instant { animation: none; }
+
 /* When rendered alongside a collapsed icons-only sidebar (CreateCourse pattern),
    the backdrop stops at the sidebar's left edge so the icons stay visible. The drawer
    itself extends full-width (right: 0) so its panel covers the vertical space above
