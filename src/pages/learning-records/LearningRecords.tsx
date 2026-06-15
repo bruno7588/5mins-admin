@@ -180,19 +180,6 @@ function LearningRecords() {
     setFiltersExpanded(true)
   }, [])
 
-  // "Add a schedule" — open the edit drawer on the report with scheduling
-  // pre-enabled, so the schedule fields are revealed and ready to fill.
-  const scheduleReport = useCallback(
-    (report: SavedReport) => {
-      applyReport(report)
-      setEditingReport({ ...report, scheduled: true })
-      setDuplicating(false)
-      setViewingName(null)
-      setReportsListOpen(false)
-      setReportDrawerOpen(true)
-    },
-    [applyReport],
-  )
 
   // "View in Table" — apply the report's filters and flag it as being viewed.
   const viewReportInTable = useCallback(
@@ -637,7 +624,6 @@ function LearningRecords() {
         reports={reports}
         onEdit={openEditReport}
         onDuplicate={duplicateReport}
-        onSchedule={scheduleReport}
         onApply={viewReportInTable}
         onDelete={deleteReport}
         onDownload={downloadReport}
