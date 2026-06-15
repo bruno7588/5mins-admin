@@ -18,6 +18,14 @@
   line-height: 1.5;
 }
 
+/* "Created by …" provenance line under the title (edit mode) */
+.rd-meta {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
 .rd-subtitle {
   font-size: 14px;
   font-weight: 400;
@@ -408,11 +416,17 @@
   border-radius: var(--radius-s);
   background: transparent;
   cursor: text;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
+  transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+}
+
+.rcp:hover {
+  border-color: var(--neutral-200);
+  background: var(--neutral-25);
 }
 
 .rcp:focus-within {
   border-color: var(--secondary-500);
+  background: transparent;
 }
 
 .rcp--error {
@@ -456,7 +470,7 @@
 
 .rcp-chip-remove:hover {
   background: var(--neutral-200);
-  color: var(--text-primary);
+  color: var(--text-error);
 }
 
 .rcp-input {
@@ -506,7 +520,7 @@
   text-align: left;
 }
 
-.rcp-option.is-active {
+.rcp-option:hover {
   background: var(--cards-background-hover, var(--neutral-50));
 }
 
@@ -562,8 +576,13 @@
 
 /* Envelope avatar for the "Add external email" row (Figma 11597:116482) */
 .rcp-avatar--email {
-  background: var(--border);
+  background: transparent;
   color: var(--text-secondary);
+  transition: background 120ms ease;
+}
+
+.rcp-option:hover .rcp-avatar--email {
+  background: var(--input-background-hover);
 }
 
 .rcp-option-add {

@@ -9,6 +9,7 @@ import Toggle from '../../../../components/Toggle/Toggle'
 import RecipientsField from './RecipientsField'
 import CsvIcon from '../../../../components/icons/CsvIcon'
 import { FILTER_BY_ID, filterOptions } from '../FilterListbox/FilterListbox'
+import { orgUserByEmail, CURRENT_USER_EMAIL } from '../../../../utils/orgUsers'
 import {
   REPORT_FREQUENCIES,
   WEEKDAYS,
@@ -201,6 +202,7 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters, onDo
   // Stable id/createdAt across edits so a re-save updates the same report.
   const [reportId, setReportId] = useState('')
   const [createdAt, setCreatedAt] = useState('')
+  const [createdBy, setCreatedBy] = useState('')
   const [triedSave, setTriedSave] = useState(false)
 
   // Identity of the current open session: the report being edited, or a new
@@ -228,6 +230,9 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters, onDo
         setTimezone(initial.timezone || defaultTimezone())
         setReportId(initial.id)
         setCreatedAt(initial.createdAt)
+        // A duplicate is a new report authored by the current user, not a
+        // re-open of someone else's — so it inherits the current creator.
+        setCreatedBy(isDuplicate ? CURRENT_USER_EMAIL : initial.createdBy ?? CURRENT_USER_EMAIL)
       } else {
         setName('')
         setScheduled(false)
@@ -241,6 +246,7 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters, onDo
         setTimezone(defaultTimezone())
         setReportId(`report-${Date.now()}`)
         setCreatedAt(new Date().toISOString())
+        setCreatedBy(CURRENT_USER_EMAIL)
       }
     }
   }
@@ -283,6 +289,7 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters, onDo
       deliverTime,
       timezone,
       createdAt,
+      createdBy,
       ...extra,
     }
   }
@@ -327,6 +334,22 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters, onDo
               <h2 id="save-report-drawer-title" className="rd-title">
                 {isEditing ? 'Edit report' : 'Save a new report'}
               </h2>
+              {isEditing && createdBy && (() => {
+                const creator = orgUserByEmail(createdBy)
+                const createdLabel = createdAt
+                  ? new Date(createdAt).toLocaleDateString('en-GB', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    })
+                  : ''
+                return (
+                  <p className="rd-meta">
+                    Created by {creator?.name ?? createdBy}
+                    {createdLabel ? ` · ${createdLabel}` : ''}
+                  </p>
+                )
+              })()}
             </div>
             <CloseButton onClick={handleClose} />
           </div>
@@ -468,7 +491,7 @@ function SaveReportDrawer({ open, onClose, onSave, initial, currentFilters, onDo
                     <BellIllustration size={20} />
                   </span>
                   <span className="rd-alert-text">
-                    Scheduled to {nextReportPreview({ frequency, weekday, startDate, monthlyMode, deliverTime, timezone })}
+                    Scheduled for {nextReportPreview({ frequency, weekday, startDate, monthlyMode, deliverTime, timezone })}.
                   </span>
                 </div>
               </div>

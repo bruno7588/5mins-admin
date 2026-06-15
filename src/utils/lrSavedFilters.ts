@@ -24,6 +24,8 @@ export interface SavedReport {
   recipients: string[] // email addresses (only meaningful when scheduled)
   frequency: string // one of REPORT_FREQUENCIES value keys (when scheduled)
   createdAt: string
+  /** Email of the creator — resolves to an org user for the "Created by" line. */
+  createdBy?: string
   // ── Schedule detail (only meaningful when scheduled) ───────────────────────
   /** Weekly cadence: which day of the week to send. One of WEEKDAYS value keys. */
   weekday?: string
@@ -248,15 +250,16 @@ export function nextReportDate(report: Partial<SavedReport>, from: Date = new Da
 /** Human-readable "next report" line, e.g. "Monday, January 5, 2026, at 9:00 AM, London GMT/BST". */
 export function nextReportPreview(report: Partial<SavedReport>): string {
   const d = nextReportDate(report)
-  const date = d.toLocaleDateString('en-US', {
+  const date = d.toLocaleDateString('en-GB', {
     weekday: 'long',
-    month: 'long',
     day: 'numeric',
+    month: 'long',
     year: 'numeric',
   })
   const time = deliveryTimeLabel(report.deliverTime ?? '09:00')
   const tz = report.timezone ?? 'UTC'
-  return `${date}, at ${time}, ${tz === 'UTC' ? 'UTC' : timezoneLabel(tz)}`
+  const tzLabel = tz === 'UTC' ? 'UTC' : timezoneLabel(tz).replace(/[()]/g, '')
+  return `${date}, at ${time}, ${tzLabel}`
 }
 
 /** Human-readable "next report" date based on cadence (legacy, frequency-only). */
@@ -267,7 +270,7 @@ export function nextReportLabel(frequency: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-const REPORTS_KEY = '5mins.lr-reports-v3'
+const REPORTS_KEY = '5mins.lr-reports-v4'
 
 /**
  * Seed reports shown on a fresh load — one per row state: a scheduled report
@@ -288,6 +291,7 @@ export const DEFAULT_REPORTS: SavedReport[] = [
     deliverTime: '09:00',
     timezone: 'UTC',
     createdAt: '2026-01-05T09:00:00.000Z',
+    createdBy: 'ibrahim.khan@example.com',
   },
   {
     id: 'report-seed-quarterly',
@@ -300,6 +304,7 @@ export const DEFAULT_REPORTS: SavedReport[] = [
     deliverTime: '09:00',
     timezone: 'Europe/London',
     createdAt: '2026-02-12T09:00:00.000Z',
+    createdBy: 'julia.romano@example.com',
   },
   {
     id: 'report-seed-unscheduled',
@@ -309,6 +314,7 @@ export const DEFAULT_REPORTS: SavedReport[] = [
     recipients: [],
     frequency: 'monthly',
     createdAt: '2026-03-01T09:00:00.000Z',
+    createdBy: 'hannah.lee@example.com',
   },
 ]
 

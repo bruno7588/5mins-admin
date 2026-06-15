@@ -45,3 +45,9 @@ export function searchOrgUsers(query: string, exclude: string[] = []): OrgUser[]
 export function orgUserByEmail(email: string): OrgUser | undefined {
   return ORG_USERS.find((u) => norm(u.email) === norm(email))
 }
+
+/**
+ * The signed-in admin persona for this prototype — used as the creator of any
+ * report saved in-session (the app has no real auth yet).
+ */
+export const CURRENT_USER_EMAIL = 'laura.pereira@example.com'
