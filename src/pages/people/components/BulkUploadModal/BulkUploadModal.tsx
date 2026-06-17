@@ -630,11 +630,17 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
             <div className="bulk-preview">
               {/* Error banner (takes priority over deactivation warning) */}
               {hasErrors ? (
-                <div className="bulk-preview-error-banner">
-                  <Danger size={20} color="var(--danger-500)" variant="Bold" />
-                  <span>
-                    {errorCount} invite{errorCount !== 1 ? 's have' : ' has'} errors. Download the error file to fix your CSV and re-upload to continue.
-                  </span>
+                <div className="bulk-preview-error-bar">
+                  <div className="bulk-preview-error-banner">
+                    <Danger size={20} color="var(--danger-500)" variant="Bold" />
+                    <span>
+                      {errorCount} invite{errorCount !== 1 ? 's have' : ' has'} errors. Download Error File to fix your CSV and re-upload to continue.
+                    </span>
+                  </div>
+                  <button className="bulk-upload-btn-primary bulk-preview-download-error" onClick={handleDownloadErrorFile}>
+                    Download Error File
+                    <DocumentDownload size={20} color="var(--neutral-25)" variant="Linear" />
+                  </button>
                 </div>
               ) : deactivationCount > 0 ? (
                 <div className="bulk-preview-warning-banner">
@@ -664,24 +670,18 @@ function BulkUploadModal({ onClose }: BulkUploadModalProps) {
                 ))}
               </div>
 
-              {/* Error grouping chips + download error file */}
+              {/* Error grouping chips */}
               {previewFilter === 'error' && (
-                <div className="bulk-preview-error-actions">
-                  <div className="bulk-preview-error-chips">
-                    {errorChips.map(chip => (
-                      <Chip
-                        key={chip.key}
-                        label={`${chip.label} (${chip.count})`}
-                        selected={errorCategory === chip.key}
-                        onClick={() => handleErrorCategoryChange(chip.key)}
-                        className="bulk-error-chip"
-                      />
-                    ))}
-                  </div>
-                  <button className="bulk-upload-btn-primary bulk-preview-download-error" onClick={handleDownloadErrorFile}>
-                    Download Error File
-                    <DocumentDownload size={20} color="var(--neutral-25)" variant="Linear" />
-                  </button>
+                <div className="bulk-preview-error-chips">
+                  {errorChips.map(chip => (
+                    <Chip
+                      key={chip.key}
+                      label={`${chip.label} (${chip.count})`}
+                      selected={errorCategory === chip.key}
+                      onClick={() => handleErrorCategoryChange(chip.key)}
+                      className="bulk-error-chip"
+                    />
+                  ))}
                 </div>
               )}
 

@@ -512,10 +512,21 @@
 }
 
 /* Error banner */
+/* Row holding the error banner pill + the standalone Download button beside it.
+   Wraps the button below the banner on narrow widths. */
+.bulk-preview-error-bar {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
 .bulk-preview-error-banner {
   display: flex;
   align-items: center;
   gap: var(--space-s);
+  flex: 1;
+  min-width: 0;
   padding: var(--space-s) var(--space-sm);
   background: rgba(223, 22, 66, 0.12);
   border-radius: var(--radius-sm);
@@ -525,7 +536,6 @@
   color: var(--danger-500);
 }
 
-/* Inline "Download Error File" link inside the error banner */
 /* Warning banner */
 .bulk-preview-warning-banner {
   display: flex;
@@ -1001,17 +1011,8 @@
 }
 
 /* ─── Error grouping chips + Download Error File ─── */
-.bulk-preview-error-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  width: 100%;
-}
-
 .bulk-preview-error-chips {
   display: flex;
-  flex: 1;
-  min-width: 0;
   flex-wrap: wrap;
   gap: 12px;
 }
@@ -1086,7 +1087,7 @@
   font-size: 13px;
   font-weight: 700;
   line-height: 1.4;
-  color: var(--danger-400);
+  color: var(--danger-100);
   white-space: nowrap;
 }
 
