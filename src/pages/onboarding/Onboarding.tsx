@@ -103,7 +103,7 @@ export default function Onboarding() {
     const rest = form.querySelectorAll('.onboarding__field, .onboarding__footer')
     const ctx = gsap.context(() => {
       gsap.set(form, { autoAlpha: 1 })
-      gsap.fromTo(form, { x: 48 * dir }, { x: 0, duration: 0.45, ease: 'power3.out' })
+      gsap.fromTo(form, { y: 48 * dir }, { y: 0, duration: 0.45, ease: 'power3.out' })
       // Header leads in first…
       gsap.fromTo(
         header,
@@ -149,7 +149,7 @@ export default function Onboarding() {
       }
       animatingRef.current = true
       gsap.to(formRef.current, {
-        x: -48 * dir,
+        y: -48 * dir,
         autoAlpha: 0,
         duration: 0.26,
         ease: 'power2.in',
