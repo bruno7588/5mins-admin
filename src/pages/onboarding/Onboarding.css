@@ -49,15 +49,38 @@
   flex-shrink: 0;
 }
 
-/* ---- Scroll mode (long chip lists): footer flows directly under the content
-   rather than being pinned to the panel bottom. If the expanded content
-   overflows, the panel scrolls with the scrollbar hidden. ---- */
+/* ---- Scroll mode (long chip lists) ----
+   The form sizes to its content (flex-grow: 0) but may shrink when space is
+   tight. On tall screens it stays content-sized, so the footer sits right
+   under the chips. On short screens it caps to the available height and the
+   fields area scrolls while the header + footer stay pinned. Scrollbar hidden. */
 .onboarding--scroll .onboarding__panel {
+  overflow: hidden;
+}
+
+.onboarding--scroll .onboarding__column {
+  min-height: 0;
+}
+
+.onboarding--scroll .onboarding__form {
+  flex: 0 1 auto;
+  min-height: 0;
+}
+
+.onboarding--scroll .onboarding__header,
+.onboarding--scroll .onboarding__footer {
+  flex-shrink: 0;
+}
+
+.onboarding--scroll .onboarding__fields {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
 }
 
-.onboarding--scroll .onboarding__panel::-webkit-scrollbar {
+.onboarding--scroll .onboarding__fields::-webkit-scrollbar {
   display: none; /* Chrome/Safari */
 }
 
