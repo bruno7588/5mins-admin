@@ -4,10 +4,10 @@ import {
   Add,
   FlashCircle,
   Mobile,
-  Setting2,
   ShieldSecurity,
 } from 'iconsax-react'
 import { Logo, learnerSideItems } from '../my-team/MyTeam'
+import ProfileMenu from '../../components/ProfileMenu/ProfileMenu'
 import '../my-team/MyTeam.css'
 import './Workspace.css'
 
@@ -78,13 +78,7 @@ function Workspace() {
             </button>
           </nav>
 
-          <div className="mt-side__profile">
-            <div className="mt-side__profile-info">
-              <p className="mt-side__profile-name">Anthonny Wallace</p>
-              <p className="mt-side__profile-email">anthonny@email.com</p>
-            </div>
-            <Setting2 size={16} color="var(--text-secondary)" variant="Linear" />
-          </div>
+          <ProfileMenu />
 
           <div className="mt-side__powered">
             <span>Powered by</span>

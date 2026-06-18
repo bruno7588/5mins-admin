@@ -10,7 +10,6 @@ import {
   Medal,
   UserSquare,
   ShieldSecurity,
-  Setting2,
   FlashCircle,
   Messages2,
   Add,
@@ -25,6 +24,7 @@ import {
   ArrowLeft2,
   ArrowRight2,
 } from 'iconsax-react'
+import ProfileMenu from '../../components/ProfileMenu/ProfileMenu'
 import Tooltip from '../../components/Tooltip/Tooltip'
 import Search from '../../components/Search/Search'
 import Checkbox from '../../components/Checkbox/Checkbox'
@@ -398,13 +398,7 @@ function MyTeam() {
             </button>
           </nav>
 
-          <div className="mt-side__profile">
-            <div className="mt-side__profile-info">
-              <p className="mt-side__profile-name">Anthonny Wallace</p>
-              <p className="mt-side__profile-email">anthonny@email.com</p>
-            </div>
-            <Setting2 size={16} color="var(--text-secondary)" variant="Linear" />
-          </div>
+          <ProfileMenu />
 
           <div className="mt-side__powered">
             <span>Powered by</span>

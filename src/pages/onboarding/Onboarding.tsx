@@ -138,7 +138,7 @@ export default function Onboarding() {
     (target: number, dir: 1 | -1) => {
       if (animatingRef.current || target < 0) return
       if (target >= STEPS.length) {
-        navigate('/my-team')
+        navigate('/workspace')
         return
       }
       dirRef.current = dir

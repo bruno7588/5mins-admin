@@ -1,0 +1,59 @@
+/* Wrapper owns the spacing + positioning context; the card styling itself
+   lives in MyTeam.css (.mt-side__profile). Higher specificity here so the
+   button resets/hover win regardless of stylesheet order. */
+.mt-side__profile-wrap {
+  position: relative;
+  margin: var(--space-sm);
+}
+
+.mt-side__profile-wrap .mt-side__profile {
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: background 150ms ease;
+}
+
+.mt-side__profile-wrap .mt-side__profile:hover {
+  background: var(--input-background-hover);
+}
+
+/* Dropdown — opens upward (the card sits at the bottom of the sidebar) */
+.profile-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 4px);
+  z-index: 1000;
+  padding: 8px;
+  background: var(--cards-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(32, 34, 42, 0.12);
+}
+
+.profile-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-s);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.profile-menu__item:hover {
+  background: var(--page-background-hover, var(--neutral-50));
+}
