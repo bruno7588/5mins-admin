@@ -6,6 +6,7 @@ import './TopNav.css'
 function TopNav() {
   const navigate = useNavigate()
   const goToApp = () => navigate('/my-team')
+  const logOut = () => navigate('/onboarding')
   return (
     <nav className="topnav">
       <div className="topnav-left">
@@ -44,7 +45,7 @@ function TopNav() {
           </button>
         </Tooltip>
         <Tooltip text="Log out" position="Bottom" alignment="End" icon={false}>
-          <button className="topnav-icon-btn" aria-label="Log out">
+          <button className="topnav-icon-btn" aria-label="Log out" onClick={logOut}>
             <Logout size={24} color="var(--neutral-500)" variant="Linear" />
           </button>
         </Tooltip>

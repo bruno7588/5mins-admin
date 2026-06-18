@@ -1,0 +1,90 @@
+/* Grouped role picker listbox (Figma node 9100:541). Lives inside .onboarding,
+   so the dark scoped tokens (--text-primary, --border, …) resolve correctly. */
+.role-search {
+  position: relative;
+  width: 100%;
+}
+
+.role-search__listbox {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 8px;
+  background: #2d313d;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: -4px 0 24px 0 rgba(0, 0, 0, 0.35);
+}
+
+.role-search__group {
+  padding: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.role-search__item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.role-search__item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.role-search__item-label {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.role-search__item-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--text-tertiary);
+}
+
+.role-search__item-emoji {
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.role-search__divider {
+  margin: 4px;
+  height: 1px;
+  background: var(--border);
+  border-radius: 4px;
+}
+
+/* Slim scrollbar to match the design */
+.role-search__listbox::-webkit-scrollbar {
+  width: 6px;
+}
+.role-search__listbox::-webkit-scrollbar-track {
+  background: transparent;
+}
+.role-search__listbox::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 20px;
+}

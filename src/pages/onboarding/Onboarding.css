@@ -1,0 +1,370 @@
+/* Onboarding is dark-by-design (dark mesh gradient + translucent panel), so we
+   override the app's light tokens locally. Everything is scoped under
+   .onboarding to avoid the project's global-CSS class collisions. */
+.onboarding {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #0e0f14;
+  z-index: 100;
+
+  /* Dark token overrides consumed by reused components (InputField, etc.) */
+  --text-primary: #f9f9fa;
+  --text-secondary: #bfc2cc;
+  --text-tertiary: #9ea4b3;
+  --text-disabled: #656b7c;
+  --border: #383d4c;
+  --border-hover: #9ea4b3;
+  --input-background: rgba(69, 76, 94, 0.16);
+  --input-background-hover: #2d313d;
+  --button-background-disabled: #656b7c; /* neutral-400, per Figma */
+}
+
+/* Translucent panel laid over the full-bleed gradient. */
+.onboarding__panel {
+  position: absolute;
+  inset: 32px;
+  border-radius: 32px;
+  background: rgba(15, 16, 20, 0.72);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 56px 24px;
+  overflow: auto;
+}
+
+.onboarding__column {
+  width: 600px;
+  max-width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.onboarding__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* ---- Scroll mode: pin the footer, scroll the fields (long chip lists) ---- */
+.onboarding--scroll .onboarding__panel {
+  overflow: hidden;
+}
+
+.onboarding--scroll .onboarding__column {
+  min-height: 0;
+}
+
+.onboarding--scroll .onboarding__form {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.onboarding--scroll .onboarding__header,
+.onboarding--scroll .onboarding__footer {
+  flex-shrink: 0;
+}
+
+.onboarding--scroll .onboarding__fields {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.onboarding--scroll .onboarding__fields::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* progress dots */
+.onboarding__progress {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.onboarding__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.18);
+  transition: background 250ms ease, width 250ms ease;
+}
+
+.onboarding__dot--active {
+  background: var(--primary-500);
+}
+
+/* form column */
+.onboarding__form {
+  margin-top: 92px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  will-change: transform, opacity;
+}
+
+.onboarding__header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.onboarding__title {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.onboarding__subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  white-space: pre-line;
+  margin: 0;
+}
+
+.onboarding__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.onboarding__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* primary button */
+.onboarding__primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-s);
+  background: var(--primary-600);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background 150ms ease, transform 80ms ease;
+}
+
+.onboarding__primary:hover {
+  background: var(--primary-700);
+}
+
+.onboarding__primary:active {
+  transform: scale(0.98);
+}
+
+.onboarding__primary:disabled {
+  background: var(--button-background-disabled);
+  color: var(--text-button-disabled);
+  cursor: not-allowed;
+}
+
+.onboarding__primary:disabled:hover {
+  background: var(--button-background-disabled);
+}
+
+.onboarding__primary:disabled:active {
+  transform: none;
+}
+
+/* icon-only back button — filled circle (Figma), circular hover */
+.onboarding__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 9999px;
+  background: rgba(69, 76, 94, 0.16);
+  color: var(--neutral-200);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.onboarding__back:hover {
+  background: rgba(69, 76, 94, 0.3);
+  color: var(--neutral-25);
+}
+
+/* ---- Section + chips (Screen 2 experience selector) ---- */
+.onboarding__section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.onboarding__section--spaced {
+  gap: 12px;
+}
+
+.onboarding__section-label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--neutral-200); /* #bfc2cc */
+}
+
+.onboarding__section-hint {
+  font-weight: 400;
+  color: var(--text-tertiary);
+}
+
+.onboarding__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Collapsible chip group: real row + off-screen measurement copy */
+.onboarding__chip-group {
+  position: relative;
+  width: 100%;
+}
+
+.onboarding__chips--measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.onboarding__chip-toggle {
+  cursor: pointer;
+}
+
+/* ---- Skill cards (Screen 4 plan reveal) ---- */
+.onboarding__skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.onboarding__skill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--input-background);
+}
+
+.onboarding__skill-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.onboarding__skill-label {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--neutral-25); /* #f9f9fa */
+  white-space: nowrap;
+}
+
+/* Chip hover on dark (base uses light --neutral-50) */
+.onboarding .chip:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.onboarding .chip--selected:hover {
+  background: var(--secondary-600);
+}
+
+/* ---- Dropdown overrides for the dark panel ---- */
+.onboarding .dropdown-field {
+  gap: 8px; /* label → field, per Figma */
+}
+
+.onboarding .dropdown-trigger:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.onboarding .dropdown-menu {
+  background: #20222a;
+  border-color: var(--border);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+.onboarding .dropdown-option:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Selected option sits on gold — keep its label dark for contrast */
+.onboarding .dropdown-option.is-selected,
+.onboarding .dropdown-option.is-selected:hover:not(:disabled) {
+  color: var(--neutral-800);
+}
+
+/* ---- InputField overrides for the dark panel (per DS input.md) ---- */
+.onboarding .input-field__label {
+  color: var(--neutral-200); /* #bfc2cc */
+}
+
+.onboarding .input-field__input::placeholder {
+  color: var(--text-tertiary); /* neutral-300 #9ea4b3 */
+}
+
+.onboarding .input-field__wrapper:hover {
+  border-color: var(--border-hover, #9ea4b3);
+  background: var(--input-background-hover, #2d313d);
+}
+
+/* Active / Focused — gold border (--selected) */
+.onboarding .input-field__wrapper:focus-within {
+  border-color: var(--selected, #ffbb38);
+  background: transparent;
+}
+
+/* Filled variant (Company) — no border, subtle fill, roomier padding */
+.onboarding .input-field--filled .input-field__wrapper {
+  border-color: transparent;
+  background: rgba(69, 76, 94, 0.16);
+  padding: 12px 16px;
+}
+
+.onboarding .input-field--filled .input-field__wrapper:hover {
+  border-color: transparent;
+  background: rgba(69, 76, 94, 0.22);
+}
+
+/* Keep the disabled (auto-filled) Company field readable on dark */
+.onboarding .input-field--disabled .input-field__label {
+  color: var(--text-secondary);
+}
+
+.onboarding .input-field--disabled .input-field__input {
+  color: var(--text-primary);
+  -webkit-text-fill-color: var(--text-primary);
+}
+
+@media (max-width: 680px) {
+  .onboarding__panel {
+    inset: 12px;
+    padding: 32px 16px;
+    border-radius: 24px;
+  }
+  .onboarding__form {
+    margin-top: 48px;
+  }
+}

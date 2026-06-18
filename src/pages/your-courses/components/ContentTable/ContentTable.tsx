@@ -12,7 +12,7 @@ import {
   ArrowRight2,
   Danger,
 } from 'iconsax-react'
-import AddScormModal from '../AddScormModal/AddScormModal'
+import AddScormModal from '../../../../components/AddScormModal/AddScormModal'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal'
 import ToastContainer, { useToast } from '../../../../components/Toast/Toast'

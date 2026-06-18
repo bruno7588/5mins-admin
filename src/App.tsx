@@ -19,6 +19,8 @@ import QBYourContent from './pages/questions-bank/YourContent'
 import ScormYourContent from './pages/scorm-content/YourContent'
 import ScormCreateCourse from './pages/scorm-content/CreateCourse'
 
+import Onboarding from './pages/onboarding/Onboarding'
+
 import MyTeam from './pages/my-team/MyTeam'
 import Workspace from './pages/workspace/Workspace'
 import Events from './pages/events/Events'
@@ -48,6 +50,7 @@ function App() {
           </div>
         }
       />
+      <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/my-team" element={<MyTeam />} />
       <Route path="/workspace" element={<Workspace />} />
       <Route path="/events" element={<Events />} />

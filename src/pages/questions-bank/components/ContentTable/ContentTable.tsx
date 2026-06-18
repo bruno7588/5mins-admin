@@ -12,7 +12,7 @@ import {
   ArrowLeft2,
   ArrowRight2,
 } from 'iconsax-react'
-import AddScormModal from '../AddScormModal/AddScormModal'
+import AddScormModal from '../../../../components/AddScormModal/AddScormModal'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import MoreIcon from '../../../../components/icons/MoreIcon'
 import './ContentTable.css'

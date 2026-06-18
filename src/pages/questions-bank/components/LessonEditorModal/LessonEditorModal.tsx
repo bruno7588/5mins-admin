@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ArrowDown2, Eye } from 'iconsax-react'
 import type { ContentRow } from '../ContentTable/ContentTable'
-import QuizTab from '../QuizTab/QuizTab'
+import QuizTab from '../../../../components/QuizTab/QuizTab'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import InfoIcon from '../../../../components/icons/InfoIcon'
 import './LessonEditorModal.css'
