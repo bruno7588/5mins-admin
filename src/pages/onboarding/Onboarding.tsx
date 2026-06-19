@@ -10,7 +10,6 @@ import StepRole from './steps/StepRole'
 import StepDetails from './steps/StepDetails'
 import StepPlan from './steps/StepPlan'
 import StepTools from './steps/StepTools'
-import SplashScreen from './SplashScreen'
 import { EMPTY_ONBOARDING, type OnboardingData, type StepProps } from './types'
 import './Onboarding.css'
 
@@ -80,9 +79,6 @@ export default function Onboarding() {
   // swap, which waits for the form to slide out.
   const [gradientIndex, setGradientIndex] = useState(0)
   const [data, setData] = useState<OnboardingData>(EMPTY_ONBOARDING)
-  // Once the final step is confirmed we swap the form for the loading splash,
-  // which plays the Hugo animation before navigating to the Workspace.
-  const [finishing, setFinishing] = useState(false)
 
   const formRef = useRef<HTMLDivElement>(null)
   const dirRef = useRef(1) // 1 = forward, -1 = back
@@ -142,7 +138,7 @@ export default function Onboarding() {
     (target: number, dir: 1 | -1) => {
       if (animatingRef.current || target < 0) return
       if (target >= STEPS.length) {
-        setFinishing(true) // show the loading splash; it navigates when done
+        navigate('/workspace')
         return
       }
       dirRef.current = dir
@@ -170,8 +166,6 @@ export default function Onboarding() {
   return (
     <div className={`onboarding${current.scrollable ? ' onboarding--scroll' : ''}`}>
       <MeshGradient config={ONBOARDING_GRADIENTS[gradientIndex]} morphDuration={2.2} />
-
-      {finishing && <SplashScreen onDone={() => navigate('/workspace')} />}
 
       <div className="onboarding__panel">
         <div className="onboarding__column">
