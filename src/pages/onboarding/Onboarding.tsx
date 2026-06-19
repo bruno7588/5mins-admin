@@ -211,8 +211,8 @@ export default function Onboarding() {
         <MeshGradient
           config={ONBOARDING_GRADIENTS[gradientIndex]}
           morphDuration={2.2}
-          breathe={2.4}
-          breatheSpeed={3}
+          breathe={3.2}
+          breatheSpeed={4}
         />
 
         <div className="onboarding__panel onboarding__panel--loading">

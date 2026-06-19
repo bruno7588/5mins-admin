@@ -383,7 +383,7 @@
 }
 
 .onboarding .dropdown-option:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--neutral-600);
 }
 
 /* Selected option sits on gold — keep its label dark for contrast */
