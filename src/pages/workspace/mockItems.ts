@@ -1,3 +1,5 @@
+import programBanner from '../../assets/programs/banner.jpg'
+
 export interface WorkspaceCourse {
   id: string
   title: string
@@ -55,6 +57,40 @@ export const workspaceCourses: WorkspaceCourse[] = [
     progress: 60,
     lessonCount: 9,
     durationMinutes: 38,
+  },
+]
+
+export interface WorkspaceProgram {
+  id: string
+  title: string
+  description: string
+  thumbnailGradient: string
+  /** Background photo for the banner; falls back to the gradient when absent. */
+  image?: string
+}
+
+export const workspacePrograms: WorkspaceProgram[] = [
+  {
+    id: 'p1',
+    title: 'Technical Product Manager Certification',
+    description:
+      'The Technical Product Manager Certification equips you with skills to lead product development and bridge technical teams with business goals. Gain expertise in managing product lifecycles, prioritizing features, and driving innovation.',
+    thumbnailGradient: 'linear-gradient(135deg, #6368db, #8158ec)',
+    image: programBanner,
+  },
+  {
+    id: 'p2',
+    title: 'Leadership Essentials Program',
+    description:
+      'A structured path to becoming a confident people leader. Build the habits, conversations, and decision-making frameworks that high-performing managers rely on every day.',
+    thumbnailGradient: 'linear-gradient(135deg, #00afc4, #6368db)',
+  },
+  {
+    id: 'p3',
+    title: 'Data-Driven Decision Making',
+    description:
+      'Learn to turn data into action. This program covers analytics fundamentals, interpreting metrics, and communicating insights that move the business forward.',
+    thumbnailGradient: 'linear-gradient(135deg, #f97316, #df1642)',
   },
 ]
 

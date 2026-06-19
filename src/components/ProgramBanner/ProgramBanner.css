@@ -1,0 +1,137 @@
+.program-banner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  border-radius: 16px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+}
+
+/* Dark scrim over the photo/gradient — darkens on hover for an interactive feel. */
+.program-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 16, 20, 0.72);
+  transition: background 200ms ease;
+  pointer-events: none;
+}
+
+.program-banner:hover::before {
+  background: rgba(15, 16, 20, 0.8);
+}
+
+.program-banner > * {
+  position: relative;
+  z-index: 1;
+}
+
+.program-banner__content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: program-banner-fade 0.4s ease;
+}
+
+@keyframes program-banner-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.program-banner__label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: rgba(249, 249, 250, 0.5);
+}
+
+.program-banner__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #f9f9fa;
+}
+
+.program-banner__desc {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgba(249, 249, 250, 0.72);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.program-banner__actions {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.program-banner__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary-600);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #f9f9fa;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms ease;
+}
+
+.program-banner__cta:hover {
+  background: var(--primary-700);
+}
+
+.program-banner__nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.program-banner__navbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(249, 249, 250, 0.16);
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.program-banner__navbtn:hover {
+  background: rgba(249, 249, 250, 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .program-banner__content {
+    animation: none;
+  }
+}
