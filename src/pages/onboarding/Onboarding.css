@@ -377,7 +377,7 @@
 }
 
 .onboarding .dropdown-menu {
-  background: #20222a;
+  background: var(--neutral-700);
   border-color: var(--border);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
 }
