@@ -1,11 +1,9 @@
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import {
   Add,
-  Book1,
   Clock,
   FlashCircle,
   Lock,
-  Medal,
   Mobile,
   PlayCircle,
   Routing,
@@ -21,6 +19,8 @@ import { workspacePrograms, type CourseStatus } from '../workspace/mockItems'
 import avatar1 from '../../assets/programs/avatar-1.png'
 import avatar2 from '../../assets/programs/avatar-2.png'
 import avatar3 from '../../assets/programs/avatar-3.png'
+import coursesIcon from '../../assets/programs/courses-icon.svg'
+import certificateArt from '../../assets/programs/program-certificate.svg'
 
 const SEGMENTS = 8
 
@@ -110,7 +110,7 @@ function ProgramDetails() {
 
             <div className="pd-banner__meta">
               <span className="pd-meta__item">
-                <Book1 size={16} color="var(--text-tertiary)" variant="Linear" />
+                <img className="pd-meta__icon" src={coursesIcon} alt="" />
                 <span>{program.courseCount} courses</span>
               </span>
               <span className="pd-meta__item">
@@ -164,7 +164,11 @@ function ProgramDetails() {
                           {isLocked ? (
                             course.title
                           ) : (
-                            <button type="button" className="pd-course__titlelink">
+                            <button
+                              type="button"
+                              className="pd-course__titlelink"
+                              onClick={() => navigate(`/courses/${course.id}`)}
+                            >
                               {course.title}
                             </button>
                           )}
@@ -198,15 +202,27 @@ function ProgramDetails() {
                       ) : null}
                     </div>
                     {course.state === 'review' ? (
-                      <button type="button" className="pd-course__cta pd-course__cta--review">
+                      <button
+                        type="button"
+                        className="pd-course__cta pd-course__cta--review"
+                        onClick={() => navigate(`/courses/${course.id}`)}
+                      >
                         Review
                       </button>
                     ) : course.state === 'continue' ? (
-                      <button type="button" className="pd-course__cta">
+                      <button
+                        type="button"
+                        className="pd-course__cta"
+                        onClick={() => navigate(`/courses/${course.id}`)}
+                      >
                         Continue
                       </button>
                     ) : course.state === 'jump-here' ? (
-                      <button type="button" className="pd-course__cta pd-course__cta--jump">
+                      <button
+                        type="button"
+                        className="pd-course__cta pd-course__cta--jump"
+                        onClick={() => navigate(`/courses/${course.id}`)}
+                      >
                         Jump Here
                       </button>
                     ) : isLocked ? (
@@ -225,7 +241,7 @@ function ProgramDetails() {
             <h2 className="pd-section__title">Certification</h2>
             <div className="pd-cert">
               <div className="pd-cert__icon">
-                <Medal size={56} color="var(--neutral-300)" variant="Bold" />
+                <img src={certificateArt} alt="" width={56} height={56} />
               </div>
               <p className="pd-cert__title">Earn your Program certificate</p>
               <div className="pd-cert__lines">

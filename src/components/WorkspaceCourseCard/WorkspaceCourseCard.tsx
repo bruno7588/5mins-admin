@@ -10,7 +10,14 @@ function WorkspaceCourseCard({ course }: { course: WorkspaceCourse }) {
   return (
     <article className="ws-course-card">
       {course.isNew ? <span className="ws-course-card__newbadge">New</span> : null}
-      <div className="ws-course-card__media" style={{ background: course.thumbnailGradient }}>
+      <div
+        className="ws-course-card__media"
+        style={
+          course.image
+            ? { backgroundImage: `url(${course.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+            : { background: course.thumbnailGradient }
+        }
+      >
         {course.dueLabel ? <span className="ws-course-card__duepill">{course.dueLabel}</span> : null}
         <div className="ws-course-card__progress" role="progressbar" aria-valuenow={course.progress} aria-valuemin={0} aria-valuemax={100}>
           {Array.from({ length: SEGMENTS }).map((_, i) => {

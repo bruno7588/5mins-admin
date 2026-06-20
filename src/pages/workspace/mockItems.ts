@@ -5,11 +5,17 @@ import courseThumb3 from '../../assets/programs/course-3.png'
 import courseThumb4 from '../../assets/programs/course-4.png'
 import courseThumb5 from '../../assets/programs/course-5.png'
 import courseThumb6 from '../../assets/programs/course-6.png'
+import enrolledThumb1 from '../../assets/workspace/course-1.png'
+import enrolledThumb2 from '../../assets/workspace/course-2.png'
+import enrolledThumb3 from '../../assets/workspace/course-3.png'
+import enrolledThumb4 from '../../assets/workspace/course-4.png'
 
 export interface WorkspaceCourse {
   id: string
   title: string
   thumbnailGradient: string
+  /** Thumbnail photo; falls back to the gradient when absent */
+  image?: string
   /** 0..100 — used to fill the segmented progress bar */
   progress: number
   lessonCount: number
@@ -25,6 +31,7 @@ export const workspaceCourses: WorkspaceCourse[] = [
     id: 'c1',
     title: 'Leadership that Drives Innovation',
     thumbnailGradient: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+    image: enrolledThumb1,
     progress: 100,
     lessonCount: 11,
     durationMinutes: 29,
@@ -33,6 +40,7 @@ export const workspaceCourses: WorkspaceCourse[] = [
     id: 'c2',
     title: 'My first playlist as a Manager',
     thumbnailGradient: 'linear-gradient(135deg, #0f172a, #1e293b)',
+    image: enrolledThumb2,
     progress: 40,
     lessonCount: 2,
     durationMinutes: 5,
@@ -43,6 +51,7 @@ export const workspaceCourses: WorkspaceCourse[] = [
     id: 'c3',
     title: 'GDPR Essentials (Global)',
     thumbnailGradient: 'linear-gradient(135deg, #38bdf8, #6366f1)',
+    image: enrolledThumb3,
     progress: 25,
     lessonCount: 7,
     durationMinutes: 17,
@@ -52,6 +61,7 @@ export const workspaceCourses: WorkspaceCourse[] = [
     id: 'c4',
     title: 'Personality-Driven Leadership: Leveraging Individual Strengths for Team Success',
     thumbnailGradient: 'linear-gradient(135deg, #f97316, #ef4444)',
+    image: enrolledThumb4,
     progress: 0,
     lessonCount: 8,
     durationMinutes: 33,
@@ -60,6 +70,7 @@ export const workspaceCourses: WorkspaceCourse[] = [
     id: 'c5',
     title: 'Customer Conversations: Building Stronger Relationships',
     thumbnailGradient: 'linear-gradient(135deg, #14b8a6, #06b6d4)',
+    image: enrolledThumb1,
     progress: 60,
     lessonCount: 9,
     durationMinutes: 38,
@@ -193,6 +204,7 @@ export const workspacePrograms: WorkspaceProgram[] = [
     description:
       'A structured path to becoming a confident people leader. Build the habits, conversations, and decision-making frameworks that high-performing managers rely on every day.',
     thumbnailGradient: 'linear-gradient(135deg, #00afc4, #6368db)',
+    image: courseThumb1,
     courseCount: 9,
     durationLabel: '15 min',
     learnerCount: 28,
@@ -236,6 +248,7 @@ export const workspacePrograms: WorkspaceProgram[] = [
     description:
       'Learn to turn data into action. This program covers analytics fundamentals, interpreting metrics, and communicating insights that move the business forward.',
     thumbnailGradient: 'linear-gradient(135deg, #f97316, #df1642)',
+    image: courseThumb3,
     courseCount: 12,
     durationLabel: '18 min',
     learnerCount: 61,

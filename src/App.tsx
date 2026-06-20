@@ -24,6 +24,7 @@ import Onboarding from './pages/onboarding/Onboarding'
 import MyTeam from './pages/my-team/MyTeam'
 import Workspace from './pages/workspace/Workspace'
 import ProgramDetails from './pages/programs/ProgramDetails'
+import ProgramCourseDetails from './pages/courses/CourseDetails'
 import Events from './pages/events/Events'
 import LearningRecords from './pages/learning-records/LearningRecords'
 
@@ -55,6 +56,7 @@ function App() {
       <Route path="/my-team" element={<MyTeam />} />
       <Route path="/workspace" element={<Workspace />} />
       <Route path="/programs/:id" element={<ProgramDetails />} />
+      <Route path="/courses/:id" element={<ProgramCourseDetails />} />
       <Route path="/events" element={<Events />} />
 
       {/* All other pages — with TopNav */}

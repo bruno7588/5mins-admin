@@ -1,0 +1,461 @@
+.cd-body {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 64px;
+}
+
+/* Soft cover image behind the header, faded into the page */
+.cd-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 340px;
+  background-size: cover;
+  background-position: center;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent 80%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent 80%);
+  pointer-events: none;
+}
+
+.cd-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ---- Header card ---- */
+.cd-header {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  background: var(--cards-background);
+  border-radius: 16px;
+  box-shadow: -1px -1px 4px 0 rgba(32, 34, 42, 0.04), 1px 1px 4px 0 rgba(32, 34, 42, 0.04);
+}
+
+.cd-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cd-header__info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cd-meta__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.cd-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cd-iconbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.cd-iconbtn:hover {
+  background: var(--page-background-hover);
+}
+
+.cd-header__title {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cd-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.cd-helper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cd-helper__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.cd-helper__icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+/* Segmented progress (shared by header + lesson rows via .cd-seg) */
+.cd-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: unset;
+  background-color: unset;
+}
+
+.cd-progress__track {
+  flex: 1 0 0;
+  min-width: 0;
+  height: 8px;
+  border-radius: 24px;
+  background: transparent;
+  overflow: hidden;
+}
+
+.cd-progress__fill {
+  height: 100%;
+  border-radius: 24px;
+  background: var(--primary-600);
+}
+
+.cd-seg {
+  flex: 1 0 0;
+  min-width: 0;
+  height: 100%;
+  background: var(--border);
+}
+
+.cd-seg--filled {
+  background: var(--primary-600);
+}
+
+.cd-progress__pct {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* ---- Tabs ---- */
+.cd-tabs {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.cd-tab {
+  position: relative;
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 4px;
+  padding: 0 0 6px;
+  background: none;
+  border: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.cd-tab--active {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.cd-tab--active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--secondary-500);
+}
+
+.cd-tab__count {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 40px;
+  background: var(--input-background);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* ---- Course outline ---- */
+.cd-outline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cd-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cd-section__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cd-section__headline {
+  display: flex;
+  flex: 1 0 0;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cd-section__name {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.cd-section__summary {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+}
+
+.cd-section__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  transition: transform 200ms ease;
+}
+
+.cd-section__chevron--closed {
+  transform: rotate(180deg);
+}
+
+.cd-section__lessons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ---- Lesson card ---- */
+.cd-lesson {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--cards-background);
+  border-radius: 12px;
+  box-shadow: -1px -1px 4px 0 rgba(32, 34, 42, 0.04), 1px 1px 4px 0 rgba(32, 34, 42, 0.04);
+}
+
+/* "Start!" tooltip floating above the active lesson, centered on the card */
+.cd-tooltip {
+  position: absolute;
+  bottom: calc(100% - 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary-600);
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #f9f9fa;
+  white-space: nowrap;
+  box-shadow: -4px 0 12px rgba(32, 34, 42, 0.12);
+  cursor: pointer;
+  transition: background 120ms ease;
+  animation: cd-tooltip-bob 1.6s ease-in-out infinite;
+}
+
+@keyframes cd-tooltip-bob {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, -8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cd-tooltip {
+    animation: none;
+  }
+}
+
+.cd-tooltip:hover {
+  background: var(--primary-700);
+}
+
+.cd-tooltip:hover::after {
+  border-top-color: var(--primary-700);
+}
+
+.cd-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--primary-600);
+}
+
+.cd-lesson__thumb {
+  position: relative;
+  flex: 0 0 auto;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cd-lesson__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cd-lesson--locked .cd-lesson__thumb img {
+  filter: grayscale(1);
+}
+
+.cd-lesson__tag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: var(--border);
+  border-bottom-right-radius: 8px;
+}
+
+.cd-lesson__info {
+  display: flex;
+  flex: 1 0 0;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cd-lesson__title {
+  margin: 0;
+  max-width: 100%;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cd-lesson--locked .cd-lesson__title {
+  color: var(--text-disabled);
+}
+
+.cd-lesson__meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.cd-lesson__metatext {
+  flex: 1 0 0;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cd-lesson--locked .cd-lesson__metatext {
+  color: var(--text-disabled);
+}
+
+.cd-lesson__track {
+  display: flex;
+  flex: 0 0 auto;
+  width: 96px;
+  height: 4px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* ---- Divider ---- */
+.cd-divider {
+  width: 100%;
+  height: 1px;
+  border-radius: 4px;
+  background: var(--border);
+}
+
+.cd-empty {
+  padding: 48px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
