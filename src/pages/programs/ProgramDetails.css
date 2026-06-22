@@ -295,14 +295,15 @@
   color: var(--primary-700);
 }
 
-/* "Jump Here" (the next course to resume) uses an outline-primary button */
-.pd-course__cta--jump {
+/* Outline-primary CTA: used by in-progress "Continue" (not overdue) and the
+   next-up "Start" course. The overdue "Continue" stays filled-primary for urgency. */
+.pd-course__cta--outline {
   background: transparent;
   border: 1px solid var(--primary-600);
   color: var(--primary-600);
 }
 
-.pd-course__cta--jump:hover {
+.pd-course__cta--outline:hover {
   background: var(--primary-100);
 }
 

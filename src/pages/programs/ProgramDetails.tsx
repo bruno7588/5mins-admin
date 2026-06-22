@@ -212,7 +212,7 @@ function ProgramDetails() {
                     ) : course.state === 'continue' ? (
                       <button
                         type="button"
-                        className="pd-course__cta"
+                        className={`pd-course__cta${course.status === 'overdue' ? '' : ' pd-course__cta--outline'}`}
                         onClick={() => navigate(`/courses/${course.id}`)}
                       >
                         Continue
@@ -220,10 +220,10 @@ function ProgramDetails() {
                     ) : course.state === 'jump-here' ? (
                       <button
                         type="button"
-                        className="pd-course__cta pd-course__cta--jump"
+                        className="pd-course__cta pd-course__cta--outline"
                         onClick={() => navigate(`/courses/${course.id}`)}
                       >
-                        Jump Here
+                        Start
                       </button>
                     ) : isLocked ? (
                       <span className="pd-course__lock" aria-label="Locked">

@@ -81,7 +81,7 @@ export const workspaceCourses: WorkspaceCourse[] = [
  * Per-course action state in a program outline:
  * - `completed`  → green "Completed" badge, outline "Review" button
  * - `continue`   → inline progress bar, filled "Continue" button
- * - `jump-here`  → next course to resume, outline-primary "Jump Here" button
+ * - `jump-here`  → next course to resume, outline-primary "Start" button
  * - `locked`     → upcoming course, no button
  */
 /** Button action shown on a course row (independent of the status badge). */
@@ -151,7 +151,8 @@ export const workspacePrograms: WorkspaceProgram[] = [
         lessonCount: 9,
         durationMinutes: 21,
         thumbnail: courseThumb2,
-        state: 'review',
+        state: 'continue',
+        progress: 30,
         status: 'overdue',
         statusLabel: 'Overdue',
       },
