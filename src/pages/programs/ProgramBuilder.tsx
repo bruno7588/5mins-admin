@@ -1,21 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import {
-  Add,
-  Edit2,
-  PlayCircle,
-  Refresh2,
-  Routing,
-  Sms,
-  Trash,
-} from 'iconsax-react'
-import CloseButton from '../../components/CloseButton/CloseButton'
+import { Add, Edit2, PlayCircle, Refresh2, Sms, Trash } from 'iconsax-react'
+import PageHeader from '../your-courses/components/PageHeader/PageHeader'
 import InputField from '../../components/InputField/InputField'
 import Toggle from '../../components/Toggle/Toggle'
 import ToastContainer, { useToast } from '../../components/Toast/Toast'
 import {
-  emptyDraft,
-  getStoredProgramById,
+  loadDraftForBuilder,
   makeId,
   MOCK_LIBRARY,
   saveProgram,
@@ -34,6 +25,8 @@ const STEP_META: Record<StepType, { label: string; icon: typeof PlayCircle }> = 
   review: { label: 'Review', icon: Refresh2 },
 }
 
+const TABS = [{ label: 'Details' }, { label: 'Program Content' }, { label: 'Settings' }]
+
 function formatDate(iso: string): string {
   try {
     return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
@@ -42,7 +35,7 @@ function formatDate(iso: string): string {
   }
 }
 
-/** One-line human summary of a step's release rule, for the row badge. */
+/** One-line human summary of a step's release rule, for the row. */
 function releaseSummary(rule: ReleaseRule, steps: ProgramStep[]): string {
   switch (rule.kind) {
     case 'on-start':
@@ -82,7 +75,8 @@ function ProgramBuilder() {
   const { id } = useParams<{ id: string }>()
   const { toasts, show } = useToast()
 
-  const [draft, setDraft] = useState<ProgramDraft>(() => (id ? getStoredProgramById(id) ?? emptyDraft() : emptyDraft()))
+  const [draft, setDraft] = useState<ProgramDraft>(() => loadDraftForBuilder(id))
+  const [activeTab, setActiveTab] = useState('Details')
   const [editingStepId, setEditingStepId] = useState<string | null>(null)
   const [addMenuOpen, setAddMenuOpen] = useState(false)
   const addMenuRef = useRef<HTMLDivElement>(null)
@@ -126,7 +120,8 @@ function ProgramBuilder() {
 
   const handleSave = (status: 'draft' | 'published') => {
     if (!draft.title.trim()) {
-      show('error', 'Add a program title before saving.')
+      setActiveTab('Details')
+      show('error', 'Add a program name before saving.')
       return
     }
     const toSave = { ...draft, status }
@@ -136,156 +131,170 @@ function ProgramBuilder() {
   }
 
   return (
-    <div className="pb">
-      {/* Top bar */}
-      <header className="pb-topbar">
-        <div className="pb-topbar__left">
-          <CloseButton onClick={() => navigate('/programs')} />
-          <input
-            className="pb-title-input"
-            value={draft.title}
-            placeholder="Untitled program"
-            onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
-          />
-        </div>
-        <div className="pb-topbar__actions">
-          <button className="pb-btn pb-btn--outline" onClick={() => handleSave('draft')}>
-            Save Draft
-          </button>
-          <button className="pb-btn pb-btn--primary" onClick={() => handleSave('published')}>
-            Publish
-          </button>
-        </div>
-      </header>
+    <>
+      <PageHeader
+        title={id ? 'Edit program' : 'Create program'}
+        tabs={TABS}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        secondaryLabel="Save Draft"
+        onSecondary={() => handleSave('draft')}
+        secondaryDisabled={false}
+        primaryLabel="Publish"
+        onPrimary={() => handleSave('published')}
+        primaryDisabled={false}
+        onClose={() => navigate('/programs')}
+      />
 
-      <div className="pb-canvas">
-        <div className="pb-sheet">
-          {/* Meta */}
-          <section className="pb-section">
-            <span className="pb-label">
-              <Routing size={16} color="var(--text-tertiary)" variant="Bold" />
-              Program
-            </span>
-            <InputField
-              label="Description"
-              placeholder="What is this program about?"
-              value={draft.description}
-              onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
-            />
-          </section>
-
-          {/* Steps */}
-          <section className="pb-section">
-            <h2 className="pb-section__title">Program outline</h2>
-
-            {draft.steps.length === 0 ? (
-              <div className="pb-steps-empty">
-                <p>No steps yet. Add a course, email, or review to start the journey.</p>
-              </div>
-            ) : (
-              <div className="pb-steps">
-                <div className="pb-steps__head">
-                  <span className="pb-col pb-col--step">Step</span>
-                  <span className="pb-col pb-col--release">Release</span>
-                  <span className="pb-col pb-col--due">Due date</span>
-                  <span className="pb-col pb-col--actions" aria-hidden="true" />
+      <div className="app-content-area">
+        <main className="main-content">
+          {/* ── Details ── */}
+          {activeTab === 'Details' && (
+            <div className="pb-panel">
+              <div className="pb-section">
+                <InputField
+                  label="Program name"
+                  placeholder="e.g. New Manager Onboarding"
+                  value={draft.title}
+                  onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
+                />
+                <label className="pb-field">
+                  <span className="pb-field__label">Description</span>
+                  <textarea
+                    className="pb-textarea"
+                    rows={4}
+                    value={draft.description}
+                    placeholder="What is this program about?"
+                    onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
+                  />
+                </label>
+                <div className="pb-cover" style={{ backgroundImage: draft.image ? `url(${draft.image})` : draft.thumbnailGradient }}>
+                  <span className="pb-cover__label">Cover</span>
                 </div>
-                {draft.steps.map((step, i) => {
-                  const Meta = STEP_META[step.type]
-                  const Icon = Meta.icon
-                  const sub =
-                    step.type === 'course' && step.lessonCount > 0
-                      ? `${Meta.label} · ${step.lessonCount} lessons · ${step.durationMinutes} min`
-                      : step.type === 'review'
-                        ? `${Meta.label} · ${step.delayDays}d after completion`
-                        : Meta.label
-                  return (
-                    <article
-                      key={step.id}
-                      className={`pb-step${overIndex === i && dragIndex !== null && dragIndex !== i ? ' pb-step--drop' : ''}${dragIndex === i ? ' pb-step--dragging' : ''}`}
-                      draggable
-                      onDragStart={() => setDragIndex(i)}
-                      onDragOver={(e) => {
-                        e.preventDefault()
-                        setOverIndex(i)
-                      }}
-                      onDrop={() => {
-                        if (dragIndex !== null) reorder(dragIndex, i)
-                        setDragIndex(null)
-                        setOverIndex(null)
-                      }}
-                      onDragEnd={() => {
-                        setDragIndex(null)
-                        setOverIndex(null)
-                      }}
-                    >
-                      <span className="pb-col pb-col--step">
-                        <span className="pb-step__grip" aria-hidden="true">⋮⋮</span>
-                        <span className={`pb-step__icon pb-step__icon--${step.type}`}>
-                          <Icon size={20} color="var(--primary-600)" variant="Bold" />
-                        </span>
-                        <span className="pb-step__titlewrap">
-                          <span className="pb-step__title">{step.title}</span>
-                          <span className="pb-step__sub">{sub}</span>
-                        </span>
-                      </span>
-                      <span className="pb-col pb-col--release">{releaseSummary(step.release, draft.steps)}</span>
-                      <span className="pb-col pb-col--due">{step.dueDate ? formatDate(step.dueDate) : '—'}</span>
-                      <span className="pb-col pb-col--actions">
-                        <button className="pb-icon-btn" aria-label="Edit step" onClick={() => setEditingStepId(step.id)}>
-                          <Edit2 size={18} color="var(--text-secondary)" variant="Linear" />
-                        </button>
-                        <button className="pb-icon-btn" aria-label="Remove step" onClick={() => removeStep(step.id)}>
-                          <Trash size={18} color="var(--text-secondary)" variant="Linear" />
-                        </button>
-                      </span>
-                    </article>
-                  )
-                })}
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Add step */}
-            <div className="pb-addstep" ref={addMenuRef}>
-              <button className="pb-addstep__btn" onClick={() => setAddMenuOpen((o) => !o)}>
-                <Add size={20} color="var(--primary-600)" variant="Linear" />
-                Add step
-              </button>
-              {addMenuOpen && (
-                <div className="pb-addmenu" role="menu">
-                  {(['course', 'email', 'review'] as StepType[]).map((t) => {
-                    const Icon = STEP_META[t].icon
-                    return (
-                      <button key={t} className="pb-addmenu__item" role="menuitem" onClick={() => addStep(t)}>
-                        <Icon size={18} color="var(--text-secondary)" variant="Linear" />
-                        <span>
-                          <span className="pb-addmenu__label">{STEP_META[t].label}</span>
-                          <span className="pb-addmenu__desc">
-                            {t === 'course' ? 'A 5Mins course from your library' : t === 'email' ? 'A drip email to learners' : 'Auto spaced-repetition review'}
+          {/* ── Program Content ── */}
+          {activeTab === 'Program Content' && (
+            <div className="pb-panel">
+              <div className="pb-section">
+                <h2 className="pb-section__title">Program outline</h2>
+
+                {draft.steps.length === 0 ? (
+                  <div className="pb-steps-empty">
+                    <p>No steps yet. Add a course, email, or review to start the journey.</p>
+                  </div>
+                ) : (
+                  <div className="pb-steps">
+                    <div className="pb-steps__head">
+                      <span className="pb-col pb-col--step">Step</span>
+                      <span className="pb-col pb-col--release">Release</span>
+                      <span className="pb-col pb-col--due">Due date</span>
+                      <span className="pb-col pb-col--actions" aria-hidden="true" />
+                    </div>
+                    {draft.steps.map((step, i) => {
+                      const Meta = STEP_META[step.type]
+                      const Icon = Meta.icon
+                      const sub =
+                        step.type === 'course' && step.lessonCount > 0
+                          ? `${Meta.label} · ${step.lessonCount} lessons · ${step.durationMinutes} min`
+                          : step.type === 'review'
+                            ? `${Meta.label} · ${step.delayDays}d after completion`
+                            : Meta.label
+                      return (
+                        <article
+                          key={step.id}
+                          className={`pb-step${overIndex === i && dragIndex !== null && dragIndex !== i ? ' pb-step--drop' : ''}${dragIndex === i ? ' pb-step--dragging' : ''}`}
+                          draggable
+                          onDragStart={() => setDragIndex(i)}
+                          onDragOver={(e) => {
+                            e.preventDefault()
+                            setOverIndex(i)
+                          }}
+                          onDrop={() => {
+                            if (dragIndex !== null) reorder(dragIndex, i)
+                            setDragIndex(null)
+                            setOverIndex(null)
+                          }}
+                          onDragEnd={() => {
+                            setDragIndex(null)
+                            setOverIndex(null)
+                          }}
+                        >
+                          <span className="pb-col pb-col--step">
+                            <span className="pb-step__grip" aria-hidden="true">⋮⋮</span>
+                            <span className={`pb-step__icon pb-step__icon--${step.type}`}>
+                              <Icon size={20} color="var(--primary-600)" variant="Bold" />
+                            </span>
+                            <span className="pb-step__titlewrap">
+                              <span className="pb-step__title">{step.title}</span>
+                              <span className="pb-step__sub">{sub}</span>
+                            </span>
                           </span>
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-          </section>
+                          <span className="pb-col pb-col--release">{releaseSummary(step.release, draft.steps)}</span>
+                          <span className="pb-col pb-col--due">{step.dueDate ? formatDate(step.dueDate) : '—'}</span>
+                          <span className="pb-col pb-col--actions">
+                            <button className="pb-icon-btn" aria-label="Edit step" onClick={() => setEditingStepId(step.id)}>
+                              <Edit2 size={18} color="var(--text-secondary)" variant="Linear" />
+                            </button>
+                            <button className="pb-icon-btn" aria-label="Remove step" onClick={() => removeStep(step.id)}>
+                              <Trash size={18} color="var(--text-secondary)" variant="Linear" />
+                            </button>
+                          </span>
+                        </article>
+                      )
+                    })}
+                  </div>
+                )}
 
-          {/* Certificate */}
-          <section className="pb-section">
-            <h2 className="pb-section__title">Certification</h2>
-            <div className="pb-cert">
-              <Toggle
-                label="Award a certificate on completion"
-                checked={draft.certificate.enabled}
-                onChange={() =>
-                  setDraft((d) => ({ ...d, certificate: { ...d.certificate, enabled: !d.certificate.enabled } }))
-                }
-              />
+                {/* Add step */}
+                <div className="pb-addstep" ref={addMenuRef}>
+                  <button className="pb-addstep__btn" onClick={() => setAddMenuOpen((o) => !o)}>
+                    <Add size={20} color="var(--primary-600)" variant="Linear" />
+                    Add step
+                  </button>
+                  {addMenuOpen && (
+                    <div className="pb-addmenu" role="menu">
+                      {(['course', 'email', 'review'] as StepType[]).map((t) => {
+                        const Icon = STEP_META[t].icon
+                        return (
+                          <button key={t} className="pb-addmenu__item" role="menuitem" onClick={() => addStep(t)}>
+                            <Icon size={18} color="var(--text-secondary)" variant="Linear" />
+                            <span>
+                              <span className="pb-addmenu__label">{STEP_META[t].label}</span>
+                              <span className="pb-addmenu__desc">
+                                {t === 'course' ? 'A 5Mins course from your library' : t === 'email' ? 'A drip email to learners' : 'Auto spaced-repetition review'}
+                              </span>
+                            </span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-          </section>
-        </div>
+          )}
+
+          {/* ── Settings ── */}
+          {activeTab === 'Settings' && (
+            <div className="pb-panel">
+              <div className="pb-section">
+                <h2 className="pb-section__title">Certification</h2>
+                <div className="pb-cert">
+                  <Toggle
+                    label="Award a certificate on completion"
+                    checked={draft.certificate.enabled}
+                    onChange={() =>
+                      setDraft((d) => ({ ...d, certificate: { ...d.certificate, enabled: !d.certificate.enabled } }))
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </main>
       </div>
 
       {editingStep && (
@@ -310,7 +319,7 @@ function ProgramBuilder() {
       )}
 
       <ToastContainer toasts={toasts} />
-    </div>
+    </>
   )
 }
 

@@ -99,8 +99,16 @@ export interface ProgramDraft {
 }
 
 const STORAGE_KEY = '5mins-programs'
+const HIDDEN_KEY = '5mins-programs-hidden'
 
 const DEFAULT_GRADIENT = 'linear-gradient(135deg, #6368db, #8158ec)'
+
+/** Display "last updated" date for the seed/mock programs (no real timestamp). */
+const MOCK_UPDATED: Record<string, string> = {
+  p1: '2026-06-18T00:00:00.000Z',
+  p2: '2026-05-30T00:00:00.000Z',
+  p3: '2026-06-10T00:00:00.000Z',
+}
 
 /** Mirror of the `loadUserFields` pattern in BulkUploadModal — fail soft on bad JSON. */
 export function loadPrograms(): ProgramDraft[] {
@@ -129,10 +137,26 @@ export function getStoredProgramById(id: string): ProgramDraft | undefined {
   return loadPrograms().find((p) => p.id === id)
 }
 
+function loadHidden(): string[] {
+  try {
+    const raw = localStorage.getItem(HIDDEN_KEY)
+    return raw ? (JSON.parse(raw) as string[]) : []
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Remove a program from every surface. Drafts are dropped from the store; seed
+ * programs (which can't be mutated) are added to a hidden-ids list that the
+ * list + learner queries filter out.
+ */
 export function deleteProgram(id: string): void {
   const all = loadPrograms().filter((p) => p.id !== id)
+  const hidden = Array.from(new Set([...loadHidden(), id]))
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(all))
+    localStorage.setItem(HIDDEN_KEY, JSON.stringify(hidden))
   } catch {
     /* non-fatal */
   }
@@ -154,6 +178,47 @@ export function emptyDraft(): ProgramDraft {
     status: 'draft',
     lastModified: new Date().toISOString(),
   }
+}
+
+/** Built-in example draft so the admin list always shows a Draft row. */
+export const SEED_DRAFTS: ProgramDraft[] = [
+  {
+    id: 'draft-emerging-leaders',
+    title: 'Emerging Leaders Program',
+    description:
+      'A draft pathway for first-time managers — coaching, feedback, and leading with influence.',
+    thumbnailGradient: 'linear-gradient(135deg, #00afc4, #6368db)',
+    steps: [
+      {
+        id: 'ds-1',
+        type: 'course',
+        title: MOCK_LIBRARY[0].title,
+        courseId: MOCK_LIBRARY[0].courseId,
+        lessonCount: MOCK_LIBRARY[0].lessonCount,
+        durationMinutes: MOCK_LIBRARY[0].durationMinutes,
+        thumbnail: MOCK_LIBRARY[0].thumbnail,
+        release: { kind: 'on-start' },
+      },
+      {
+        id: 'ds-2',
+        type: 'course',
+        title: MOCK_LIBRARY[2].title,
+        courseId: MOCK_LIBRARY[2].courseId,
+        lessonCount: MOCK_LIBRARY[2].lessonCount,
+        durationMinutes: MOCK_LIBRARY[2].durationMinutes,
+        thumbnail: MOCK_LIBRARY[2].thumbnail,
+        release: { kind: 'after-step', stepId: 'ds-1' },
+      },
+    ],
+    certificate: { enabled: true },
+    status: 'draft',
+    lastModified: '2026-06-21T00:00:00.000Z',
+  },
+]
+
+/** A draft's source of truth: a saved draft (localStorage) wins over the seed draft. */
+function getDraftSource(id: string): ProgramDraft | undefined {
+  return getStoredProgramById(id) ?? SEED_DRAFTS.find((d) => d.id === id)
 }
 
 function formatDueDate(iso: string): string {
@@ -214,12 +279,68 @@ export function toWorkspaceProgram(draft: ProgramDraft): WorkspaceProgram {
   }
 }
 
-/** Mock programs + published drafts, for the learner Workspace + ProgramDetails. */
+/** Mock programs + published drafts, for the learner Workspace + ProgramDetails.
+ *  Stored drafts win over a seed program with the same id; hidden ids are excluded. */
 export function getAllPrograms(): WorkspaceProgram[] {
-  const published = loadPrograms()
-    .filter((p) => p.status === 'published')
+  const stored = loadPrograms()
+  const hidden = new Set(loadHidden())
+  const storedIds = new Set(stored.map((p) => p.id))
+  const published = stored
+    .filter((p) => p.status === 'published' && !hidden.has(p.id))
     .map(toWorkspaceProgram)
-  return [...published, ...workspacePrograms]
+  const mock = workspacePrograms.filter((p) => !storedIds.has(p.id) && !hidden.has(p.id))
+  return [...published, ...mock]
+}
+
+/** Build an editable draft from a seed program (for Edit / Duplicate of mock rows). */
+function mockToDraft(p: WorkspaceProgram): ProgramDraft {
+  const steps: ProgramStep[] = p.outline.map((c) => ({
+    id: makeId('step'),
+    type: 'course',
+    title: c.title,
+    courseId: c.id,
+    lessonCount: c.lessonCount,
+    durationMinutes: c.durationMinutes,
+    thumbnail: c.thumbnail,
+    release: { kind: 'on-start' },
+  }))
+  return {
+    id: p.id,
+    title: p.title,
+    description: p.description,
+    thumbnailGradient: p.thumbnailGradient,
+    image: p.image,
+    steps,
+    certificate: { enabled: true },
+    status: 'published',
+    lastModified: MOCK_UPDATED[p.id] ?? new Date().toISOString(),
+  }
+}
+
+/** Draft to hydrate the builder: saved/seed draft → seed-derived from a program → empty (new). */
+export function loadDraftForBuilder(id?: string): ProgramDraft {
+  if (!id) return emptyDraft()
+  const draft = getDraftSource(id)
+  if (draft) return draft
+  const mock = workspacePrograms.find((p) => p.id === id)
+  return mock ? mockToDraft(mock) : emptyDraft()
+}
+
+/** Clone a program (draft or seed) into a new draft, returns the new id. */
+export function duplicateProgram(id: string): string {
+  const draft = getDraftSource(id)
+  const mock = workspacePrograms.find((p) => p.id === id)
+  const src = draft ?? (mock ? mockToDraft(mock) : undefined)
+  if (!src) return ''
+  const copy: ProgramDraft = {
+    ...(JSON.parse(JSON.stringify(src)) as ProgramDraft),
+    id: makeId('prog'),
+    title: `${src.title} (Copy)`,
+    status: 'draft',
+    lastModified: new Date().toISOString(),
+  }
+  saveProgram(copy)
+  return copy.id
 }
 
 /** Row shape for the admin Programs list table. */
@@ -231,31 +352,41 @@ export interface AdminProgramRow {
   courseCount: number
   learnerCount: number
   status: 'draft' | 'published'
-  /** Editable drafts open in the builder; mock programs open the learner view. */
-  isDraft: boolean
+  /** ISO timestamp of the last edit (drafts) or seed display date. */
+  updatedAt: string
 }
 
-/** All programs for the admin list: stored drafts (any status) + mock programs. */
+/** All programs for the admin list: stored drafts (any status) + seed programs,
+ *  deduped by id (stored wins) and minus hidden/deleted ids. */
 export function getAdminProgramRows(): AdminProgramRow[] {
-  const drafts: AdminProgramRow[] = loadPrograms().map((d) => ({
-    id: d.id,
-    title: d.title || 'Untitled program',
-    image: d.image,
-    thumbnailGradient: d.thumbnailGradient,
-    courseCount: d.steps.filter((s) => s.type === 'course').length,
-    learnerCount: 0,
-    status: d.status,
-    isDraft: true,
-  }))
-  const mock: AdminProgramRow[] = workspacePrograms.map((p) => ({
-    id: p.id,
-    title: p.title,
-    image: p.image,
-    thumbnailGradient: p.thumbnailGradient,
-    courseCount: p.courseCount,
-    learnerCount: p.learnerCount,
-    status: 'published',
-    isDraft: false,
-  }))
-  return [...drafts, ...mock]
+  const stored = loadPrograms()
+  const hidden = new Set(loadHidden())
+  const storedIds = new Set(stored.map((p) => p.id))
+  // Saved drafts + built-in seed drafts (saved wins over seed of the same id).
+  const draftSources = [...stored, ...SEED_DRAFTS.filter((d) => !storedIds.has(d.id))]
+  const draftRows: AdminProgramRow[] = draftSources
+    .filter((d) => !hidden.has(d.id))
+    .map((d) => ({
+      id: d.id,
+      title: d.title || 'Untitled program',
+      image: d.image,
+      thumbnailGradient: d.thumbnailGradient,
+      courseCount: d.steps.filter((s) => s.type === 'course').length,
+      learnerCount: 0,
+      status: d.status,
+      updatedAt: d.lastModified,
+    }))
+  const mockRows: AdminProgramRow[] = workspacePrograms
+    .filter((p) => !storedIds.has(p.id) && !hidden.has(p.id))
+    .map((p) => ({
+      id: p.id,
+      title: p.title,
+      image: p.image,
+      thumbnailGradient: p.thumbnailGradient,
+      courseCount: p.courseCount,
+      learnerCount: p.learnerCount,
+      status: 'published',
+      updatedAt: MOCK_UPDATED[p.id] ?? '2026-06-01T00:00:00.000Z',
+    }))
+  return [...draftRows, ...mockRows]
 }

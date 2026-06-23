@@ -183,7 +183,7 @@ function StepConfigDrawer({ step, allSteps, onPatch, onPickCourse, onClose }: Pr
         </div>
 
         <footer className="scd-footer">
-          <button className="pb-btn pb-btn--primary scd-done" onClick={handleClose}>
+          <button className="btn-primary scd-done" onClick={handleClose}>
             Done
           </button>
         </footer>

@@ -18,8 +18,16 @@ export interface Column<T> {
   sortable?: boolean
   /** CSS `flex` shorthand for fixed/uneven widths, e.g. "0 0 52px". Default: equal columns. */
   width?: string
+  /** Horizontal alignment of the header + cell content. Default: left. */
+  align?: 'left' | 'right' | 'center'
   render: (row: T) => ReactNode
 }
+
+const justifyFor = (align?: Column<unknown>['align']) =>
+  align === 'right' ? 'flex-end' : align === 'center' ? 'center' : undefined
+
+const cellStyle = (col: { width?: string; align?: Column<unknown>['align'] }) =>
+  col.width || col.align ? { flex: col.width, justifyContent: justifyFor(col.align) } : undefined
 
 export interface TablePagination {
   from: number
@@ -70,7 +78,7 @@ export function Table<T>({
           <div
             key={col.key}
             className={`tbl-head-cell${col.sortable ? ' is-sortable' : ''}`}
-            style={col.width ? { flex: col.width } : undefined}
+            style={cellStyle(col)}
             onClick={col.sortable ? () => onSort?.(col.key) : undefined}
           >
             <span>{col.header}</span>
@@ -101,7 +109,7 @@ export function Table<T>({
               </div>
             )}
             {columns.map((col) => (
-              <div key={col.key} className="tbl-cell" style={col.width ? { flex: col.width } : undefined}>
+              <div key={col.key} className="tbl-cell" style={cellStyle(col)}>
                 {col.render(row)}
               </div>
             ))}
