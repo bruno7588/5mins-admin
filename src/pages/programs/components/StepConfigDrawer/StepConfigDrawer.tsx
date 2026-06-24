@@ -4,10 +4,10 @@ import Dropdown from '../../../../components/Dropdown/Dropdown'
 import InputField from '../../../../components/InputField/InputField'
 import Collapse from '../../../../components/Collapse/Collapse'
 import {
-  MOCK_LIBRARY,
   type ProgramStep,
   type ReleaseRule,
 } from '../../programStore'
+import { CATALOG_COURSES } from '../../coursesCatalog'
 import './StepConfigDrawer.css'
 
 interface Props {
@@ -79,7 +79,7 @@ function StepConfigDrawer({ step, allSteps, onPatch, onPickCourse, onClose }: Pr
               label="Course"
               placeholder="Select a course"
               value={step.courseId || undefined}
-              options={MOCK_LIBRARY.map((c) => ({ value: c.courseId, label: c.title }))}
+              options={CATALOG_COURSES.map((c) => ({ value: c.courseId, label: c.title }))}
               onChange={onPickCourse}
             />
           )}

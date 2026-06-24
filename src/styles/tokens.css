@@ -57,6 +57,7 @@
   --input-background: rgba(191, 194, 204, 0.16);
   --input-background-hover: rgba(223, 225, 230, 1);
   --border: var(--neutral-100);
+  --border-elevated: var(--neutral-200);
   --border-hover: var(--neutral-300);
   --tooltip-background: #20222a;
   --text-primary: var(--neutral-800);

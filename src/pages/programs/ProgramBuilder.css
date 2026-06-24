@@ -6,74 +6,133 @@
   padding: var(--space-l) 0 80px;
 }
 
-.pb-field {
+/* Courses tab mirrors the Create Course layout: wide (1180px) content column,
+   and full main-content width while the empty state is showing. */
+.pb-panel--courses {
+  max-width: 1180px;
+}
+
+.pb-panel--full {
+  max-width: none;
+}
+
+/* ---- Details tab: banner + inline-editable headline ---- */
+.pb-details {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-.pb-field__label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.pb-textarea {
+  align-items: center;
+  gap: var(--space-l);
   width: 100%;
-  resize: vertical;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--text-primary);
-  background: var(--cards-background);
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--space-l) 0 80px;
 }
 
-.pb-textarea:focus {
-  outline: none;
-  border-color: var(--primary-600);
-}
-
-.pb-cover {
-  height: 132px;
-  border-radius: 12px;
+.pb-banner {
+  position: relative;
+  width: 100%;
+  height: 136px;
+  border-radius: var(--radius-sm);
   background-size: cover;
   background-position: center;
-  display: flex;
-  align-items: flex-end;
-  padding: 12px;
+  overflow: hidden;
 }
 
-.pb-cover__label {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(249, 249, 250, 0.9);
+.pb-banner__btn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: none;
+  border-radius: var(--radius-full, 999px);
+  background: rgba(15, 16, 20, 0.5);
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.pb-banner__btn:hover {
+  background: rgba(15, 16, 20, 0.7);
+}
+
+.pb-banner__file {
+  display: none;
+}
+
+.pb-headline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+.pb-headline__title,
+.pb-headline__desc {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  text-align: left;
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.5;
+  padding: 0;
+}
+
+.pb-headline__title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pb-headline__desc {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  resize: none;
+  overflow: hidden;
+}
+
+.pb-headline__title::placeholder,
+.pb-headline__desc::placeholder {
+  color: var(--text-disabled);
+}
+
+/* Forward nudge to the Courses tab */
+.pb-details__footer {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pb-next-btn {
+  padding: var(--space-s) var(--space-ml);
+  border: none;
+  border-radius: var(--radius-s);
+  background: var(--primary-600);
+  color: var(--neutral-0);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.pb-next-btn:hover {
+  background: var(--primary-700);
+}
+
+.pb-next-btn:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
 }
 
 .pb-section {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.pb-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.2;
-  color: var(--text-tertiary);
-}
-
-.pb-section__title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.5;
-  color: var(--text-primary);
 }
 
 /* ---- Steps (shared admin card-row pattern, matches .people-table) ---- */
@@ -119,17 +178,56 @@
   gap: 2px;
 }
 
-.pb-steps-empty {
-  padding: 28px;
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-sm);
-  text-align: center;
-  color: var(--text-secondary);
-  font-size: 14px;
+/* ---- Courses empty state (Figma node 2362:33058) ---- */
+.pb-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-m);
+  padding: var(--space-xxl) var(--space-l);
+  border: 1px dashed var(--border-elevated);
+  border-radius: 20px;
+  background: var(--input-background, rgba(69, 76, 94, 0.16));
 }
 
-.pb-steps-empty p {
+.pb-empty__art {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+}
+
+.pb-empty__title {
   margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.pb-empty__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 10px var(--space-ml);
+  border: none;
+  border-radius: var(--radius-s);
+  background: var(--primary-600);
+  color: var(--neutral-0);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.pb-empty__cta:hover {
+  background: var(--primary-700);
+}
+
+.pb-empty__cta:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
 }
 
 .pb-step {
@@ -247,56 +345,67 @@
   background: var(--primary-100);
 }
 
-.pb-addmenu {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  z-index: 20;
-  width: 320px;
-  padding: 6px;
-  background: var(--cards-background);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(32, 34, 42, 0.12);
+/* ---- Settings: Course completion (Figma node 2369:63430) ---- */
+.pb-settings {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-sm);
 }
 
-.pb-addmenu__item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-  transition: background 120ms ease;
-}
-
-.pb-addmenu__item:hover {
-  background: var(--neutral-50);
-}
-
-.pb-addmenu__label {
-  display: block;
-  font-size: 14px;
+.pb-settings__title {
+  margin: 0;
+  font-size: 16px;
   font-weight: 700;
+  line-height: 1.5;
   color: var(--text-primary);
 }
 
-.pb-addmenu__desc {
-  display: block;
-  font-size: 12px;
-  color: var(--text-tertiary);
+.pb-setting-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  padding: var(--space-m);
+  border-radius: var(--radius-sm);
+  background: var(--cards-background);
+  box-shadow: -1px -1px 4px rgba(32, 34, 42, 0.04), 1px 1px 4px rgba(32, 34, 42, 0.04);
 }
 
-/* ---- Certificate ---- */
-.pb-cert {
-  padding: 16px;
-  background: var(--cards-background);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+/* The shared Checkbox is a 32px hit-area (16px box + 8px padding). Offset it so the
+   box sits at the card's left edge, keeps an 8px gap to the text, and centers on the
+   "Certificate" line. */
+.pb-setting-card .checkbox {
+  margin: -4px 0 0 -8px;
+}
+
+.pb-setting-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: 1;
+  min-width: 0;
+}
+
+.pb-setting-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.pb-setting-desc {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.pb-setting-link {
+  color: var(--primary-700);
+  text-decoration: underline;
+}
+
+.pb-setting-link:hover {
+  text-decoration: none;
 }

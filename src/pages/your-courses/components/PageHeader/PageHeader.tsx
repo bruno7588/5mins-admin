@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import './PageHeader.css'
@@ -15,6 +16,7 @@ interface PageHeaderProps {
   onSecondary?: () => void
   secondaryDisabled?: boolean
   primaryLabel?: string
+  primaryIcon?: ReactNode
   onPrimary?: () => void
   primaryDisabled?: boolean
   onClose?: () => void
@@ -41,6 +43,7 @@ function PageHeader({
   onSecondary,
   secondaryDisabled = true,
   primaryLabel = 'Create Course',
+  primaryIcon,
   onPrimary,
   primaryDisabled = true,
   onClose,
@@ -64,6 +67,7 @@ function PageHeader({
             onClick={primaryDisabled ? undefined : onPrimary}
           >
             {primaryLabel}
+            {primaryIcon}
           </button>
           <CloseButton onClick={handleClose} className="page-header-close" />
         </div>

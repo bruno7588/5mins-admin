@@ -1,14 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Add, Edit2, PlayCircle, Refresh2, Sms, Trash } from 'iconsax-react'
+import { Add, Edit2, GalleryAdd, PlayCircle, Refresh2, Sms, Trash } from 'iconsax-react'
 import PageHeader from '../your-courses/components/PageHeader/PageHeader'
-import InputField from '../../components/InputField/InputField'
-import Toggle from '../../components/Toggle/Toggle'
+import Checkbox from '../../components/Checkbox/Checkbox'
 import ToastContainer, { useToast } from '../../components/Toast/Toast'
 import {
   loadDraftForBuilder,
   makeId,
-  MOCK_LIBRARY,
   saveProgram,
   type CourseStep,
   type ProgramDraft,
@@ -16,7 +14,11 @@ import {
   type ReleaseRule,
   type StepType,
 } from './programStore'
+import { getCatalogCourse, type CatalogCourse } from './coursesCatalog'
 import StepConfigDrawer from './components/StepConfigDrawer/StepConfigDrawer'
+import CoursePickerDrawer from './components/CoursePickerDrawer/CoursePickerDrawer'
+import defaultBanner from '../../assets/programs/program-banner-default.png'
+import emptyCoursesPlus from '../../assets/programs/empty-courses-plus.svg'
 import './ProgramBuilder.css'
 
 const STEP_META: Record<StepType, { label: string; icon: typeof PlayCircle }> = {
@@ -25,7 +27,7 @@ const STEP_META: Record<StepType, { label: string; icon: typeof PlayCircle }> = 
   review: { label: 'Review', icon: Refresh2 },
 }
 
-const TABS = [{ label: 'Details' }, { label: 'Program Content' }, { label: 'Settings' }]
+const TABS = [{ label: 'Details' }, { label: 'Courses' }, { label: 'Settings' }]
 
 function formatDate(iso: string): string {
   try {
@@ -52,24 +54,6 @@ function releaseSummary(rule: ReleaseRule, steps: ProgramStep[]): string {
   }
 }
 
-function newStep(type: StepType, steps: ProgramStep[]): ProgramStep {
-  const id = makeId('step')
-  if (type === 'email') {
-    return { id, type: 'email', title: 'New email', subject: '', body: '', release: { kind: 'after-days', days: 1 } }
-  }
-  if (type === 'review') {
-    const lastCourse = [...steps].reverse().find((s) => s.type === 'course')
-    return {
-      id,
-      type: 'review',
-      title: 'Spaced repetition review',
-      delayDays: 14,
-      release: lastCourse ? { kind: 'after-step', stepId: lastCourse.id } : { kind: 'on-start' },
-    }
-  }
-  return { id, type: 'course', title: 'Select a course', courseId: '', lessonCount: 0, durationMinutes: 0, thumbnail: '', release: { kind: 'on-start' } }
-}
-
 function ProgramBuilder() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
@@ -78,33 +62,59 @@ function ProgramBuilder() {
   const [draft, setDraft] = useState<ProgramDraft>(() => loadDraftForBuilder(id))
   const [activeTab, setActiveTab] = useState('Details')
   const [editingStepId, setEditingStepId] = useState<string | null>(null)
-  const [addMenuOpen, setAddMenuOpen] = useState(false)
-  const addMenuRef = useRef<HTMLDivElement>(null)
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const coverInputRef = useRef<HTMLInputElement>(null)
+  const descInputRef = useRef<HTMLTextAreaElement>(null)
 
   // Drag-to-reorder (flat list)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [overIndex, setOverIndex] = useState<number | null>(null)
 
+  // Keep the inline description textarea sized to its content (it has no border/scroll).
   useEffect(() => {
-    if (!addMenuOpen) return
-    const onDown = (e: MouseEvent) => {
-      if (addMenuRef.current && !addMenuRef.current.contains(e.target as Node)) setAddMenuOpen(false)
-    }
-    document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
-  }, [addMenuOpen])
+    const el = descInputRef.current
+    if (!el || activeTab !== 'Details') return
+    el.style.height = 'auto'
+    el.style.height = `${el.scrollHeight}px`
+  }, [draft.description, activeTab])
+
+  const handleCoverChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const url = URL.createObjectURL(file)
+    setDraft((d) => ({ ...d, image: url }))
+    e.target.value = ''
+  }
 
   const editingStep = draft.steps.find((s) => s.id === editingStepId) ?? null
 
   const patchStep = (stepId: string, patch: Partial<ProgramStep>) =>
     setDraft((d) => ({ ...d, steps: d.steps.map((s) => (s.id === stepId ? ({ ...s, ...patch } as ProgramStep) : s)) }))
 
-  const addStep = (type: StepType) => {
-    const step = newStep(type, draft.steps)
-    setDraft((d) => ({ ...d, steps: [...d.steps, step] }))
-    setAddMenuOpen(false)
-    setEditingStepId(step.id)
-  }
+  // Course ids already in the program — the picker shows these as "Remove".
+  const existingCourseIds = draft.steps.filter((s) => s.type === 'course').map((s) => s.courseId)
+
+  // V1: programs bundle courses only. The picker adds/removes courses live.
+  const addCourseFromCatalog = (c: CatalogCourse) =>
+    setDraft((d) => ({
+      ...d,
+      steps: [
+        ...d.steps,
+        {
+          id: makeId('step'),
+          type: 'course' as const,
+          title: c.title,
+          courseId: c.courseId,
+          lessonCount: c.lessonCount,
+          durationMinutes: c.durationMinutes,
+          thumbnail: c.thumb,
+          release: { kind: 'on-start' as const },
+        },
+      ],
+    }))
+
+  const removeCourseFromProgram = (courseId: string) =>
+    setDraft((d) => ({ ...d, steps: d.steps.filter((s) => !(s.type === 'course' && s.courseId === courseId)) }))
 
   const removeStep = (stepId: string) =>
     setDraft((d) => ({ ...d, steps: d.steps.filter((s) => s.id !== stepId) }))
@@ -140,55 +150,83 @@ function ProgramBuilder() {
         secondaryLabel="Save Draft"
         onSecondary={() => handleSave('draft')}
         secondaryDisabled={false}
-        primaryLabel="Publish"
+        primaryLabel={id ? 'Save Changes' : 'Create Program'}
+        primaryIcon={id ? undefined : <Add size={20} color="var(--neutral-0)" variant="Linear" />}
         onPrimary={() => handleSave('published')}
         primaryDisabled={false}
         onClose={() => navigate('/programs')}
       />
 
-      <div className="app-content-area">
+      <div className={`app-content-area${pickerOpen ? ' app-content-area--with-picker' : ''}`}>
         <main className="main-content">
           {/* ── Details ── */}
           {activeTab === 'Details' && (
-            <div className="pb-panel">
-              <div className="pb-section">
-                <InputField
-                  label="Program name"
-                  placeholder="e.g. New Manager Onboarding"
+            <div className="pb-details">
+              <div
+                className="pb-banner"
+                style={{ backgroundImage: `url(${draft.image || defaultBanner})` }}
+              >
+                <button
+                  type="button"
+                  className="pb-banner__btn"
+                  aria-label={draft.image ? 'Change cover image' : 'Add cover image'}
+                  onClick={() => coverInputRef.current?.click()}
+                >
+                  <GalleryAdd size={20} color="var(--neutral-0)" variant="Linear" />
+                </button>
+                <input
+                  ref={coverInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="pb-banner__file"
+                  onChange={handleCoverChange}
+                />
+              </div>
+
+              <div className="pb-headline">
+                <input
+                  className="pb-headline__title"
+                  placeholder="Add program title"
                   value={draft.title}
                   onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
+                  aria-label="Program title"
                 />
-                <label className="pb-field">
-                  <span className="pb-field__label">Description</span>
-                  <textarea
-                    className="pb-textarea"
-                    rows={4}
-                    value={draft.description}
-                    placeholder="What is this program about?"
-                    onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
-                  />
-                </label>
-                <div className="pb-cover" style={{ backgroundImage: draft.image ? `url(${draft.image})` : draft.thumbnailGradient }}>
-                  <span className="pb-cover__label">Cover</span>
-                </div>
+                <textarea
+                  ref={descInputRef}
+                  className="pb-headline__desc"
+                  rows={1}
+                  placeholder="Add a description to your program"
+                  value={draft.description}
+                  onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
+                  aria-label="Program description"
+                />
+              </div>
+
+              <div className="pb-details__footer">
+                <button type="button" className="pb-next-btn" onClick={() => setActiveTab('Courses')}>
+                  Next
+                </button>
               </div>
             </div>
           )}
 
-          {/* ── Program Content ── */}
-          {activeTab === 'Program Content' && (
-            <div className="pb-panel">
+          {/* ── Courses ── */}
+          {activeTab === 'Courses' && (
+            <div className={`pb-panel ${draft.steps.length === 0 ? 'pb-panel--full' : 'pb-panel--courses'}`}>
               <div className="pb-section">
-                <h2 className="pb-section__title">Program outline</h2>
-
                 {draft.steps.length === 0 ? (
-                  <div className="pb-steps-empty">
-                    <p>No steps yet. Add a course, email, or review to start the journey.</p>
+                  <div className="pb-empty">
+                    <img className="pb-empty__art" src={emptyCoursesPlus} alt="" aria-hidden="true" />
+                    <p className="pb-empty__title">Add courses to your program</p>
+                    <button className="pb-empty__cta" onClick={() => setPickerOpen(true)}>
+                      Add Courses
+                      <Add size={20} color="var(--neutral-0)" variant="Linear" />
+                    </button>
                   </div>
                 ) : (
                   <div className="pb-steps">
                     <div className="pb-steps__head">
-                      <span className="pb-col pb-col--step">Step</span>
+                      <span className="pb-col pb-col--step">Course</span>
                       <span className="pb-col pb-col--release">Release</span>
                       <span className="pb-col pb-col--due">Due date</span>
                       <span className="pb-col pb-col--actions" aria-hidden="true" />
@@ -248,31 +286,15 @@ function ProgramBuilder() {
                   </div>
                 )}
 
-                {/* Add step */}
-                <div className="pb-addstep" ref={addMenuRef}>
-                  <button className="pb-addstep__btn" onClick={() => setAddMenuOpen((o) => !o)}>
-                    <Add size={20} color="var(--primary-600)" variant="Linear" />
-                    Add step
-                  </button>
-                  {addMenuOpen && (
-                    <div className="pb-addmenu" role="menu">
-                      {(['course', 'email', 'review'] as StepType[]).map((t) => {
-                        const Icon = STEP_META[t].icon
-                        return (
-                          <button key={t} className="pb-addmenu__item" role="menuitem" onClick={() => addStep(t)}>
-                            <Icon size={18} color="var(--text-secondary)" variant="Linear" />
-                            <span>
-                              <span className="pb-addmenu__label">{STEP_META[t].label}</span>
-                              <span className="pb-addmenu__desc">
-                                {t === 'course' ? 'A 5Mins course from your library' : t === 'email' ? 'A drip email to learners' : 'Auto spaced-repetition review'}
-                              </span>
-                            </span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
+                {/* Add course (the empty state has its own CTA) */}
+                {draft.steps.length > 0 && (
+                  <div className="pb-addstep">
+                    <button className="pb-addstep__btn" onClick={() => setPickerOpen(true)}>
+                      <Add size={20} color="var(--primary-600)" variant="Linear" />
+                      Add Course
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -280,16 +302,25 @@ function ProgramBuilder() {
           {/* ── Settings ── */}
           {activeTab === 'Settings' && (
             <div className="pb-panel">
-              <div className="pb-section">
-                <h2 className="pb-section__title">Certification</h2>
-                <div className="pb-cert">
-                  <Toggle
-                    label="Award a certificate on completion"
+              <div className="pb-settings">
+                <h2 className="pb-settings__title">Course completion</h2>
+                <div className="pb-setting-card">
+                  <Checkbox
                     checked={draft.certificate.enabled}
                     onChange={() =>
                       setDraft((d) => ({ ...d, certificate: { ...d.certificate, enabled: !d.certificate.enabled } }))
                     }
                   />
+                  <div className="pb-setting-body">
+                    <p className="pb-setting-name">Certificate</p>
+                    <p className="pb-setting-desc">
+                      Add a certificate for completion.{' '}
+                      <a className="pb-setting-link" href="#" onClick={(e) => e.preventDefault()}>
+                        Read
+                      </a>{' '}
+                      how certification works.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -303,18 +334,27 @@ function ProgramBuilder() {
           allSteps={draft.steps}
           onPatch={(patch) => patchStep(editingStep.id, patch)}
           onPickCourse={(courseId) => {
-            const lib = MOCK_LIBRARY.find((c) => c.courseId === courseId)
+            const lib = getCatalogCourse(courseId)
             if (lib) {
               patchStep(editingStep.id, {
                 courseId: lib.courseId,
                 title: lib.title,
                 lessonCount: lib.lessonCount,
                 durationMinutes: lib.durationMinutes,
-                thumbnail: lib.thumbnail,
+                thumbnail: lib.thumb,
               } as Partial<CourseStep>)
             }
           }}
           onClose={() => setEditingStepId(null)}
+        />
+      )}
+
+      {pickerOpen && (
+        <CoursePickerDrawer
+          existingCourseIds={existingCourseIds}
+          onAdd={addCourseFromCatalog}
+          onRemove={removeCourseFromProgram}
+          onClose={() => setPickerOpen(false)}
         />
       )}
 

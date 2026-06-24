@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Add, Copy, Edit2, Eye, Routing, Status, Trash } from 'iconsax-react'
+import { Add, Copy, Edit2, Routing, Status, Trash } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import Badge from '../../components/Badge/Badge'
 import Search from '../../components/Search/Search'
@@ -146,10 +146,6 @@ function ProgramsAdmin() {
                 <Edit2 size={18} color="var(--text-secondary)" variant="Linear" />
                 Edit
               </button>
-              <button className="programs-kebab-item" onClick={() => navigate(`/programs/${row.id}`)}>
-                <Eye size={18} color="var(--text-secondary)" variant="Linear" />
-                Preview
-              </button>
               <button className="programs-kebab-item" onClick={() => handleDuplicate(row.id)}>
                 <Copy size={18} color="var(--text-secondary)" variant="Linear" />
                 Duplicate
@@ -208,7 +204,7 @@ function ProgramsAdmin() {
               <p className="programs-empty-desc">
                 {query
                   ? 'No programs match your search. Try another term.'
-                  : 'Bundle courses, emails, and review steps into one guided journey, then assign it to your team.'}
+                  : 'Combine your courses into one guided learning journey, then assign it to your team.'}
               </p>
               {!query && (
                 <button className="programs-create-btn" onClick={() => navigate('/programs/builder')}>

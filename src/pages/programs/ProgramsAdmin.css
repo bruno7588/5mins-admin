@@ -106,14 +106,7 @@
   background: transparent;
   color: var(--text-primary);
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 120ms ease, background 120ms ease;
-}
-
-/* Revealed on row hover or while its menu is open (Figma: actions column empty at rest). */
-.tbl-row:hover .programs-kebab-btn,
-.programs-kebab--open .programs-kebab-btn {
-  opacity: 1;
+  transition: background 120ms ease;
 }
 
 .programs-kebab-btn:hover {
