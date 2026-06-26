@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
-import { Add, ArrowDown2, ArrowLeft2, ArrowRight2, Sort } from 'iconsax-react'
+import { Add, ArrowDown2, ArrowLeft2, ArrowRight2, Calendar, Sort, UserTick } from 'iconsax-react'
 import CloseButton from '../../../../components/CloseButton/CloseButton'
 import Checkbox from '../../../../components/Checkbox/Checkbox'
 import Search from '../../../../components/Search/Search'
-import Badge from '../../../../components/Badge/Badge'
 import Chip from '../../../../components/Chip/Chip'
+import Radio from '../../../../components/Radio/Radio'
+import MiniCalendar from '../CourseOutline/MiniCalendar'
 import bellIllustration from '../../../../assets/programs/bell.svg'
 import './EnrolPeopleDrawer.css'
 
@@ -20,7 +21,8 @@ interface PersonRow {
   name: string
   email: string
   team: string
-  status: 'Registered' | 'Invited'
+  /** Whether the person is already enrolled in this program. */
+  enrolled: boolean
 }
 
 interface CohortRow {
@@ -42,7 +44,7 @@ const PEOPLE: PersonRow[] = PERSON_NAMES.map((name, i) => ({
   name,
   email: `${name.toLowerCase().split(' ')[0]}@${COMPANY.toLowerCase().replace(/[^a-z]/g, '')}.com`,
   team: TEAMS[i % TEAMS.length],
-  status: i % 6 === 0 ? 'Invited' : 'Registered',
+  enrolled: i % 4 === 0,
 }))
 
 const COHORTS: CohortRow[] = [
@@ -58,6 +60,11 @@ const todayISO = () => {
   const d = new Date()
   const pad = (n: number) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
+const fmtDate = (iso: string) => {
+  const [y, m, d] = iso.split('-')
+  return d && m && y ? `${d}/${m}/${y}` : iso
 }
 
 interface Props {
@@ -103,9 +110,10 @@ function DrawerPagination({ page, total, onPage }: { page: number; total: number
 
 function EnrolPeopleDrawer({ open, onClose, launched, onEnrol }: Props) {
   const [closing, setClosing] = useState(false)
-  const [headerTab, setHeaderTab] = useState<'your' | '5mins'>('your')
   const [mode, setMode] = useState<Mode>('all')
+  const [startMode, setStartMode] = useState<'immediately' | 'on-date'>('immediately')
   const [startDate, setStartDate] = useState(todayISO())
+  const [startCalOpen, setStartCalOpen] = useState(false)
 
   // Selection state, kept independent per mode.
   const [allSelected, setAllSelected] = useState(false)
@@ -182,7 +190,7 @@ function EnrolPeopleDrawer({ open, onClose, launched, onEnrol }: Props) {
       const n = selectedCohorts.size
       summary = `${n} ${n === 1 ? 'cohort' : 'cohorts'}`
     }
-    onEnrol(summary, startDate)
+    onEnrol(summary, startMode === 'on-date' ? startDate : todayISO())
   }
 
   if (!open) return null
@@ -205,26 +213,6 @@ function EnrolPeopleDrawer({ open, onClose, launched, onEnrol }: Props) {
             <CloseButton onClick={handleClose} />
           </div>
           <div className="epd-divider" />
-          <div className="epd-tabs" role="tablist">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={headerTab === 'your'}
-              className={`epd-tab${headerTab === 'your' ? ' epd-tab--active' : ''}`}
-              onClick={() => setHeaderTab('your')}
-            >
-              Your Courses
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={headerTab === '5mins'}
-              className={`epd-tab${headerTab === '5mins' ? ' epd-tab--active' : ''}`}
-              onClick={() => setHeaderTab('5mins')}
-            >
-              5Mins Courses
-            </button>
-          </div>
         </header>
 
         {/* Scrollable form */}
@@ -311,10 +299,14 @@ function EnrolPeopleDrawer({ open, onClose, launched, onEnrol }: Props) {
                         </div>
                         <div className="epd-cell epd-cell--team">{p.team}</div>
                         <div className="epd-cell epd-cell--status">
-                          <Badge
-                            type={p.status === 'Registered' ? 'success' : 'warning'}
-                            label={p.status}
-                          />
+                          {p.enrolled ? (
+                            <span className="epd-enrolled-badge">
+                              <UserTick size={16} color="currentColor" variant="Linear" />
+                              Enrolled
+                            </span>
+                          ) : (
+                            <span className="epd-status-empty">–</span>
+                          )}
                         </div>
                       </div>
                     )
@@ -399,13 +391,49 @@ function EnrolPeopleDrawer({ open, onClose, launched, onEnrol }: Props) {
               <span className="epd-date__title">Program start date</span>
               <span className="epd-date__sub">Choose when enrolment should start</span>
             </div>
-            <input
-              type="date"
-              className="epd-date__input"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              aria-label="Program start date"
-            />
+            <div className="epd-date__options">
+              <button
+                type="button"
+                className={`epd-date__opt${startMode === 'immediately' ? ' epd-date__opt--selected' : ''}`}
+                onClick={() => setStartMode('immediately')}
+              >
+                <Radio checked={startMode === 'immediately'} readOnly tabIndex={-1} />
+                <span>immediately</span>
+              </button>
+
+              <div className={`epd-date__opt${startMode === 'on-date' ? ' epd-date__opt--selected' : ''}`}>
+                <button
+                  type="button"
+                  className="epd-date__opt-radio"
+                  onClick={() => setStartMode('on-date')}
+                >
+                  <Radio checked={startMode === 'on-date'} readOnly tabIndex={-1} />
+                  <span>On specific date</span>
+                </button>
+                <div className="epd-date__cal">
+                  <button
+                    type="button"
+                    className={`epd-date__cal-trigger${startMode === 'on-date' ? '' : ' epd-date__cal-trigger--disabled'}${startCalOpen ? ' epd-date__cal-trigger--active' : ''}`}
+                    disabled={startMode !== 'on-date'}
+                    onClick={() => setStartCalOpen((o) => !o)}
+                  >
+                    <span>{fmtDate(startDate)}</span>
+                    <Calendar size={20} color="currentColor" variant="Linear" />
+                  </button>
+                  {startCalOpen && startMode === 'on-date' && (
+                    <div className="epd-date__cal-pop">
+                      <MiniCalendar
+                        value={startDate}
+                        onSelect={(iso) => {
+                          setStartDate(iso)
+                          setStartCalOpen(false)
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

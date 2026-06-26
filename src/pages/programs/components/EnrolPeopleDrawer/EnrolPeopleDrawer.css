@@ -390,16 +390,92 @@
   color: var(--text-secondary);
 }
 
-.epd-date__input {
-  width: 200px;
+/* Two start-mode options: immediately / on specific date (Figma 2423:12442). */
+.epd-date__options {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-m);
+}
+
+.epd-date__opt {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: none;
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+/* Hover fills the whole option (input), per DS: page-background-hover + border-hover. */
+.epd-date__opt:hover {
+  background: var(--page-background-hover);
+  border-color: var(--border-hover);
+}
+
+.epd-date__opt-radio {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+
+.epd-date__cal {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.epd-date__cal-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
   padding: var(--space-s) var(--space-sm);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: none;
   font-size: 14px;
   color: var(--text-primary);
-  font-family: inherit;
   cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.epd-date__cal-trigger:not(.epd-date__cal-trigger--disabled):hover {
+  border-color: var(--border-hover);
+  background: var(--input-background-hover);
+}
+
+/* DS input "active/focused" border (input.md). */
+.epd-date__cal-trigger--active,
+.epd-date__cal-trigger--active:hover {
+  border-color: var(--selected);
+  background: none;
+}
+
+.epd-date__cal-trigger--disabled {
+  color: var(--text-disabled);
+  cursor: default;
+}
+
+.epd-date__cal-pop {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 30;
 }
 
 /* ── Footer ─────────────────────────────────────────────────────────────── */
@@ -428,4 +504,23 @@
   background: var(--button-background-disabled);
   color: var(--text-button-disabled);
   cursor: default;
+}
+
+/* Not-enrolled status placeholder. */
+.epd-status-empty {
+  color: var(--text-tertiary);
+}
+
+/* "Enrolled" badge — neutral chip with user-tick icon (Figma 2383:33403). */
+.epd-enrolled-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: var(--input-background);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
 }
