@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft2, ArrowRight2, Clock, Danger, DocumentDownload, Eye, Link2, More, Profile, TaskSquare, TickCircle, UserMinus } from 'iconsax-react'
+import { ArrowLeft2, ArrowRight2, Clock, Danger, DocumentDownload, Eye, Link2, More, Profile, TaskSquare, TickCircle, UserCirlceAdd, UserMinus } from 'iconsax-react'
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar'
 import Search from '../../components/Search/Search'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
+import ToastContainer, { useToast } from '../../components/Toast/Toast'
 import LearnerProgressDrawer from './components/LearnerProgressDrawer/LearnerProgressDrawer'
-import { loadDraftForBuilder, type CourseStep, type ProgramStep } from './programStore'
+import EnrolPeopleDrawer from './components/EnrolPeopleDrawer/EnrolPeopleDrawer'
+import { loadDraftForBuilder, programLifecycle, type CourseStep, type ProgramStep } from './programStore'
+import ProgramStatusBadge from './components/ProgramStatusBadge/ProgramStatusBadge'
 import coursesIcon from '../../assets/programs/courses-icon.svg'
 import avatar1 from '../../assets/programs/avatar-1.png'
 import avatar2 from '../../assets/programs/avatar-2.png'
@@ -144,6 +147,10 @@ function ProgramAdminDetails() {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [progressLearner, setProgressLearner] = useState<Learner | null>(null)
   const [unenrolTarget, setUnenrolTarget] = useState<Learner | null>(null)
+  const [enrolled, setEnrolled] = useState(false)
+  const [programStart, setProgramStart] = useState<string | null>(null)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const { toasts, show: showToast } = useToast()
   const menuRef = useRef<HTMLDivElement>(null)
 
   const draft = useMemo(() => loadDraftForBuilder(id), [id])
@@ -180,9 +187,33 @@ function ProgramAdminDetails() {
 
   const confirmUnenrol = () => {
     if (!unenrolTarget) return
-    setLearners((ls) => ls.filter((l) => l.id !== unenrolTarget.id))
+    const { id: removedId, name } = unenrolTarget
+    setLearners((ls) => ls.filter((l) => l.id !== removedId))
     setUnenrolTarget(null)
+    showToast('success', `${name} has been unenrolled from this program`)
   }
+
+  const handleEnrol = (summary: string, startDate: string) => {
+    const launching = !enrolled
+    setEnrolled(true)
+    setProgramStart(startDate)
+    setLearners(LEARNERS)
+    setPage(0)
+    setDrawerOpen(false)
+    showToast(
+      'success',
+      launching ? `Program launched — ${summary} enrolled` : `${summary} enrolled in this program`,
+    )
+  }
+
+  // No enrolments until the program is launched, regardless of the seeded table.
+  const enrolledCount = enrolled ? learnerCount : 0
+  // Ready to Launch until launched; once launched, Scheduled while the start date
+  // is in the future, Live once it has arrived.
+  const lifecycle = programLifecycle({
+    learnerCount: enrolledCount,
+    startsAt: programStart ?? undefined,
+  })
 
   const changeTab = (t: string) => {
     setTab(t)
@@ -217,13 +248,16 @@ function ProgramAdminDetails() {
               <Clock size={16} color="var(--text-tertiary)" variant="Linear" />
               {totalMins} mins
             </span>
-            <span className="pad-avatars" aria-hidden="true">
-              <img className="pad-avatars__img" src={avatar1} alt="" />
-              <img className="pad-avatars__img" src={avatar2} alt="" />
-              <img className="pad-avatars__img" src={avatar3} alt="" />
-              <span className="pad-avatars__more">+{Math.max(0, learnerCount - 3)}</span>
-            </span>
-            <span className="pad-meta__item">{learnerCount} learners</span>
+            {enrolledCount > 0 && (
+              <span className="pad-avatars" aria-hidden="true">
+                <img className="pad-avatars__img" src={avatar1} alt="" />
+                <img className="pad-avatars__img" src={avatar2} alt="" />
+                <img className="pad-avatars__img" src={avatar3} alt="" />
+                <span className="pad-avatars__more">+{Math.max(0, enrolledCount - 3)}</span>
+              </span>
+            )}
+            <span className="pad-meta__item">{enrolledCount} learners</span>
+            <ProgramStatusBadge status={lifecycle} />
           </div>
         </div>
 
@@ -299,7 +333,18 @@ function ProgramAdminDetails() {
         ))}
 
       {/* ── Enrolments ── */}
-      {tab === 'Enrolments' && (
+      {tab === 'Enrolments' && (!enrolled ? (
+        <div className="pad-empty-state">
+          <UserCirlceAdd size={72} variant="Bold" color="var(--text-tertiary)" className="pad-empty-state__icon" />
+          <div className="pad-empty-state__info">
+            <h3 className="pad-empty-state__title">You haven’t enrolled any learners yet!</h3>
+            <p className="pad-empty-state__sub">Enrol people to your program</p>
+          </div>
+          <button type="button" className="pad-btn pad-btn--outline" onClick={() => setDrawerOpen(true)}>
+            Enrol People
+          </button>
+        </div>
+      ) : (
         <>
           <div className="pad-stats">
             <div className="pad-stat">
@@ -351,7 +396,7 @@ function ProgramAdminDetails() {
                 Download Report
                 <DocumentDownload size={20} color="currentColor" variant="Linear" />
               </button>
-              <button type="button" className="pad-btn pad-btn--outline">
+              <button type="button" className="pad-btn pad-btn--outline" onClick={() => setDrawerOpen(true)}>
                 Enrol People
               </button>
             </div>
@@ -434,7 +479,7 @@ function ProgramAdminDetails() {
             <TablePagination page={page} total={filteredLearners.length} onPage={setPage} />
           </div>
         </>
-      )}
+      ))}
 
       {/* ── Settings ── */}
       {tab === 'Settings' && <div className="pad-empty">{tab} coming soon.</div>}
@@ -480,6 +525,15 @@ function ProgramAdminDetails() {
           </>
         )}
       </ConfirmModal>
+
+      <EnrolPeopleDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        launched={enrolled}
+        onEnrol={handleEnrol}
+      />
+
+      <ToastContainer toasts={toasts} />
     </div>
   )
 }
